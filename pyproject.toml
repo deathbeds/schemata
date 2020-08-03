@@ -1,0 +1,13 @@
+[build-system]
+requires = ["flit_core >=2,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.flit.metadata]
+module = "schemata"
+author = "deathbeds"
+author-email = "tony.fast@gmail.com"
+requires = ["jsonschema", "babel", "rdflib"]
+keywords = ""
+home-page = "https://github.com/deathbeds/schemata"
+license = "BSD-3-Clause"
+description-file = 'readme.md'
