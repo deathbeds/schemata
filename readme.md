@@ -1,20 +1,31 @@
 # schemata
 
-A primary goal of schemata isa to provide a locale-aware trait system for python uses
-the jsonschema specification.
+A primary goal of schemata isa to provide a locale-aware trait system for python.
 
     import schemata
 
-* types in your locale
-* type validation
-* type discovery
-* type composition
-* rich displays
-* observable objects
+The trait system provides the following features:
 
-# from language agnostic to locale aware
+- [x] Validation
+- [x] Defaults
+- [x] Examples
+- [ ] Locales
+- [ ] Notification
+- [ ] GUI Generation
+  - [x] IPython
+  - [ ] Widgets
+- [ ] Predefined types
+  - [x] `jsonschema` types
+  - [ ] `jsonschema` formats
+  - [x] Container Types
+- [ ] API Compatability
+  - [ ] traitlets
+  - [ ] pydantic
+  - [ ] param
 
-`schemata` implements a locale type system beginning with 
+## from language agnostic to locale aware
+
+`schemata` implements a locale type system beginning with
 URIs and IRIs. It uses symbols as gestures to supplement language
 before building a concrete Python vocabulary.
 
@@ -23,6 +34,8 @@ The symbols and urls can locale specific type systems.
 
 ## supported schema
 
+### `jsonschema`
+
 - [x] jsonschema-core
 - [x] json hyper schema
 - [x] geojson
@@ -30,6 +43,11 @@ The symbols and urls can locale specific type systems.
 - [ ] tableschema
 - [ ] schema.org
 - [ ] notebook format
+
+### python types
+
+- [ ] Instances
+- [ ] Types
 
 Schema must be implemented in two different conformations:
 
