@@ -61,11 +61,11 @@ def schema_from_annotations(annotation) -> typing.Dict[typing.AnyStr, typing.Any
     if isinstance(annotation, typing._GenericAlias):
         if annotation.__origin__ is typing.Union:
             annotation = annotation.__args__
-    if isinstance(annotation, dict):
+    if isinstance(annotation, (dict, frozendict.frozendict)):
         return {k: schema_from_annotations(v) for k, v in annotation.items()}
     if isinstance(annotation, (tuple, list)):
-        return type(annotation)(map(schema_from_annotations, annotation))
+        return list(map(schema_from_annotations, annotation))
     if isinstance(annotation, type):
-        return getattr(type, "__schema__", {})
+        return getattr(annotation, "__schema__", {})
     return annotation
 
