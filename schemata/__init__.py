@@ -7,6 +7,7 @@ from . import protocols
 from . import types
 from .types import *
 from . import geo
+from . import table
 from . import strings
 
 from .core import *
