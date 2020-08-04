@@ -1,20 +1,31 @@
 # schemata
 
-A primary goal of schemata isa to provide a locale-aware trait system for python uses
-the jsonschema specification.
+A primary goal of schemata isa to provide a locale-aware trait system for python.
 
     import schemata
 
-* types in your locale
-* type validation
-* type discovery
-* type composition
-* rich displays
-* observable objects
+The trait system provides the following features:
 
-# from language agnostic to locale aware
+- [x] Validation
+- [x] Defaults
+- [x] Examples
+- [ ] Locales
+- [ ] Notification
+- [ ] GUI Generation
+  - [x] IPython
+  - [ ] Widgets
+- [ ] Predefined types
+  - [x] `jsonschema` types
+  - [ ] `jsonschema` formats
+  - [x] Container Types
+- [ ] API Compatability
+  - [ ] traitlets
+  - [ ] pydantic
+  - [ ] param
 
-`schemata` implements a locale type system beginning with 
+## from language agnostic to locale aware
+
+`schemata` implements a locale type system beginning with
 URIs and IRIs. It uses symbols as gestures to supplement language
 before building a concrete Python vocabulary.
 
@@ -22,6 +33,8 @@ before building a concrete Python vocabulary.
 The symbols and urls can locale specific type systems.
 
 ## supported schema
+
+### `jsonschema`
 
 - [x] jsonschema-core
 - [x] json hyper schema
@@ -31,6 +44,11 @@ The symbols and urls can locale specific type systems.
 - [ ] schema.org
 - [ ] notebook format
 
+### python types
+
+- [ ] Instances
+- [ ] Types
+
 Schema must be implemented in two different conformations:
 
 1. A schema is a meta schema that establishes an abstract type. In this case, the schema defines jsonschema types
@@ -38,3 +56,17 @@ that are not compatible with the base json schema.
 2. A schema derives for the a jsonschema object because it's schema conforms the standard json schema.
 
 ## architecture
+
+## comparison with other trait libraries
+
+`schemata` is preceded by a few different trait libraries `enthought.traits`, `traitlets`, and `pydantic`.
+`traitlets` is a reimplementation of the `enthought.traits` by the `IPython` community; `traitlets` have been the
+configuration for `jupyter` and `IPython` since.
+`traitlets` preceeded a lot of critical web technology critical to the `jupyter` interactive computing ecosystem;
+`traitlets` are only concerned with Python objects and lack features of the modern.
+`pydantic` provides value as trait system by building off of the `jsonschema` specification to validate types.
+`schemata` unifies `traitlets` and `pydantic` by providing a description type interface based off of open web standards.
+
+The desire is a trait system for interactive computing that enables more expressive design and testing of interactive
+computing technology.
+
