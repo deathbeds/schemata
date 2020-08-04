@@ -28,7 +28,7 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
             bases += (base_type,)
 
         # Finally create the type.
-        self = super().__new__(cls, name, bases, kwargs)
+        self = super().__new__(cls, a.get(_("title"), name), bases, kwargs)
 
         # The annotations are frozen
         # Access an equivalent cached type if it exists.
@@ -126,11 +126,44 @@ class meta_schema(
 
 
 class jsonschema(implementation, metaclass=meta_schema):
+    @classmethod
+    def __new_anyof__(cls, object):
+        for schema in cls.__schema__["anyOf"]:
+            try:
+                return jsonschema[schema](object)
+            except:
+                ...
+        cls.validate(object)
+
+    @classmethod
+    def __new_oneof__(cls, object):
+        for i, schema in enumerate(cls.__schema__["oneOf"]):
+            try:
+                self = jsonschema[schema](object)
+                break
+            except:
+                ...
+        else:
+            cls.validate(object)
+
+        for schema in cls.__schema__["oneOf"][i:]:
+            try:
+                jsonschema[schema](object)
+                cls.validate(object)
+            except:
+                ...
+        return self
+
     def __new__(cls, object=None, verified=False):
         if object is None:
             object = cls.__schema__.get(_("default"), object)
             if object is None:
                 object = cls.__schema__.get(_("examples"), [object])[0]
+        if "anyOf" in cls.__schema__:
+            return cls.__new_anyof__(object)
+        if "oneOf" in cls.__schema__:
+            return cls.__new_oneof__(object)
+
         cls.validate(object)
         if issubclass(builtins.type(object), (bool, builtins.type(None))):
             return object
@@ -138,7 +171,9 @@ class jsonschema(implementation, metaclass=meta_schema):
 
     def __init_subclass__(cls):
         util.merge_annotations(cls)
-        cls.__schema__ = util.schema_from_annotations(cls.__annotations__)
+        cls.__schema__ = util.unfreeze(
+            util.schema_from_annotations(cls.__annotations__)
+        )
         __import__("jsonschema").validate(
             cls.__schema__, type(cls).__annotations__, cls=checker.Validator
         )
@@ -174,7 +209,7 @@ class jsonschema(implementation, metaclass=meta_schema):
         """Generate testing strategies from a schema."""
         from hypothesis import strategies
 
-        schema = util.unfreeze(cls.__schema__)
+        schema = cls.__schema__
         strategy = __import__("hypothesis_jsonschema").from_schema(schema)
         if "default" in schema or "examples" in schema:
             strategy = (strategy,)
