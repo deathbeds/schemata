@@ -4,7 +4,6 @@ import jsonschema
 import schemata
 
 
-
 @hypothesis.given(schemata.string.strategy())
 def test_string(value):
     schemata.string(value)
@@ -42,4 +41,26 @@ def test_object(value):
 
 def test_template():
     assert schemata.template(dict(x={"$eval": "foo + 2"}))(dict(foo=4)) == dict(x=6)
+
+# test complex schema
+def test_anyof():
+    anyof = schemata.jsonschema[dict(anyOf=[schemata.integer, schemata.string])]
+    with pytest.raises(jsonschema.ValidationError):
+        anyof({})
+    with pytest.raises(jsonschema.ValidationError):
+        anyof(1.1)
+
+    assert anyof(10)
+    assert anyof("abc")
+
+
+
+stringOrInteger = schemata.jsonschema[
+    dict(anyOf=[schemata.integer, schemata.string], title="stringOrInteger")
+]
+
+
+@hypothesis.given(stringOrInteger.strategy())
+def test_anyof_strategy(value):
+    assert isinstance(value, stringOrInteger)
 
