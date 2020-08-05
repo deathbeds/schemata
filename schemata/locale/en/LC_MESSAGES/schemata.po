@@ -1,0 +1,102 @@
+# Translations template for PROJECT.
+# Copyright (C) 2020 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2020-08-04 19:56-0400\n"
+"PO-Revision-Date: 2020-08-04 20:03-0400\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.8.0\n"
+"X-Generator: Poedit 2.3\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: en\n"
+
+#: Documents/schemata/schemata/core.py:31
+msgid "title"
+msgstr ""
+
+#: Documents/schemata/schemata/core.py:159
+msgid "default"
+msgstr ""
+
+#: Documents/schemata/schemata/core.py:161
+msgid "examples"
+msgstr ""
+
+#: Documents/schemata/schemata/core.py:190
+#: Documents/schemata/schemata/core.py:191
+#: Documents/schemata/schemata/types.py:55
+msgid "contentMediaType"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:9
+#: Documents/schemata/schemata/types.py:10
+#: Documents/schemata/schemata/types.py:12
+msgid "null"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:12
+#: Documents/schemata/schemata/types.py:18
+#: Documents/schemata/schemata/types.py:23
+#: Documents/schemata/schemata/types.py:29
+#: Documents/schemata/schemata/types.py:35
+#: Documents/schemata/schemata/types.py:42
+#: Documents/schemata/schemata/types.py:48
+msgid "type"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:15
+#: Documents/schemata/schemata/types.py:16
+#: Documents/schemata/schemata/types.py:18
+msgid "boolean"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:20
+#: Documents/schemata/schemata/types.py:21
+#: Documents/schemata/schemata/types.py:23
+msgid "integer"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:26
+#: Documents/schemata/schemata/types.py:27
+#: Documents/schemata/schemata/types.py:29
+msgid "number"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:32
+#: Documents/schemata/schemata/types.py:33
+#: Documents/schemata/schemata/types.py:35
+msgid "array"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:39
+#: Documents/schemata/schemata/types.py:40
+#: Documents/schemata/schemata/types.py:42
+msgid "string"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:45
+#: Documents/schemata/schemata/types.py:46
+#: Documents/schemata/schemata/types.py:48
+#: Documents/schemata/schemata/types.py:54
+#: Documents/schemata/schemata/types.py:64
+msgid "object"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:51
+#: Documents/schemata/schemata/types.py:53
+msgid "dict"
+msgstr ""
+
+#: Documents/schemata/schemata/types.py:63
+#: Documents/schemata/schemata/types.py:64
+msgid "template"
+msgstr ""

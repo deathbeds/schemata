@@ -1,10 +1,11 @@
 """The core types of schemata"""
 # We have to use symbollic dictionaries in this script
 import rdflib
-from . import mutable
+from . import mutable, util
 from .core import jsonschema
 
-_ = __import__("gettext").gettext
+_ = locals().get("_", __import__("gettext").gettext)
+
 
 locals()[_("null")] = type(
     _("null"),
@@ -49,17 +50,12 @@ locals()[_("object")] = type(
 )
 
 locals()[_("dict")] = type(
-
     _("dict"),
     (locals()[_("object")],),
     {"__annotations__": {_("contentMediaType"): "application/json"}},
 )
 
 
-def _render_jsone_template(self, object):
-    return __import__("jsone").render(self, object)
-
-
 locals()[_("template")] = type(
-    _("template"), (locals()[_("object")],), {"__call__": _render_jsone_template}
+    _("template"), (locals()[_("object")],), {"__call__": util.render_jsone_template}
 )
