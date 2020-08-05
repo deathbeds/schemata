@@ -1,5 +1,6 @@
 """Utility functions for schemata."""
 
+import contextlib
 import frozendict
 import inspect
 import typing
@@ -68,4 +69,17 @@ def schema_from_annotations(annotation) -> typing.Dict[typing.AnyStr, typing.Any
     if isinstance(annotation, type):
         return getattr(annotation, "__schema__", {})
     return annotation
+
+
+@contextlib.contextmanager
+def swap_locale(locale):
+    import os
+
+    language, lang = os.environ["LANGUAGE"], os.environ["LANG"]
+    os.environ["LANGUAGE"] = os.environ["LANG"] = locale
+    yield
+    os.environ["LANGUAGE"], os.environ["LANG"] = language, lang
+
+def render_jsone_template(self, object):
+    return __import__("jsone").render(self, object)
 
