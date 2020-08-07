@@ -9,7 +9,7 @@ The trait system provides the following features:
 - [x] Validation
 - [x] Defaults
 - [x] Examples
-- [ ] Locales
+- [x] Locales
 - [ ] Notification
 - [ ] GUI Generation
   - [x] IPython
@@ -19,6 +19,7 @@ The trait system provides the following features:
   - [ ] `jsonschema` formats
   - [x] Container Types
 - [ ] API Compatability
+  - [ ] dataclasses (maybe attrs)
   - [ ] traitlets
   - [ ] pydantic
   - [ ] param
@@ -56,6 +57,11 @@ that are not compatible with the base json schema.
 2. A schema derives for the a jsonschema object because it's schema conforms the standard json schema.
 
 ## architecture
+
+Existing trait libraries use special objects, with custom logic, to acheive the features 
+of traitlet patterns. On the other hand, `schemata` provides concrete python types with traitlet features.
+
+`schemata` uses open source projects to extend the abilities of the library.
 
 ## comparison with other trait libraries
 
