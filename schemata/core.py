@@ -175,7 +175,10 @@ class jsonschema(implementation, metaclass=meta_schema):
             util.schema_from_annotations(cls.__annotations__)
         )
         __import__("jsonschema").validate(
-            cls.__schema__, type(cls).__annotations__, cls=checker.Validator
+            cls.__schema__,
+            type(cls).__annotations__,
+            cls=checker.Validator,
+            format_checker=checker.checker,
         )
 
     @classmethod
