@@ -4,6 +4,32 @@ import jsonschema
 import schemata
 
 
+def test_metaschema():
+    assert {"definitions", "dependencies"} == set(
+        jsonschema.Draft7Validator.META_SCHEMA["properties"]
+    ) - set(schemata.core.meta_schema.__annotations__["properties"])
+    assert {
+        "$anchor",
+        "$defs",
+        "$recursiveAnchor",
+        "$recursiveRef",
+        "$vocabulary",
+        "base",
+        "contentSchema",
+        "dependentRequired",
+        "dependentSchemas",
+        "deprecated",
+        "links",
+        "maxContains",
+        "minContains",
+        "unevaluatedItems",
+        "unevaluatedProperties",
+        "writeOnly",
+    } == set(schemata.core.meta_schema.__annotations__["properties"]) - set(
+        jsonschema.Draft7Validator.META_SCHEMA["properties"]
+    )
+
+
 def test_invalid_schema():
     with pytest.raises(jsonschema.ValidationError):
 
