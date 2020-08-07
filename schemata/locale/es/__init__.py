@@ -10,10 +10,8 @@ _module = importlib.util.module_from_spec(
     )
 )
 
-_ = gettext.translation(
-    "schemata", pathlib.Path(schemata.__file__).parent / "locale", languages=["es"]
-)
-_module._ = _.gettext
+_module.__file__ = schemata.types.__file__
+_module.language = "es"
 _module.__loader__.exec_module(_module)
 
 locals().update(vars(_module))
