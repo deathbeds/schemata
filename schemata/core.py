@@ -2,14 +2,15 @@
 import abc
 import typing
 import builtins
-import gettext
 import inspect
 import munch
 import pathlib
 import rdflib
+import schemata
+from . import checker, data, mutable, util, ops, rdf, translate
 
-_ = __import__("gettext").gettext
-from . import checker, data, mutable, util, ops, rdf
+_ = translate.get_translation("en").gettext
+
 
 __all__ = "jsonschema", "protocol"
 
@@ -20,12 +21,14 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
     # A cache of types.
     __types__ = {}
 
-    def __new__(cls, name, bases, kwargs, language="en"):
+    __init_subclass__ = util.merge_annotations
+
+    def __new__(cls, name, bases, kwargs, language=None):
         # ensure we're adding annotations.
         a = kwargs["__annotations__"] = kwargs.get("__annotations__", {})
         if language:
             a["@context"] = a.get("@context", {})
-            a.update({"@language": language})
+            a["@context"].update({"@language": language})
 
         # assign a concrete type the base classes based on URIs.
         base_type = cls.to_type(a, *bases)
@@ -34,19 +37,6 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
 
         # Finally create the type.
         self = super().__new__(cls, a.get("title", name), bases, kwargs)
-
-        _ = gettext.translation(
-            "schemata",
-            pathlib.Path(__file__).parent / "locale",
-            languages=[
-                self.__annotations__.get("@context", {"@language": "en"}).get(
-                    "@language", "en"
-                )
-            ],
-        )
-        self.__name__ = _.gettext(self.__name__)
-
-        self.__annotations__ = util.translate(self.__annotations__, _.gettext)
 
         # The annotations are frozen
         # Access an equivalent cached type if it exists.
@@ -76,8 +66,6 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
                     type = rdflib.URIRef(cls.__schema__.get("@type"))
                     if type in rdf.types:
                         return rdf.types[type]
-
-    __init_subclass__ = util.merge_annotations
 
     def __instancecheck__(cls, object):
         try:
@@ -155,7 +143,6 @@ class jsonschema(implementation, metaclass=meta_schema):
                 ...
         cls.validate(object)
 
-    @classmethod
     def __new_oneof__(cls, object):
         for i, schema in enumerate(cls.__schema__["oneOf"]):
             try:
@@ -194,17 +181,24 @@ class jsonschema(implementation, metaclass=meta_schema):
         cls.__schema__ = util.unfreeze(
             util.schema_from_annotations(cls.__annotations__)
         )
+
+        language = cls.__schema__.get("@context", {}).get("@language", "en")
+
         __import__("jsonschema").validate(
             cls.__schema__,
-            type(cls).__annotations__,
-            cls=checker.Validator,
+            translate.translate(type(cls).__annotations__, language),
+            cls=checker.localize_validator(language),
             format_checker=checker.checker,
         )
 
     @classmethod
     def validate(cls, object: typing.Any):
         """Validate an  object against a schema."""
-        __import__("jsonschema").validate(object, cls.__schema__, cls=checker.Validator)
+        language = cls.__schema__.get("@context", {}).get("@language", "en")
+
+        __import__("jsonschema").validate(
+            object, cls.__schema__, cls=checker.localize_validator(language)
+        )
 
     # IPython display features
     def _repr_data_(self) -> typing.Dict[str, str]:

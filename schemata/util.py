@@ -76,15 +76,3 @@ def schema_from_annotations(annotation) -> typing.Dict[typing.AnyStr, typing.Any
 def render_jsone_template(self, object):
     return __import__("jsone").render(self, object)
 
-
-def translate(object, _=gettext.gettext):
-    """Iterate through an object an apply translations."""
-    if isinstance(object, rdflib.URIRef):
-        return object
-    elif isinstance(object, str):
-        return _(object)
-    elif isinstance(object, typing.Mapping):
-        return type(object)({_(k): translate(v, _=_) for k, v in object.items()})
-    elif isinstance(object, (list, tuple)):
-        return type(object)(translate(x, _=_) for x in object)
-    return object
