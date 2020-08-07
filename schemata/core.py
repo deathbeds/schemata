@@ -2,8 +2,10 @@
 import abc
 import typing
 import builtins
+import gettext
 import inspect
 import munch
+import pathlib
 import rdflib
 
 _ = __import__("gettext").gettext
@@ -18,9 +20,12 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
     # A cache of types.
     __types__ = {}
 
-    def __new__(cls, name, bases, kwargs):
+    def __new__(cls, name, bases, kwargs, language="en"):
         # ensure we're adding annotations.
         a = kwargs["__annotations__"] = kwargs.get("__annotations__", {})
+        if language:
+            a["@context"] = a.get("@context", {})
+            a.update({"@language": language})
 
         # assign a concrete type the base classes based on URIs.
         base_type = cls.to_type(a, *bases)
@@ -28,7 +33,20 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
             bases += (base_type,)
 
         # Finally create the type.
-        self = super().__new__(cls, a.get(_("title"), name), bases, kwargs)
+        self = super().__new__(cls, a.get("title", name), bases, kwargs)
+
+        _ = gettext.translation(
+            "schemata",
+            pathlib.Path(__file__).parent / "locale",
+            languages=[
+                self.__annotations__.get("@context", {"@language": "en"}).get(
+                    "@language", "en"
+                )
+            ],
+        )
+        self.__name__ = _.gettext(self.__name__)
+
+        self.__annotations__ = util.translate(self.__annotations__, _.gettext)
 
         # The annotations are frozen
         # Access an equivalent cached type if it exists.
@@ -45,11 +63,13 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
     @staticmethod
     def to_type(annotation, *bases):
         """URIs are used for type discovery, to_type discovers types."""
+        # has a new type been defined?
         if "@type" in annotation:
             type = rdflib.URIRef(annotation["@type"])
             if type in rdf.types:
                 return rdf.types[type]
 
+        # Look through the base class for the canonical type.
         for cls in bases:
             for cls in inspect.getmro(cls):
                 if hasattr(cls, "__schema__") and "@type" in cls.__schema__:
@@ -154,7 +174,7 @@ class jsonschema(implementation, metaclass=meta_schema):
                 ...
         return self
 
-    def __new__(cls, object=None, verified=False):
+    def __new__(cls, object=None):
         if object is None:
             object = cls.__schema__.get(_("default"), object)
             if object is None:
