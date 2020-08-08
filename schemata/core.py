@@ -2,6 +2,7 @@
 import abc
 import typing
 import builtins
+import functools
 import inspect
 import munch
 import pathlib
@@ -21,7 +22,19 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
     # A cache of types.
     __types__ = {}
 
-    __init_subclass__ = util.merge_annotations
+    def __init_subclass__(cls):
+        util.merge_annotations(cls)
+        
+        # Derive a fluent api for enriching schema.
+        for property in cls.__annotations__["properties"]:
+            setattr(
+                cls,
+                property.lstrip("$"),
+                functools.partialmethod(cls._property_attribute, property),
+            )
+
+    def _property_attribute(cls, key, object, **schema):
+        return cls[{key: object, **schema}]
 
     def __new__(cls, name, bases, kwargs, language=None):
         # ensure we're adding annotations.
