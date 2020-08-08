@@ -48,3 +48,11 @@ def test_invalid_schema():
 
 def test_compare_types():
     assert (schemata.integer <= 10) is (schemata.integer <= 10)
+
+
+def test_fluent_integer():
+    assert isinstance(
+        9, schemata.integer.minimum(0).maximum(10).title("Between 0 and 10")
+    ) ^ isinstance(
+        99, schemata.integer.minimum(0).maximum(10).title("Between 0 and 10")
+    )
