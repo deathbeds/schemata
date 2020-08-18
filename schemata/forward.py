@@ -1,3 +1,4 @@
+"""Forward type declarations with validation."""
 import schemata.core, abc
 
 import typing
@@ -10,6 +11,7 @@ class Forward(abc.ABCMeta):
         )
 
     def eval(cls):
+        """evaluate a forward reference using the sys modules."""
         if not cls.__forward_reference__.__forward_evaluated__:
             try:
                 cls.__forward_reference__._evaluate(
