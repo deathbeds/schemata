@@ -4,7 +4,6 @@ import typing
 import builtins
 import functools
 import inspect
-import munch
 import pathlib
 import rdflib
 import schemata
@@ -13,7 +12,7 @@ from . import checker, data, mutable, util, ops, rdf, translate
 _ = translate.get_translation("en").gettext
 
 
-__all__ = "jsonschema", "protocol"
+__all__ = "jsonschema", 
 
 
 class specification(ops.unary, ops.binary, abc.ABCMeta):
@@ -24,9 +23,9 @@ class specification(ops.unary, ops.binary, abc.ABCMeta):
 
     def __init_subclass__(cls):
         util.merge_annotations(cls)
-        
+
         # Derive a fluent api for enriching schema.
-        for property in cls.__annotations__["properties"]:
+        for property in cls.__annotations__.get("properties", {}):
             setattr(
                 cls,
                 property.lstrip("$"),
@@ -256,16 +255,3 @@ class jsonschema(implementation, metaclass=meta_schema):
         if filter is not None and not callable(filter):
             raise TypeError("filter must be a callable.")
         return cls(cls.strategy(filter).example())
-
-
-class protocol(implementation, metaclass=specification):
-    def __new__(cls, *args, **kwargs):
-        raise TypeError("Can't instantiate a {cls} protocol.")
-
-    @classmethod
-    def validate(cls, object):
-        for key, value in cls.__annotations__.items():
-            if hasattr(object, key) and isinstance(getattr(object, key), value):
-                continue
-            raise AttributeError(f"{key} is not an instance of {value}")
-
