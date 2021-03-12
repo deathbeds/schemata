@@ -33,13 +33,6 @@ class Literal(B.Any, type=P.RDFS["Literal"], vocab=P.PROPS.vocab()):
             return super().instance(*args)
         return B.call(*p, *args)
 
-    def __init_subclass__(
-        cls, type=None, context=None, vocab=None, base=None, **extras
-    ):
-        super().__init_subclass__(
-            type=type, context=context, vocab=vocab or cls.vocab(), base=base, **extras
-        )
-
 
 class Validate:
     @classmethod

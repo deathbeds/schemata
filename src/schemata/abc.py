@@ -102,6 +102,19 @@ class Generic(abc.ABCMeta):
 
     def __getitem__(cls, object):
         return cls.new_type(object)
+    
+    @staticmethod
+    def flatten_schema(cls):
+        import collections
+        ANNOTATIONS = "__annotations__"
+        return dict(collections.ChainMap(
+            *(getattr(x, ANNOTATIONS, {}) for x in cls.__mro__))
+        )
+    @staticmethod        
+    def is_empty_slice(x):
+        if isinstance(x, slice):
+            return all(x is None for x in (x.start, x.stop, x.step))
+        return False
 
     @staticmethod
     def ravel_schema(x, parent=None):
@@ -110,7 +123,6 @@ class Generic(abc.ABCMeta):
         we iterate through the schema and expose the schema for objects when we can.
         we strip superfluous json-ld content that may distract new users."""
         from .protocols import LD
-        from .util import flatten, flatten_type_schema, get_annotations
 
         if x is parent:
             return "#"
@@ -118,7 +130,7 @@ class Generic(abc.ABCMeta):
         if isinstance(x, type):
             parent = x
             x = Generic.types.get((x,), x)
-            x = flatten_type_schema(x)
+            x = Generic.flatten_schema(x)
 
         if isinstance(x, dict):
             x = {
