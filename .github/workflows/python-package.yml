@@ -19,7 +19,7 @@ jobs:
       with:
         python-version: 3.9
     - run: python -m pip install --upgrade pip wheel setuptools flit
-    - run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) flit build
+    - run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) flit build && cd dist && sha256sum * | tee SHA256SUMS
     - uses: actions/upload-artifact@v2
       with:
         name: schemata dist ${{ github.run_number }}
@@ -37,7 +37,7 @@ jobs:
         restore-keys: |
           ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-
     - run: pip install --ignore-installed --upgrade .[test]
-    - run: pytest --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
+    - run: pytest --pyargs schemata --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
     - run: python -m pip install codecov && codecov
 
   test:
@@ -78,4 +78,4 @@ jobs:
           restore-keys: |
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-
       - run: ${{ matrix.pip }} install --find-links=dist schemata[test]
-      - run: pytest
+      - run: pytest --pyargs schemata
