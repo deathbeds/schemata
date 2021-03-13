@@ -26,6 +26,7 @@ jobs:
     - run: codecov
 
   test:
+    name: test ${{ matrix.os }} ${{ matrix.py }}
     needs: [build]
     runs-on: ${{ matrix.os }}-latest
     strategy:
@@ -34,7 +35,7 @@ jobs:
         py: [3.6, 3.9, pypy3]
         exclude:
           - os: windows
-          - py: pypy3
+            py: pypy3
         include:
           - os: linux
             pip: python -m pip
