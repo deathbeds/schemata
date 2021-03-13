@@ -1,5 +1,10 @@
 # schemata
 
+[![cov-badge]][cov]
+
+[cov-badge]: https://img.shields.io/codecov/c/github/deathbeds/schemata?token=hob01Xmh6Z
+[cov]: https://app.codecov.io/gh/deathbeds/schemata
+
 A primary goal of schemata isa to provide a locale-aware trait system for python.
 
     import schemata
@@ -75,4 +80,5 @@ configuration for `jupyter` and `IPython` since.
 
 The desire is a trait system for interactive computing that enables more expressive design and testing of interactive
 computing technology.
+
 
