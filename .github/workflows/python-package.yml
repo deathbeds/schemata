@@ -12,22 +12,43 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9
-
     - run: python -m pip install --upgrade pip wheel setuptools flit codecov
-
     - run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) flit build
-
     - uses: actions/upload-artifact@v2
       with:
         name: schemata dist ${{ github.run_number }}
         path: ./dist
-    
     - run: pip install .[test]
-
-    - run: pytest --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail
-
+    - run: pytest --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
     - run: codecov
+
+  test:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      matrix:
+        os: [linux, macos, windows]
+        py: [3.6, 3.9, pypy3]
+        exclude:
+          - os: windows
+          - py: pypy3
+        include:
+          - os: linux
+            pip: python -m pip
+          - os: macos
+            pip: python3 -m pip
+          - os: windows
+            pip: python -m pip
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.py }}
+      - run: ${{ matrix.pip }} install --upgrade pip wheel setuptools
+      - uses: actions/download-artifact@v2
+        with:
+          name: schemata dist ${{ github.run_number }}
+          path: ./dist
+      - run: ${{ matrix.pip }} install --no-index --find-links=dist schemata[test]
+      - run: pytest
