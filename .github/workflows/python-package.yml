@@ -26,6 +26,7 @@ jobs:
     - run: codecov
 
   test:
+    needs: [build]
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
