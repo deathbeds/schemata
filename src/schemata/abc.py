@@ -189,6 +189,12 @@ class ABC(abc.ABCMeta):
             x = [Generic.ravel_schema(x, parent=parent) for x in x]
         return x
 
+    def _attach_parent(cls, x):
+        if isinstance(x, (type(None), bool)):
+            return x
+        x.parent = cls
+        return x
+
 
 class Generic(ABC):
     # the generic base case is the metaclass for all of schemata's typess and protocols

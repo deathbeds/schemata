@@ -69,7 +69,7 @@ class MyList(List + Generic.MinItems[1]):
 
 class ContainerTest(unittest.TestCase):
     examples = (
-        hypothesis.strategies.sampled_from((Dict, List, IDict, IList, MyDict, MyList))
+        hypothesis.strategies.sampled_from((Dict, List, IDict, IList))
         | LiteralTest.examples.map(lambda x: Dict[x])
         | LiteralTest.examples.map(lambda x: List[x])
     )
@@ -129,6 +129,7 @@ class ExoticTest(unittest.TestCase):
             y = draw(t)
             x = y if x is None else draw(op)(x, draw(t))
         return x
+
     examples = examples()
 
     @hypothesis.strategies.composite
@@ -140,10 +141,22 @@ class ExoticTest(unittest.TestCase):
 
     draw_enum = draw_enum()
 
-    test_literals = hypothesis.given((examples ).flatmap(type_example))(
+    test_literals = hypothesis.given((examples).flatmap(type_example))(
         unwrap(LiteralTest.test_literals)
     )
 
+    @hypothesis.given(
+        (examples | draw_enum).flatmap(
+            lambda x: globals().__setitem__("G", x)
+            or Not[x].strategy().map(lambda y: (x, y))
+        )
+    )
+    @hypothesis.settings(max_examples=100)
+    def test_null_space(x, v):
+        global T, V
+        T, V = t, v = v
+        with pytest.raises(ValidationErrors):
+            t(v)
 
 
 @hypothesis.strategies.composite
@@ -171,6 +184,7 @@ def draw_patches(
             patches.append(dict(type=t, patch=p, value=v))
     return patches
 
+
 class PyTests(unittest.TestCase):
     def test_py(x):
         assert Sys["builtins.range"]() is range
@@ -180,13 +194,14 @@ class PyTests(unittest.TestCase):
             Instance["builtins.range"]()
 
         assert Instance["builtins.range"](10) == range(10)
-        
+
+
 class CastTests(unittest.TestCase):
     def test_py(x):
         with pytest.raises(ValidationErrors):
             Cast[Integer, String](1)
         assert Cast[Integer, str, String](10) == "10"
-        
+
 
 @hypothesis.given(draw_patches())
 @hypothesis.settings(
@@ -209,6 +224,7 @@ def test_patch(ps):
                 x.patches(*p["patch"])
 
         assert x == p["value"], f"{x}\n\n{p['value']}"
+
 
 def test_juxt():
     assert Juxt["builtins.type"](int) == type

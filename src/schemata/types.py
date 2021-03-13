@@ -705,7 +705,11 @@ class Enum(Validate, Literal, Generic.Plural, type=P.XSD["enumeration"]):
 
     """
 
-    pass
+    def instance(cls, *args, **kwargs):
+        self = super().instance(*args, **kwargs)
+        cls._attach_parent(self)
+        return self
+
     # we need a strategy for extensible type bases.
     # maybe can get them from all instances.
 
@@ -750,13 +754,6 @@ class Nested:
                 order.append(x)
         self.__annotations__[n] = order
         return self
-
-    @classmethod
-    def _attach_parent(cls, x):
-        if isinstance(x, (type(None), bool)):
-            return x
-        x.parent = cls
-        return x
 
 
 class AnyOf(Nested, Composite, Generic.Plural):
@@ -816,7 +813,7 @@ class OneOf(Nested, Composite, Generic.Plural):
         raise ValidationError()
 
 
-class Not(Generic.Alias, Composite):
+class Not(Composite, Generic.Alias):
     @classmethod
     def instance(cls, *args):
         try:
@@ -1137,9 +1134,3 @@ class Excepts(Conditional, Instance):
             return super().instance(*args, **kwargs)
         except cls.value or () as e:
             return X(e)
-
-
-class Not(Instance):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        return not cls.instance(*args, **kwargs)
