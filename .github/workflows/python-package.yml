@@ -77,5 +77,5 @@ jobs:
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-
-      - run: ${{ matrix.pip }} install --no-index --find-links=dist schemata[test]
+      - run: ${{ matrix.pip }} install --find-links=dist schemata[test]
       - run: pytest
