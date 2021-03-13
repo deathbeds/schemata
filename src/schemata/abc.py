@@ -9,54 +9,54 @@ class ValidationError(BaseException):
 ValidationErrors = (ValidationError, __import__("jsonschema").ValidationError)
 
 
-class ABC(abc.ABCMeta):
+class ABC:
     # the ABC represents all of the bespoke type api features we provide through schemata.
 
     # types and strategies are caches for types and hypothesis strategies
     types, strategies = {}, {}
 
     @abc.abstractclassmethod
-    def alias(cls):
-        raise NotImplementedError
+    def alias(cls):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def schema(cls, *args, **kwargs):
-        raise NotImplementedError
+    def schema(cls, *args, **kwargs):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def default(cls, *args, **kwargs):
-        raise NotImplementedError
+    def default(cls, *args, **kwargs):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def instance(cls, *args, **kwargs):
-        raise NotImplementedError
+    def instance(cls, *args, **kwargs):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def validate(cls, *args):
-        raise NotImplementedError
+    def validate(cls, *args):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def strategy(cls, *args):
-        raise NotImplementedError
+    def strategy(cls, *args):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def cast(cls, *args):
-        raise NotImplementedError
+    def cast(cls, *args):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def enter(cls):
-        raise NotImplementedError
+    def enter(cls):  # pragma: no cover
+        pass
 
     @abc.abstractclassmethod
-    def exit(cls, *e):
-        raise NotImplementedError
+    def exit(cls, *e):  # pragma: no cover
+        pass
 
     def example(cls):
         return cls.strategy().example()
 
     @abc.abstractclassmethod
-    def mediatype(cls, *args, **kwargs):
-        raise NotImplementedError
+    def mediatype(cls, *args, **kwargs):  # pragma: no cover
+        pass
 
     def new_type(cls, **kwargs):
         # new_type is our alias for making a new type.
@@ -68,7 +68,10 @@ class ABC(abc.ABCMeta):
             cls = (cls,)
 
         # our types our cached for easier comparison, here we hash the new type
-        id = cls + tuple(Generic.hash_item(kwargs))
+        try:
+            id = cls + tuple(Generic.hash_item(kwargs))
+        except EmptySlice:
+            return cls
 
         if id not in Generic.types:
             # if the hash id doesn't exist then we create it.
@@ -93,17 +96,13 @@ class ABC(abc.ABCMeta):
 
             elif isinstance(y, (set, list, tuple)):
                 yield from tuple(map(Generic.hash_item, y))
+            
             else:
                 yield y
 
     # type annotation methods
     def annotations(cls):
-        ANNOTATIONS = "__annotations__"
-        if isinstance(object, dict) and ANNOTATIONS in object:
-            # we could load a dictionary type that lacks annotations
-            # in this case the type could have annotations
-            return object.get(ANNOTATIONS, {})
-        return getattr(object, ANNOTATIONS, {})
+        return getattr(object, "__annotations__", {})
 
     def annotate(cls, t=None, in_place=False, **kwargs):
         TYPE = "@type"
@@ -115,7 +114,7 @@ class ABC(abc.ABCMeta):
         return Generic.new_type(cls, **kwargs)
 
     # type classmethods
-    def children(cls, deep=True):
+    def children(cls, deep=True):  # pragma: no cover
         from .protocols import Protocol
 
         if not deep:
@@ -157,12 +156,6 @@ class ABC(abc.ABCMeta):
         )
 
     @staticmethod
-    def is_empty_slice(x):
-        if isinstance(x, slice):
-            return all(x is None for x in (x.start, x.stop, x.step))
-        return False
-
-    @staticmethod
     def ravel_schema(x, parent=None):
         """a schema maybe be comprised of python object, yet to be schemafied.
 
@@ -196,7 +189,7 @@ class ABC(abc.ABCMeta):
         return x
 
 
-class Generic(ABC):
+class Generic(ABC, abc.ABCMeta):
     # the generic base case is the metaclass for all of schemata's typess and protocols
     # in this specific definition we only add magic method definitions to the types
 
@@ -278,17 +271,17 @@ class Generic(ABC):
             return cls[properties]
         return cls
 
-    def __getitem__(cls, object):
+    def __getitem__(cls, x):
         # getitem on types invokes the new_type method
-        return cls.new_type(object)
+        if isinstance(x, slice):
+            if x.start is x.stop is x.step is None:
+                return cls
+        return cls.new_type(x)
 
     # here we add symbolic methods to the type for easier composition
     # we take advantage of the getitem method for this reason
     def __add__(cls, object):
-        try:
-            return Generic.new_type((cls, object))
-        except TypeError:
-            return Generic.new_type((object, cls))
+        return Generic.new_type((cls, object))
 
     def __sub__(cls, object):
         from .types import AllOf, Not

@@ -203,8 +203,6 @@ Generic.types[
 class Tuple(List, type=P.RDF["Alt"]):
     @classmethod
     def new_type(cls, object):
-        if Generic.is_empty_slice(object):
-            return cls
         if isinstance(object, list):
             object = tuple(object)
         if not isinstance(object, tuple):
@@ -314,9 +312,6 @@ class Dict(Validate, Literal, Type["object"], dict):
 
     @classmethod
     def new_type(cls, object):
-        if Generic.is_empty_slice(object):
-            return cls
-
         if isinstance(object, dict):
             return cls + Generic.Properties[object]
 

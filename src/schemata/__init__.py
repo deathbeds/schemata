@@ -28,13 +28,13 @@ __import__("jsonschema").Draft7Validator.TYPE_CHECKER.redefine(
 )
 
 
-def load_ipython_extension(shell):
+def load_ipython_extension(shell):  # pragma: no cover
     from .ipython import load_ipython_extension
 
     load_ipython_extension(shell)
 
 
-def unload_ipython_extension(shell):
+def unload_ipython_extension(shell):  # pragma: no cover
     from .ipython import unload_ipython_extension
 
     unload_ipython_extension(shell)

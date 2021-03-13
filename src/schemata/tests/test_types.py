@@ -23,6 +23,7 @@ class LiteralTest(unittest.TestCase):
     @hypothesis.given(examples.flatmap(type_example))
     def test_literals(self, t):
         t, v = t
+        assert t[:] is t
         y = t.instance(v)
         assert y == v
         hypothesis.assume(not isinstance(v, (bool, type(None))))
@@ -32,12 +33,15 @@ class LiteralTest(unittest.TestCase):
         assert (t + Default[v]).instance() == v
 
     def test_none(x):
+        Null(Null.example())
         assert Null() is Null(None) is None
         for x in (False,) + (0, "", [], {}):
             with pytest.raises(ValidationErrors):
                 Null(x)
 
     def test_bool(x):
+        Bool(Bool.example())
+
         assert Bool() is bool() is Bool(False)
         assert Bool(True) is True
         for x in true + false:
@@ -45,10 +49,15 @@ class LiteralTest(unittest.TestCase):
                 Bool(x)
 
     def test_string(x):
+        String(String.example())
+
         assert String() == str() == "" == String("")
         assert String("abc") == str("abc") == "abc" == String("abc")
 
     def test_numbers(x):
+        Number(Number.example())
+        Integer(Integer.example())
+
         assert Float() == float() == 0.0 == Float(0.0)
         assert Integer() == int() == 0.0 == Integer(0.0)
 
@@ -79,6 +88,7 @@ class ContainerTest(unittest.TestCase):
     )
 
     def test_dict(x):
+        Dict(Dict.example())
         assert Dict() == Dict({}) == dict() == {}
         with pytest.raises(ValidationErrors):
             assert dict("") == {}
@@ -93,6 +103,8 @@ class ContainerTest(unittest.TestCase):
         assert "a" not in d and d["a"] == dict(a=[])
 
     def test_list(x):
+        List(List.example())
+
         assert List() == List([]) == list() == []
         with pytest.raises(ValidationErrors):
             assert list("") == []
@@ -157,6 +169,25 @@ class ExoticTest(unittest.TestCase):
         T, V = t, v = v
         with pytest.raises(ValidationErrors):
             t(v)
+
+    test_symbollic = hypothesis.given(
+        hypothesis.strategies.sampled_from(
+            (
+                (String > 1) < 10,
+                (String >= 1) <= 10,
+                (Integer > 1) < 10,
+                (Integer >= 1) <= 10,
+                (Number > 1) < 10,
+                (Number >= 1) <= 10,
+                (Dict > 1) < 10,
+                (Dict >= 1) <= 10,
+                (List > 1) < 10,
+                (List >= 1) <= 10,
+                OneOf[Bool],
+                OneOf[Null],
+            )
+        ).flatmap(type_example)
+    )(unwrap(LiteralTest.test_literals))
 
 
 @hypothesis.strategies.composite
