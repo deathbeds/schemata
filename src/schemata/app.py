@@ -1,13 +1,12 @@
 from . import base as B
-from . import literal as L
-from . import literal as P
+from . import types as T
 
 
-class IPython(L.Py["IPython.get_ipython()"]):
+class IPython(T.Py["IPython.get_ipython()"]):
     pass
 
 
-class Action(L.Py["doit.action.CmdAction"], B.Generic.Alias):
+class Action(T.Py["doit.action.CmdAction"], B.Generic.Alias):
     # Also cwd happens a lot
     # That also breaks work Path on windows unless cast to a string
     @classmethod
@@ -37,13 +36,13 @@ class Voila:
     pass
 
 
-class Doit(L.Instance["doit.run"], B.Generic.Alias):
+class Doit(T.Instance["doit.run"], B.Generic.Alias):
     @classmethod
     def instance(cls, object):
         return super().instance()(object)
 
 
-class Pydantic(L.Py["pydantic.BaseModel"], B.Generic.Alias):
+class Pydantic(T.Py["pydantic.BaseModel"], B.Generic.Alias):
     @classmethod
     def new_type(cls, object):
         return type(
@@ -53,13 +52,13 @@ class Pydantic(L.Py["pydantic.BaseModel"], B.Generic.Alias):
         )
 
 
-class Logging(L.Py["structlog.get_logger()"], B.Generic.Alias):
+class Logging(T.Py["structlog.get_logger()"], B.Generic.Alias):
     @classmethod
     def instance(cls, object):
         return super().instance().msg(cls.__name__, **object)
 
 
-class Typer(L.Py.Instance["typer.Typer"], B.Generic.Alias):
+class Typer(T.Py.Instance["typer.Typer"], B.Generic.Alias):
     # use an alias so we don't collide with the existing value
     def __init_subclass__(cls, **kwargs):
         import inspect
@@ -72,7 +71,7 @@ class Typer(L.Py.Instance["typer.Typer"], B.Generic.Alias):
         cls.runner().run("--help")
 
     @classmethod
-    def _pythonic_signature(cls) -> L.Py["inspect.Signature"]:
+    def _pythonic_signature(cls) -> T.Py["inspect.Signature"]:
         # convert class signature to something typer understands
         import inspect
 
@@ -91,6 +90,7 @@ class Typer(L.Py.Instance["typer.Typer"], B.Generic.Alias):
     @classmethod
     def runner(cls, **kwargs):
         import inspect
+
         import typer
 
         def runner(*args, **kwargs):
@@ -103,7 +103,7 @@ class Typer(L.Py.Instance["typer.Typer"], B.Generic.Alias):
         return typer.main.get_command(app)
 
     @classmethod
-    def instance(cls, *args, **kwargs) -> L.Py["click.Command"]:
+    def instance(cls, *args, **kwargs) -> T.Py["click.Command"]:
         import sys
 
         args = args or None

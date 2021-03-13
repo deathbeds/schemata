@@ -18,16 +18,10 @@ we should raise errors as rdf too.
 """
 __version__ = "0.0.1"
 
-from .base import *
+from . import types as T
 
-from .literal import *  # isort:skip
-from .composite import *  # isort:skip
-
-# from .literal import *  # isort:skip
-from .json import *  # isort:skip
-from .strings import *  # isort:skip
-from .callables import *  # isort:skip
-from . import app, numbers, strings, literal, composite, alias, json  # isort:skip
+from .types import *  # isort:skip
+from . import app, types  # isort:skip
 
 __import__("jsonschema").Draft7Validator.TYPE_CHECKER.redefine(
     "array", lambda c, x: isinstance(x, (list, tuple))

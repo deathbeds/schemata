@@ -61,6 +61,14 @@ class AdditionalProperties(Any, Generic.Alias):
     pass
 
 
+class Properties(Any, Generic.Alias):
+    pass
+
+
+class Dependencies(Any, Generic.Alias):
+    pass
+
+
 class Required(Any, Generic.Plural):
     pass
 

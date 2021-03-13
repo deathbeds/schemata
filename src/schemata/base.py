@@ -3,128 +3,36 @@
 in this module we introduce the schemata type api
 """
 
-from .abc import Generic, ValidationErrors, ValidationError
-import typing
 import functools
+import typing
+
+from .abc import Generic, ValidationError, ValidationErrors
 
 
 def call(f, *args, **kwargs):
+    """a universal call method we use"""
+    # lists and dicts dont init properly, mebbe they do now,
+    # this function exists because of each cases.
     if hasattr(f, "instance"):
         return f.instance(*args, **kwargs)
     return f(*args, **kwargs)
 
 
-class Any(metaclass=Generic):
-    """everything is a Any, this is your interface to rdf land.
-
-    rdf descriptions allow for multiple vocabularies and schema to cooperate.
-    our Any type is jsonschema aware allowing for more flexible type descriptions
-    than python."""
-
-    # relative to pydantic:
-    # pydantic only care about jsonschema, we care about jsonschema and rdf schema.
-
-    # relative to traitlets/params
-    # these tools define schema for runtime objects in python.
-    # they reduce to jsonschema with work, but still lack general metadata
-    # descriptions that enabled improved searches.
-
-    # a near term goal is to generate pydantic, traitlets, and params translations of our types and vice versa.
-    def __new__(cls, *args, **kwargs):
-        # for ease of execution and testing we define the instance classmethod as the way types are created.
-        return cls.instance(*args, **kwargs)
-
-    def __init_subclass__(cls, type=None, ctx=None, vocab=None, base=None, **extras):
-
-        cls._build_context(context=ctx, vocab=vocab, base=base)
-
-        try:
-            super().__init_subclass__(**extras)
-        except TypeError:
-            pass
-
-    @classmethod
-    def _build_context(cls, context=None, vocab=None, base=None, language=None):
-        """build the context of the based on specific keys defined in the specification."""
-        VOCAB, BASE, LANGUAGE = "@vocab", "@base", "@language"
-        if context is None:
-            context = {}
-        if vocab:
-            context[VOCAB] = str(vocab)
-        else:
-            for x in cls.__mro__:
-                if hasattr(x, "vocab"):
-                    v = x.vocab()
-                    if v:
-                        context[VOCAB] = v
-                    break
-
-        if base:
-            context[BASE] = str(base)
-
-        if language:
-            context[LANGUAGE] = language
-        if context:
-            cls.__annotations__.update(context)
-
-    @classmethod
-    def alias(cls):
-        x = cls.__name__
-        return x[0].lower() + x[1:] if x else x
-
-    @classmethod
-    def cast(*args):
-        from .literal import Py
-
-        return Py[args]
-
-    @classmethod
-    def enter(cls):
-        pass
-
-    @classmethod
-    def exit(cls, *e):
-        pass
-
-    @classmethod
-    def default(cls, *args):
-
-        CONST, DEFAULT, ENUM = "const", "default", "enum"
-        s = cls.schema(0)
-
-        # find constants first, always return the constant if there is one
-        if CONST in s:
-            return (s[CONST],)
-
-        if args:
-            return args
-
-        # then look for default
-        if DEFAULT in s:
-            return (s[DEFAULT],)
-
-        # then look for enums
-        if ENUM in s:
-            return tuple(s[ENUM][:1])
-
-        return args
-
-    @classmethod
-    def mediatype(cls):
-        from .composite import Composite
-
-        this = cls.schema(0)
-        if "contentMediaType" in this:
-            return this["contentMediaType"]
-        return
-
+class Display:
+    # custom display properties in ipython
     def _repr_mimebundle_(self, include=None, exclude=None):
+        # customize the default view behavior for the object
+        # currently we have an opinion about mediatype
+        # the reality is that the formatter should be entirely its own thing.
         t = self.mediatype()
         if t is None:
+            # parent is defined on Composite types allowing derived types to reference
+            # their parent types.
             if hasattr(self, "parent"):
                 t = self.parent.mediatype()
 
         if t is None:
+            # default to text plain
             t = "text/plain"
 
         if t == "text/plain":
@@ -132,14 +40,21 @@ class Any(metaclass=Generic):
 
         return {t: self}, {}
 
-    @classmethod
-    def annotate(cls, t=None, in_place=False, **kwargs):
-        if t is not None:
-            kwargs["@type"] = t
-        if in_place:
-            cls.__annotations__.update(kwargs)
-            return cls
-        return Generic.new_type(cls, **kwargs)
+
+class Any(Display, metaclass=Generic):
+    # the primary concrete type of every schemata export
+
+    # modify the construction behavior of the type
+    # Any represents _any object_, it is equivalent to RDFS.Resource
+    def __new__(cls, *args, **kwargs):
+        # derived schemata types should use the instance method instead of
+        # __new__ and __init__ for overriding functions
+        return cls.instance(*args, **kwargs)
+
+    def __init__(self, *args, **kwargs):
+        # short circuit initialization below this point and execute it ourselves
+        # in the instance methods
+        pass
 
     @classmethod
     def instance(cls, *args, **kwargs):
@@ -164,8 +79,40 @@ class Any(metaclass=Generic):
             self.value = args[0]
         return self
 
+    # modify features of the ABC
+    @classmethod
+    def default(cls, *args):
+        # conventions to build defaults from const, default, enum
+
+        CONST, DEFAULT, ENUM = "const", "default", "enum"
+        s = cls.schema(0)
+
+        # find constants first, always return the constant if there is one
+        if CONST in s:
+            return (s[CONST],)
+
+        if args:
+            return args
+
+        # then look for default
+        if DEFAULT in s:
+            return (s[DEFAULT],)
+
+        # then look for enums
+        if ENUM in s:
+            return tuple(s[ENUM][:1])
+
+        return args
+
+    @classmethod
+    def mediatype(cls):
+        return cls.schema(0).get(Generic.ContentMediaType.alias())
+
     @classmethod
     def strategy(cls):
+        # derive a hypothesis strategy from type
+        # our default strategy is to create strategies from the schema on
+        # all of the objects.
         import hypothesis
 
         if cls not in cls.strategies:
@@ -174,14 +121,39 @@ class Any(metaclass=Generic):
             )
         return cls.strategies[cls]
 
-        return hypothesis.strategies.none()
-
     @classmethod
     def schema(cls: Generic, ravel=True):
+        # generate the schema for the class
+
+        # flatten schema squashes all annotations into a single dictionary
         x = Generic.flatten_schema(cls)
         if ravel:
+            # raveling converts python types to jsonschema types
+            # the unraveled schema is useful for python things, the ravelled types is
+            # useful for jsonschema
             x = Generic.ravel_schema(x, parent=cls)
         return x
 
+    @classmethod
+    def alias(cls):
+        # a common alias for the type, the default is the lowercase class name
 
-del typing
+        x = cls.__name__
+        return x[0].lower() + x[1:] if x else x  #  lowercase x
+
+    @classmethod
+    def cast(*args):
+        # cast the type to another type if it validates
+        from .types import Py
+
+        return Py[args]
+
+    @classmethod
+    def enter(cls):
+        # an empty enter method for abc compliance
+        pass
+
+    @classmethod
+    def exit(cls, *e):
+        # an empty exit method for abc compliance
+        pass

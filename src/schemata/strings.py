@@ -1,37 +1,37 @@
 from . import base as B
-from . import literal as L
-from .literal import String, Uri
+from . import types as T
+from .types import String, Uri
 
 
-class DateTime(L.String, L.String.Format["date-time"]):
+class DateTime(T.String, T.String.Format["date-time"]):
     pass
 
 
-class Date(L.String, L.String.Format["date"]):
+class Date(T.String, T.String.Format["date"]):
     pass
 
 
-class Time(L.String, L.String.Format["time"]):
+class Time(T.String, T.String.Format["time"]):
     pass
 
 
-class Email(L.String, L.String.Format["email"]):
+class Email(T.String, T.String.Format["email"]):
     pass
 
 
-class HostName(L.String, L.String.Format["hostname"]):
+class HostName(T.String, T.String.Format["hostname"]):
     pass
 
 
-class IPv4(L.String, L.String.Format["ipyv4"]):
+class IPv4(T.String, T.String.Format["ipyv4"]):
     pass
 
 
-class IPv6(L.String, L.String.Format["ipyv6"]):
+class IPv6(T.String, T.String.Format["ipyv6"]):
     pass
 
 
-class UriTemplate(L.String, L.String.Format["uri-template"]):
+class UriTemplate(T.String, T.String.Format["uri-template"]):
     # conventions for uri templates
     # a UriTemplate is template for ids, we make it callable to resolve to Uri
     # with get, post, patch, head, options, ... methods
@@ -39,26 +39,11 @@ class UriTemplate(L.String, L.String.Format["uri-template"]):
     def apply(self, *args, **kwargs):
         import uritemplate
 
-        return L.Uri(uritemplate.URITemplate(self).expand(**kwargs))
+        return T.Uri(uritemplate.URITemplate(self).expand(**kwargs))
 
 
-class RegEx(L.String, L.String.Format["regex"]):
+class RegEx(T.String, T.String.Format["regex"]):
     pass
-
-
-class Pointer(L.String, L.String.Format["json-pointer"]):
-    @classmethod
-    def instance(cls, *args):
-        if len(args) > 1:
-            args = (__import__("jsonpointer").JsonPointer.from_parts(args).path,)
-        return super().instance(*args)
-
-    def apply(self, object):
-        # a pointer can be called against an object to resolve
-        return __import__("jsonpointer").resolve_pointer(object, self)
-
-    def __truediv__(self, object):
-        return Pointer(self + "/" + object)
 
 
 class Pattern(B.Any, B.Generic.Alias):
@@ -84,7 +69,9 @@ class Format(Formatter, Pattern):
 
 class Jinja(Formatter, Pattern):
     def format(self, *args, **kwargs):
-        import jinja2, sys
+        import sys
+
+        import jinja2
 
         return jinja2.Template(self).render(*args, **sys.modules, **kwargs)
 
