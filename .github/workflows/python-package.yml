@@ -30,4 +30,8 @@ jobs:
         pip install .[all,test]
     - name: Test with pytest
       run: |
-        pytest --cov=schemata
+        pytest --cov=schemata --cov-report term-missing:skip-covered
+    - name: Upload coverage
+      run: |
+        pip install codecov
+        codecov
