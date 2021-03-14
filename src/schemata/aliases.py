@@ -98,19 +98,12 @@ class ContentMediaType(Any, Generic.Alias):
 
 
 class Examples(Any, Generic.Plural):
-    @classmethod
-    def examples(cls, *args):
-        if not args:
-            return cls.schema(False).get("examples", [])
-        cls.__annotations__["examples"] = cls.__annotations__.get("examples", [])
-        for v in args:
-            cls.__annotations__["examples"].append(v)
-        return cls
+    pass
 
 
 class Title(Any, Generic.Alias):
-    ...
+    pass
 
 
 class Description(Any, Generic.Alias):
-    ...
+    pass
