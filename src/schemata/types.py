@@ -3,8 +3,12 @@ import typing
 
 try:
     from typing import _ForwardRef as ForwardRef
+
+    _root = True
 except ImportError:
     from typing import ForwardRef
+
+    _root = False
 
 from . import protocols as P
 from .base import Any, Generic, ValidationError, ValidationErrors, call
@@ -489,7 +493,7 @@ Generic.types[
 ] = Dict
 
 
-class Forward(ForwardRef, _root=False):
+class Forward(ForwardRef, _root=_root):
     def __new__(cls, object):
         if isinstance(object, str):
             self = super().__new__(cls)
@@ -1133,3 +1137,6 @@ class Excepts(Conditional, Instance):
             return super().instance(*args, **kwargs)
         except cls.value or () as e:
             return X(e)
+
+
+del _root

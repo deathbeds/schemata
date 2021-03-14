@@ -72,6 +72,10 @@ class LiteralTest(unittest.TestCase):
         assert Float() == float() == 0.0 == Float(0.0)
         assert Integer() == int() == 0.0 == Integer(0.0)
 
+    def test_display(x):
+        assert "application/json" in Json({})._repr_mimebundle_()[0]
+        assert "text/plain" in String("")._repr_mimebundle_()[0]
+
 
 false = (0, "", [], {})
 true = (1.0, "a", ["a"], {"a": bool})
