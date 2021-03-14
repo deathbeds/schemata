@@ -608,7 +608,7 @@ class Instance(Py):
         args, kwargs = (), {}
         value, *object = object
         if isinstance(value, str):
-            value = ForwardInstance(value)
+            value = Forward(value)
 
         for arg in object:
             if isinstance(arg, slice):

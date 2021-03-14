@@ -68,10 +68,7 @@ class ABC:
             cls = (cls,)
 
         # our types our cached for easier comparison, here we hash the new type
-        try:
-            id = cls + tuple(Generic.hash_item(kwargs))
-        except EmptySlice:
-            return cls
+        id = cls + tuple(Generic.hash_item(kwargs))
 
         if id not in Generic.types:
             # if the hash id doesn't exist then we create it.
@@ -96,7 +93,7 @@ class ABC:
 
             elif isinstance(y, (set, list, tuple)):
                 yield from tuple(map(Generic.hash_item, y))
-            
+
             else:
                 yield y
 
@@ -140,7 +137,7 @@ class ABC:
 
     def choices(cls):
         for x in cls.__mro__:
-            a = cls.annotations(x)
+            a = Generic.annotations(x)
             if "enum" in a:
                 return a["enum"]
         return []
@@ -164,7 +161,7 @@ class ABC:
         from .protocols import LD
 
         if x is parent:
-            return "#"
+            return "#"  # pragma: no cover
 
         if isinstance(x, type):
             parent = x

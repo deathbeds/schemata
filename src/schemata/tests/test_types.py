@@ -17,6 +17,17 @@ def type_example(x):
     return x.strategy().map(lambda y: (x, y))
 
 
+class BaseTest(unittest.TestCase):
+    def test_base(x):
+        assert Any.new_type() is Any
+
+    def test_forward(x):
+        assert Forward("builtins.range").instance() is range
+        with pytest.raises(TypeError):
+            assert ForwardInstance("builtins.range").instance()
+        assert ForwardInstance("builtins.range").instance(10) == range(10)
+
+
 class LiteralTest(unittest.TestCase):
     examples = hypothesis.strategies.sampled_from((Null, Bool, Integer, Number, String))
 
@@ -146,16 +157,24 @@ class ExoticTest(unittest.TestCase):
 
     @hypothesis.strategies.composite
     def draw_enum(
-        draw,
-        a=hypothesis.strategies.lists(examples, min_size=1),
+        draw, a=examples, i=hypothesis.strategies.sampled_from([0, 1, 5, 20])
     ):
-        return Enum[[draw(x.strategy()) for x in draw(a)]]
+
+        return Enum[tuple(draw(draw(a).strategy()) for _ in range(draw(i)))]
 
     draw_enum = draw_enum()
 
     test_literals = hypothesis.given((examples).flatmap(type_example))(
         unwrap(LiteralTest.test_literals)
     )
+
+    # @hypothesis.given(draw_enum)
+    # def test_enums(x, t):
+    #     c = t.choices()
+    #     for x in c:
+    #         t(c)
+    #     hypothesis.assume(t.choices())
+    #     assert t() is t.choices()[0]
 
     @hypothesis.given(
         (examples | draw_enum).flatmap(
