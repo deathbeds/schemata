@@ -517,7 +517,7 @@ class Forward(ForwardRef, _root=_root):
     __call__ = instance
 
 
-class ForwardInstance(Forward, _root=False):
+class ForwardInstance(Forward, _root=_root):
     def instance(cls, *args, **kwargs):
         return super().instance()(*args, **kwargs)
 
