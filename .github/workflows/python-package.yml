@@ -45,6 +45,7 @@ jobs:
     needs: [build]
     runs-on: ${{ matrix.os }}-latest
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu, macos, windows]
         py: [3.6, 3.9, pypy3]
