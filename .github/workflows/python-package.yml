@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ master ]
 
+env:
+  CACHE_EPOCH: 0
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -15,15 +18,27 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - run: python -m pip install --upgrade pip wheel setuptools flit codecov
-    - run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) flit build
+    - run: python -m pip install --upgrade pip wheel setuptools flit
+    - run: SOURCE_DATE_EPOCH=$(git log -1 --format=%ct) flit build && cd dist && sha256sum * | tee SHA256SUMS
     - uses: actions/upload-artifact@v2
       with:
         name: schemata dist ${{ github.run_number }}
         path: ./dist
-    - run: pip install .[test]
-    - run: pytest --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
-    - run: codecov
+    - uses: actions/cache@v2
+      with:
+        path: .hypothesis
+        key: |
+          ${{ env.CACHE_EPOCH }}-${{ runner.os }}-hypothesis-${{ hashFiles('pyproject.toml') }}
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: |
+          ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-${{ hashFiles('pyproject.toml') }}
+        restore-keys: |
+          ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-
+    - run: pip install --ignore-installed --upgrade .[test]
+    - run: pytest --pyargs schemata -vv --durations=10 --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
+    - run: python -m pip install codecov && codecov
 
   test:
     name: test ${{ matrix.os }} ${{ matrix.py }}
@@ -31,18 +46,21 @@ jobs:
     runs-on: ${{ matrix.os }}-latest
     strategy:
       matrix:
-        os: [linux, macos, windows]
+        os: [ubuntu, macos, windows]
         py: [3.6, 3.9, pypy3]
         exclude:
           - os: windows
             py: pypy3
         include:
-          - os: linux
+          - os: ubuntu
             pip: python -m pip
+            pip-cache: ~/.cache/pip 
           - os: macos
             pip: python3 -m pip
+            pip-cache: ~/Library/Caches/pip
           - os: windows
             pip: python -m pip
+            pip-cache: ~\AppData\Local\pip\Cache
     steps:
       - uses: actions/setup-python@v2
         with:
@@ -52,5 +70,12 @@ jobs:
         with:
           name: schemata dist ${{ github.run_number }}
           path: ./dist
-      - run: ${{ matrix.pip }} install --no-index --find-links=dist schemata[test]
-      - run: pytest
+      - uses: actions/cache@v2
+        with:
+          path: ${{ matrix.pip-cache }}
+          key: |
+            ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-
+      - run: ${{ matrix.pip }} install --find-links=dist schemata[test]
+      - run: pytest --pyargs schemata -vv --durations=10
