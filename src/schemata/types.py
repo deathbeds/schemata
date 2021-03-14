@@ -1,6 +1,9 @@
 import pathlib
-import typing
 
+try:
+    from typing import _ForwardRef as ForwardRef
+except ImportError:
+    from typing import ForwardRef
 from . import protocols as P
 from .base import Any, Generic, ValidationError, ValidationErrors, call
 
@@ -484,7 +487,7 @@ Generic.types[
 ] = Dict
 
 
-class Forward(typing.ForwardRef, _root=False):
+class Forward(ForwardRef, _root=False):
     def __new__(cls, object):
         if isinstance(object, str):
             self = super().__new__(cls)
@@ -509,8 +512,10 @@ class Forward(typing.ForwardRef, _root=False):
 
 
 class ForwardInstance(Forward, _root=False):
-    def __call__(cls, *args, **kwargs):
-        return super().__call__()(*args, **kwargs)
+    def instance(cls, *args, **kwargs):
+        return super().instance()(*args, **kwargs)
+
+    __call__ = instance
 
 
 class Sys(Any):
@@ -549,10 +554,7 @@ class Sys(Any):
                 object = self.value
         else:
             object = self
-        if isinstance(object, Forward):
-            if not isinstance(object, type):
-                object = object.instance()
-        return object
+        return call(object)
 
     @classmethod
     def new_type(cls, x):
@@ -640,7 +642,7 @@ class Juxt(Py):
             return object
 
         elif isinstance(object, str):
-            return ForwardInstance(object)
+            return Instance[object]
 
         elif isinstance(object, slice):
             f = Function()
