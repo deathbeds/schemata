@@ -45,9 +45,11 @@ jobs:
     needs: [build]
     runs-on: ${{ matrix.os }}-latest
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu, macos, windows]
-        py: [3.6, 3.9, pypy3]
+        # TODO: restore pypy3 after https://github.com/Zac-HD/hypothesis-jsonschema/issues/77
+        py: [3.6, 3.9]  #, pypy3]  
         exclude:
           - os: windows
             py: pypy3
@@ -65,6 +67,8 @@ jobs:
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.py }}
+      - if: ${{ matrix.os == 'ubuntu' && matrix.py == 'pypy3' }}
+        run: sudo apt-get install -y libxml2-dev libxslt-dev
       - run: ${{ matrix.pip }} install --upgrade pip wheel setuptools
       - uses: actions/download-artifact@v2
         with:
