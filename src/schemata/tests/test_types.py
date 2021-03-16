@@ -23,9 +23,6 @@ class BaseTest(unittest.TestCase):
 
     def test_forward(x):
         assert Forward("builtins.range").instance() is range
-        with pytest.raises(TypeError):
-            assert ForwardInstance("builtins.range").instance()
-        assert ForwardInstance("builtins.range").instance(10) == range(10)
 
 
 class LiteralTest(unittest.TestCase):
@@ -135,6 +132,52 @@ class ContainerTest(unittest.TestCase):
             MyList([dict(b="xxx")])
 
         assert MyList([dict(a="a")]) == [dict(a="a")]
+
+    def test_ilist(x):
+        t = IList[String]
+        with pytest.raises(ValidationErrors):
+            t("abc")
+
+        with pytest.raises(ValidationErrors):
+            t([1, 2])
+
+        l = t()
+        with pytest.raises(ValidationErrors):
+            l.append(1)
+
+        l.append("abc")
+        assert l == ["abc"]
+
+        l.extend(list("wxyz"))
+        assert l == ["abc", "w", "x", "y", "z"]
+
+        l.remove("w")
+        assert "w" not in l
+
+        l.pop()
+        assert "z" not in l
+        with pytest.raises(ValidationErrors):
+            l.append(1)
+
+        l.move(-1, 0)
+        assert l[0] == "y"
+
+        l.replace(0, "a")
+
+        assert l[0] == "a"
+
+        l.add("m")
+        assert l[-1] == "m"
+
+        with pytest.raises(ValidationErrors):
+            l + [1, 2]
+
+        with pytest.raises(ValidationErrors):
+            l += [1, 2]
+
+        # the behavior below is non canonical
+        l + ["n"]
+        assert l[-1] == "n"
 
 
 class ExoticTest(unittest.TestCase):
@@ -275,7 +318,7 @@ def test_patch(ps):
             x = p["type"](p["value"])
         else:
             with x:
-                x.patches(*p["patch"])
+                x.add_patches(*p["patch"])
 
         assert x == p["value"], f"{x}\n\n{p['value']}"
 

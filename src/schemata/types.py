@@ -517,13 +517,6 @@ class Forward(ForwardRef, _root=_root):
     __call__ = instance
 
 
-class ForwardInstance(Forward, _root=_root):
-    def instance(cls, *args, **kwargs):
-        return super().instance()(*args, **kwargs)
-
-    __call__ = instance
-
-
 class Sys(Any):
     """forward reference to python objects."""
 
@@ -879,20 +872,7 @@ class Patch:
     MOVE = dict(op="move")
     TEST = dict(op="test")
 
-    _depth = 0
-    _push_mode = 0
-
-    @staticmethod
-    def pointer(x):
-        import jsonpointer
-
-        if isinstance(x, str):
-            if x.startswith("/"):
-                return jsonpointer.JsonPointer(x).path
-            x = (x,)
-        if isinstance(x, tuple):
-            return jsonpointer.JsonPointer.from_parts(x).path
-        raise BaseException("dunno")
+    _depth = _push_mode = 0
 
     def __enter__(self):
         self._depth += 1
@@ -901,24 +881,27 @@ class Patch:
     def __exit__(self, *e):
         self._depth -= 1
         if not self._depth:
-            # a depth indicates we should collect our patches, verify and apply them.
+            # a depth indicates we should not collect our patches, verify and apply them.
             self.verify()
 
     def verify(self):
         with self.push_mode():
+            # push the changes to a temporary object
             x = self.inc()
 
         try:
+            # validate the object
             self.validate(x)
         except ValidationErrors as e:
-            self.reset()
             raise e
-
-        self.apply_patch()
+        else:
+            self.apply_patch()
+        finally:
+            self.reset()
 
     def push_mode(self):
-        """enter a push mode state where the dictionary can apply standard changes,
-        otherwise we only record the patches"""
+        # enter a push mode state where the dictionary can apply standard changes,
+        # otherwise we only record the patches
         import contextlib
 
         @contextlib.contextmanager
@@ -934,28 +917,39 @@ class Patch:
         import jsonpatch
 
         with self.push_mode():
-            jsonpatch.apply_patch(self, self._patches, in_place=True)
-            self.reset()
+            try:
+                jsonpatch.apply_patch(self, self._patches, in_place=True)
+            finally:
+                self.reset()
         return self
 
     def inc(self):
         """created a temporary instance of the patched object"""
         import jsonpatch
 
+        if not hasattr(self, "_patches"):
+            self._patches, self._applied_patches = [], []
+
         t = type(self)
-        t = [list, dict][issubclass(t, dict)]
         with self.push_mode():
-            self._tmp = jsonpatch.apply_patch(t(self), self._patches, in_place=False)
+            self._tmp = jsonpatch.apply_patch(
+                [list, dict][issubclass(type(self), dict)](self),
+                self._patches,
+                in_place=False,
+            )
+
         return self._tmp
 
     def resolve(self, x):
+        # resolve a jsonpointer reference on self
         import jsonpointer
 
         with self.push_mode():
             self = jsonpointer.resolve_pointer(self, Patch.pointer(x))
         return self
 
-    def patches(self, *patch):
+    def add_patches(self, *patch):
+        # add patches to a queue of chances to be applied
         if not hasattr(self, "_patches"):
             self._patches, self._applied_patches = [], []
 
@@ -967,29 +961,60 @@ class Patch:
 
         return self
 
-    def add(self, key, value):
-        return self.patches(dict(path=key, value=self[key], **self.ADD))
-
-    def remove(self, key, *default):
-        return self.patches(dict(path=key, value=self[key], **self.REMOVE))
-
-    def move(self, key, target):
-        return self.patches(dict(path=target, **{"from": key}, **self.MOVE))
-
-    def copy(self, key, target):
-        return self.patches(dict(path=target, **{"from": key}, **self.COPY))
-
-    def replace(self, key, value):
-        return self.patches(dict(path=key, value=value, **self.REPLACE))
-
     def reset(self):
         self._depth = self._push_mode = 0
-        for x in (self._patches, self._applied_patches, self._tmp):
+        for x in (self._patches, self._applied_patches):
             while x:
                 if isinstance(x, list):
                     x.pop()
                 elif isinstance(x, dict):
                     x.popitem()
+
+    # jsonpointer method
+    @staticmethod
+    def pointer(x):
+        import jsonpointer
+
+        if isinstance(x, tuple):
+            return jsonpointer.JsonPointer.from_parts(x).path
+
+        if not isinstance(x, str):
+            if x == -1:
+                x = "-"
+            else:
+                x = str(x)
+
+        if isinstance(x, str):
+            if x.startswith("/"):
+                return jsonpointer.JsonPointer(x).path
+            return Patch.pointer((x,))
+        raise BaseException("dunno")
+
+    # json patch methods
+    def add(self, key, value):
+        # add patch
+        return self.add_patches(dict(path=key, value=self[key], **self.ADD))
+
+    def remove(self, key, *default):
+        # remove patch
+        return self.add_patches(dict(path=key, value=self[key], **self.REMOVE))
+
+    def move(self, key, target):
+        # move patch
+        if key == -1:
+            key = len(self) - 1
+        if target == -1:
+            target = len(self) - 1
+
+        return self.add_patches(dict(path=target, **{"from": key}, **self.MOVE))
+
+    def copy(self, key, target):
+        # copy patch
+        return self.add_patches(dict(path=target, **{"from": key}, **self.COPY))
+
+    def replace(self, key, value):
+        # replace patch
+        return self.add_patches(dict(path=key, value=value, **self.REPLACE))
 
 
 from .objects import *  # isort:skip
