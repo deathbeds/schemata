@@ -36,7 +36,7 @@ jobs:
           ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-${{ hashFiles('pyproject.toml') }}
         restore-keys: |
           ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-
-    - run: pip install --ignore-installed --upgrade .[test] pytest-github-actions-annotate-failures 
+    - run: pip install --ignore-installed --upgrade .[test]
     - run: pytest --pyargs schemata -vv --durations=10 --cov=schemata --cov-report term-missing:skip-covered --no-cov-on-fail --cov-fail-under 74
     - run: python -m pip install codecov && codecov
 
@@ -49,14 +49,14 @@ jobs:
       matrix:
         os: [ubuntu, macos, windows]
         # TODO: restore pypy3 after https://github.com/Zac-HD/hypothesis-jsonschema/issues/77
-        py: [3.6, 3.9]  #, pypy3]  
+        py: [3.6, 3.9]  #, pypy3]
         exclude:
           - os: windows
             py: pypy3
         include:
           - os: ubuntu
             pip: python -m pip
-            pip-cache: ~/.cache/pip 
+            pip-cache: ~/.cache/pip
           - os: macos
             pip: python3 -m pip
             pip-cache: ~/Library/Caches/pip
@@ -64,6 +64,7 @@ jobs:
             pip: python -m pip
             pip-cache: ~\AppData\Local\pip\Cache
     steps:
+      - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.py }}
@@ -81,5 +82,5 @@ jobs:
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-
-      - run: ${{ matrix.pip }} install --find-links=dist schemata[test] pytest-github-actions-annotate-failures
-      - run: pytest --pyargs schemata -vv --durations=10
+      - run: ${{ matrix.pip }} install --find-links=dist schemata[test]
+      - run: cd dist && pytest --pyargs schemata -vv --durations=10

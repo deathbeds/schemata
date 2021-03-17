@@ -334,6 +334,6 @@ def test_juxt():
 
 
 def test_annotation_fail():
-    import platform
-    if platform.system() == "Windows":
-        raise Exception("delete me")
+    import sys
+    if sys.version_info < (3, 7):
+        assert True is False
