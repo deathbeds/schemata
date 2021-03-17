@@ -6,10 +6,11 @@
 import os
 import sys
 import sysconfig
-from pathlib import Path
 from collections import OrderedDict
+from pathlib import Path
 
 import pytest
+
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item, call):

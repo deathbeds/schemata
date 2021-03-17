@@ -8,6 +8,8 @@ import pytest
 
 from schemata import *
 
+raises = pytest.raises(ValidationErrors)
+
 
 def unwrap(x):
     return getattr(getattr(x, "hypothesis", x), "inner_test", x)
@@ -73,6 +75,14 @@ class LiteralTest(unittest.TestCase):
         assert "application/json" in Json({})._repr_mimebundle_()[0]
         assert "text/plain" in String("")._repr_mimebundle_()[0]
 
+    def test_enum(x):
+        E = Enum["a", "b"]
+
+        assert E() == "a"
+        with raises:
+            E("c")
+        assert E("b") == "b"
+
 
 false = (0, "", [], {})
 true = (1.0, "a", ["a"], {"a": bool})
@@ -134,51 +144,85 @@ class ContainerTest(unittest.TestCase):
         assert MyList([dict(a="a")]) == [dict(a="a")]
 
     def test_ilist(x):
-        t = IList[String]
-        with pytest.raises(ValidationErrors):
-            t("abc")
+        L = IList[String]
 
-        with pytest.raises(ValidationErrors):
-            t([1, 2])
+        with raises:
+            L(1)
 
-        l = t()
-        with pytest.raises(ValidationErrors):
+        with raises:
+            L("abc")
+
+        l = (list >> L)("abc")
+
+        assert isinstance(l, IList)
+
+        with raises:
             l.append(1)
 
-        l.append("abc")
-        assert l == ["abc"]
+        l.append("d")
 
-        l.extend(list("wxyz"))
-        assert l == ["abc", "w", "x", "y", "z"]
+        assert l == list("abcd")
 
-        l.remove("w")
-        assert "w" not in l
+        with raises:
+            l.extend([1, "a"])
+
+        l.extend(list("ef"))
+        assert l == list("abcdef")
+
+        l.remove("a")
+        assert l == list("bcdef")
+
+        l.pop(0)
+        assert l == list("cdef")
+
+        assert l[0] == "c" and l[-1] == "f"
 
         l.pop()
-        assert "z" not in l
-        with pytest.raises(ValidationErrors):
-            l.append(1)
+        assert l[-1] == "e"
 
-        l.move(-1, 0)
-        assert l[0] == "y"
+        with raises:
+            m = l + [2, 4]
 
-        l.replace(0, "a")
+        m = l + list("yz")
 
-        assert l[0] == "a"
+        assert m == list("cdeyz")
 
-        l.add("m")
-        assert l[-1] == "m"
+        m.insert(3, "w")
+        assert m == list("cdewyz")
 
-        with pytest.raises(ValidationErrors):
-            l + [1, 2]
+        m[3] = "W"
 
-        with pytest.raises(ValidationErrors):
-            l += [1, 2]
+        assert m == list("cdeWyz")
 
-        # the behavior below is non canonical
-        l + ["n"]
-        assert l[-1] == "n"
+    def test_idict(x):
+        D = IDict[String]
+        
+        with raises:
+            D(a=1)
 
+        d = D(a="A")
+        assert d == dict(a="A") and d["a"] == d.get("a") == "A" and d.get("q") is None
+        with raises:
+            d["a"] = 1
+
+        d["a"] = "B"
+        assert d == dict(a="B") and d["a"] == "B"
+        d.pop("a")
+        assert not d
+
+        d.update(b="B", c="C")
+        
+        assert d == dict(b="B", c="C")
+        
+        with raises:
+            d.update(b="B", c="C", d=1)
+        
+        with raises:
+            (D>=1)()
+        e = (D>=1)(a="a")
+        with raises:
+            e.pop("a")
+        assert e ==dict(a="a")
 
 class ExoticTest(unittest.TestCase):
     @hypothesis.strategies.composite

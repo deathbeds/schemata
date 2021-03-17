@@ -993,11 +993,12 @@ class Patch:
     # json patch methods
     def add(self, key, value):
         # add patch
-        return self.add_patches(dict(path=key, value=self[key], **self.ADD))
+        return self.add_patches(dict(path=key, value=value, **self.ADD))
 
     def remove(self, key, *default):
         # remove patch
-        return self.add_patches(dict(path=key, value=self[key], **self.REMOVE))
+        # we can and might want to include the value in the patch
+        return self.add_patches(dict(path=key, **self.REMOVE))
 
     def move(self, key, target):
         # move patch

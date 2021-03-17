@@ -9,8 +9,8 @@ class ValidationError(BaseException):
 ValidationErrors = (ValidationError, __import__("jsonschema").ValidationError)
 
 
-class ABC:
-    # the ABC represents all of the bespoke type api features we provide through schemata.
+class Interface:
+    # the Interface represents all of the bespoke type api features we provide through schemata.
 
     # types and strategies are caches for types and hypothesis strategies
     types, strategies = {}, {}
@@ -37,10 +37,6 @@ class ABC:
 
     @abc.abstractclassmethod
     def strategy(cls, *args):  # pragma: no cover
-        pass
-
-    @abc.abstractclassmethod
-    def cast(cls, *args):  # pragma: no cover
         pass
 
     @abc.abstractclassmethod
@@ -186,7 +182,7 @@ class ABC:
         return x
 
 
-class Generic(ABC, abc.ABCMeta):
+class Generic(Interface, abc.ABCMeta):
     # the generic base case is the metaclass for all of schemata's typess and protocols
     # in this specific definition we only add magic method definitions to the types
 
@@ -209,7 +205,7 @@ class Generic(ABC, abc.ABCMeta):
             "__annotations__",
         )
 
-        for x in vars(ABC).values():
+        for x in vars(Interface).values():
             # since we've defined our base class completely, we enforce our abstract methods
             # to be classmethods. we have to do this before object creation otherwise
             # we lose track of our class methods and would have to attach them to
@@ -417,8 +413,13 @@ class Generic(ABC, abc.ABCMeta):
         cls.__annotations__.update(getattr(cls, f"__{op}__", object).__annotations__)
         return cls
 
-    for x in ("add", " sub", " rshift", " lshift", " or", " and", " xor", " mul"):
+    def __r__(cls, op, object):
+        return getattr(Generic, f"__{op}__")(object, cls)
+
+    for x in ("add", "sub", "rshift", "lshift", "or", "and", "xor", "mul"):
         locals()[f"__i{x}__"] = functools.partialmethod(__i__, x)
+        locals()[f"__r{x}__"] = functools.partialmethod(__r__, x)
+
     del x
 
     # right sided operations

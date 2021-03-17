@@ -4,24 +4,25 @@ from .types import List, Patch
 class IList(Patch, List):
     """a mutable list with validation"""
 
-    def copy(self, source=None, target=None):
-        if self._push_mode:
-            return dict.copy(self)
-        with self:
-            return self.copy(source, target)
+    # list has a copy method, i'm not sure what schemata should do with it.
+    copy, clear, count, sort, reverse, index = (
+        list.copy,
+        list.clear,
+        list.count,
+        list.sort,
+        list.reverse,
+        list.index,
+    )
 
     def append(self, object):
         self.extend((object,))
-
-    add = append
 
     def extend(self, args=None):
         if self._push_mode:
             return list.extend(self, args)
         with self:
-            self.add_patches(
-                *(dict(path="/-", value=x, **self.ADD) for x in args or [])
-            )
+            for x in args or []:
+                self.add(-1, x)
 
     def insert(self, id, value):
         if self._push_mode:
@@ -30,22 +31,15 @@ class IList(Patch, List):
             self.add(id, value)
 
     def pop(self, index=-1):
-        if self._push_mode:
-            return list.pop(self, index)
         with self:
-            return super().remove(str(len(self) - 1 if index == -1 else index))
+            if index == -1:
+                index = len(self) - 1
+            return super().remove(index)
 
     def remove(self, value):
-        if self._push_mode:
-            return list.remove(self, value)
         self.pop(self.index(value))
 
-    def __getitem__(self, key):
-        if isinstance(key, str):
-            if self._push_mode:
-                return list.__getitem__(self, key)
-            return self.resolve(key)
-        return list.__getitem__(self, key)
+    __getitem__ = list.__getitem__
 
     def __setitem__(self, key, value):
         if self._push_mode:
@@ -53,13 +47,10 @@ class IList(Patch, List):
         with self:
             self.replace(key, value)
 
-    def replace(self, key, value):
-        # replace patch
-        with self:
-            super().replace(key, value)
+    __iadd__ = extend
 
-    def move(self, key, target):
-        with self:
-            super().move(key, target)
+    def __add__(self, object):
+        return type(self)(list.__add__(self, object))
 
-    __iadd__ = __add__ = extend
+    def __delitem__(self, x):
+        return list.__delitem__(self, x)

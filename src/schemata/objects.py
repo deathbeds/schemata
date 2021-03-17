@@ -4,18 +4,9 @@ from .types import Dict, Patch
 class IDict(Patch, Dict):
     """a mutable dict with validation"""
 
-    def copy(self, source=None, target=None):
-        if self._push_mode:
-            return dict.copy(self)
-        with self:
-            return self.copy(source, target)
-
-    def get(self, key, default=None):
-        return self.resolve(key)
+    copy = dict.copy
 
     def pop(self, key, default=None):
-        if self._push_mode:
-            return dict.pop(self, key, default)
         with self:
             return self.remove(key)
 
@@ -39,4 +30,7 @@ class IDict(Patch, Dict):
 
         with self:
             for k, v in dict(*args, **kwargs).items():
-                self.replace(k, v)
+                if k in self:
+                    self.replace(k, v)
+                else:
+                    self.add(k, v)

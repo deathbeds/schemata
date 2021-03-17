@@ -32,3 +32,10 @@ test = ["pytest", "hypothesis", "hypothesis-jsonschema", "pytest-cov"]
 include = []
 
 [tool.flit.entrypoints]
+
+[tool.coverage.run]
+omit = [
+    "src/schemata/tests/*" ]
+
+[tool.coverage.html]
+directory = "docs/coverage"

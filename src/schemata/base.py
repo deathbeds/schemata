@@ -40,6 +40,21 @@ class Display:
 
         return {t: self}, {}
 
+    # https://rich.readthedocs.io/en/latest/protocol.html
+    # def __rich__(self):
+    #     # rich display
+    #     return
+
+    # def __rich_console__(self):
+    #     yield
+
+    # def __rich_measure__(self), console, max_dict):
+    #     pass
+
+    # def __pt_container__(self):
+    #     # prompt toolkit display
+    #     return
+
 
 class Any(Display, metaclass=Generic):
     # the primary concrete type of every schemata export
@@ -86,21 +101,21 @@ class Any(Display, metaclass=Generic):
 
         CONST, DEFAULT, ENUM = "const", "default", "enum"
         s = cls.schema(0)
+        if isinstance(s, typing.Iterable):
+            # find constants first, always return the constant if there is one
+            if CONST in s:
+                return (s[CONST],)
 
-        # find constants first, always return the constant if there is one
-        if CONST in s:
-            return (s[CONST],)
+            if args:
+                return args
 
-        if args:
-            return args
+            # then look for default
+            if DEFAULT in s:
+                return (s[DEFAULT],)
 
-        # then look for default
-        if DEFAULT in s:
-            return (s[DEFAULT],)
-
-        # then look for enums
-        if ENUM in s:
-            return tuple(s[ENUM][:1])
+            # then look for enums
+            if ENUM in s:
+                return tuple(s[ENUM][:1])
 
         return args
 
@@ -142,18 +157,11 @@ class Any(Display, metaclass=Generic):
         return x[0].lower() + x[1:] if x else x  #  lowercase x
 
     @classmethod
-    def cast(*args):
-        # cast the type to another type if it validates
-        from .types import Py
-
-        return Py[args]
-
-    @classmethod
     def enter(cls):
         # an empty enter method for abc compliance
-        pass
+        pass  # pragma: no cover
 
     @classmethod
     def exit(cls, *e):
         # an empty exit method for abc compliance
-        pass
+        pass  # pragma: no cover
