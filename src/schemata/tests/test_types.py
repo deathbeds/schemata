@@ -331,9 +331,3 @@ def test_juxt():
     assert Juxt[{type, range}](1) == {int, range(1)}
     assert Juxt[dict(a=type, b=range)](1) == {"a": int, "b": range(0, 1)}
     assert Juxt[{type: type, str: range}](1) == {int: int, "1": range(0, 1)}
-
-
-def test_annotation_fail():
-    import sys
-    if sys.version_info < (3, 7):
-        assert True is False
