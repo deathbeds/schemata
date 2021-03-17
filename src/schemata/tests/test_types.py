@@ -331,3 +331,9 @@ def test_juxt():
     assert Juxt[{type, range}](1) == {int, range(1)}
     assert Juxt[dict(a=type, b=range)](1) == {"a": int, "b": range(0, 1)}
     assert Juxt[{type: type, str: range}](1) == {int: int, "1": range(0, 1)}
+
+
+def test_annotation_fail():
+    import platform
+    if platform.system() == "Windows":
+        raise Exception("delete me")
