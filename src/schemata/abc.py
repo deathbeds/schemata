@@ -132,11 +132,7 @@ class Interface:
                     return a[CONTEXT][VOCAB]
 
     def choices(cls):
-        for x in cls.__mro__:
-            a = Generic.annotations(x)
-            if "enum" in a:
-                return a["enum"]
-        return []
+        return cls.schema(0).get("enum", [])
 
     # staticmethods
     @staticmethod
@@ -325,7 +321,7 @@ class Generic(Interface, abc.ABCMeta):
         if issubclass(cls, T.List):
             return cls + T.List.MaxItems[object - 1]
 
-        return super().__lt__(object)
+        return super().__lt__(object)  # pragma: no cover
 
     def __le__(cls, object):
         from . import types as T
@@ -339,7 +335,7 @@ class Generic(Interface, abc.ABCMeta):
         if issubclass(cls, T.List):
             return cls + T.List.MaxItems[object]
 
-        return super().__le__(object)
+        return super().__le__(object)  # pragma: no cover
 
     def __gt__(cls, object):
         from . import types as T
@@ -353,7 +349,7 @@ class Generic(Interface, abc.ABCMeta):
         if issubclass(cls, T.List):
             return cls + T.List.MinItems[object + 1]
 
-        return super().__gt__(object)
+        return super().__gt__(object)  # pragma: no cover
 
     def __ge__(cls, object):
         from . import types as T
@@ -367,7 +363,7 @@ class Generic(Interface, abc.ABCMeta):
         if issubclass(cls, T.List):
             return cls + T.List.MinItems[object]
 
-        return super().__ge__(object)
+        return super().__ge__(object)  # pragma: no cover
 
     def __mul__(cls, object):
         from . import types as T

@@ -78,6 +78,7 @@ class LiteralTest(unittest.TestCase):
     def test_enum(x):
         E = Enum["a", "b"]
 
+        assert E.choices() == ("a", "b")
         assert E() == "a"
         with raises:
             E("c")
@@ -281,6 +282,8 @@ class ExoticTest(unittest.TestCase):
         with pytest.raises(ValidationErrors):
             t(v)
 
+        assert not isinstance(v, t)
+
     test_symbollic = hypothesis.given(
         hypothesis.strategies.sampled_from(
             (
@@ -294,6 +297,8 @@ class ExoticTest(unittest.TestCase):
                 (Dict >= 1) <= 10,
                 (List > 1) < 10,
                 (List >= 1) <= 10,
+                List[String] * 10,
+                Float - Integer,
                 OneOf[Bool],
                 OneOf[Null],
             )
@@ -343,6 +348,14 @@ class CastTests(unittest.TestCase):
         with pytest.raises(ValidationErrors):
             Cast[Integer, String](1)
         assert Cast[Integer, str, String](10) == "10"
+
+        assert (String << print)("abc") == "abc"
+        assert (String >> print)("abc") is None
+
+        assert (String >> list)("abc") == list("abc")
+        s = String("abc")
+        s += "de"
+        assert s == "abcde"
 
 
 @hypothesis.given(draw_patches())
