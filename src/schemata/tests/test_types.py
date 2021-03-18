@@ -196,7 +196,7 @@ class ContainerTest(unittest.TestCase):
 
     def test_idict(x):
         D = IDict[String]
-        
+
         with raises:
             D(a=1)
 
@@ -211,18 +211,19 @@ class ContainerTest(unittest.TestCase):
         assert not d
 
         d.update(b="B", c="C")
-        
+
         assert d == dict(b="B", c="C")
-        
+
         with raises:
             d.update(b="B", c="C", d=1)
-        
+
         with raises:
-            (D>=1)()
-        e = (D>=1)(a="a")
+            (D >= 1)()
+        e = (D >= 1)(a="a")
         with raises:
             e.pop("a")
-        assert e ==dict(a="a")
+        assert e == dict(a="a")
+
 
 class ExoticTest(unittest.TestCase):
     @hypothesis.strategies.composite
@@ -375,3 +376,20 @@ def test_juxt():
     assert Juxt[{type, range}](1) == {int, range(1)}
     assert Juxt[dict(a=type, b=range)](1) == {"a": int, "b": range(0, 1)}
     assert Juxt[{type: type, str: range}](1) == {int: int, "1": range(0, 1)}
+
+
+class StringTest(unittest.TestCase):
+    def test_uritemplate(x):
+        t = UriTemplate(
+            "https://api.github.com/search/issues?q={query}{&page,per_page,sort,order}"
+        )
+        assert callable(t)
+        assert t(query="heart") == "https://api.github.com/search/issues?q=heart"
+
+    def test_templates(x):
+        assert Format["pos arg {}, kwarg {foo}"]("hi", foo=2) == "pos arg hi, kwarg 2"
+        assert Dollar["kwarg $foo $bar"](foo=1, bar="hello") == "kwarg 1 hello"
+        assert Jinja["kwarg {{foo}} {{bar}}"](foo=1, bar="hello") == "kwarg 1 hello"
+        assert JsonE[{"foo": {JsonE.EVAL: "foo"}, "bar": {JsonE.EVAL: "bar"}}](
+            foo=1, bar="hello"
+        ) == {"foo": 1, "bar": "hello"}

@@ -36,7 +36,7 @@ class UriTemplate(T.String, T.String.Format["uri-template"]):
     # a UriTemplate is template for ids, we make it callable to resolve to Uri
     # with get, post, patch, head, options, ... methods
 
-    def apply(self, *args, **kwargs):
+    def __call__(self, **kwargs):
         import uritemplate
 
         return T.Uri(uritemplate.URITemplate(self).expand(**kwargs))
@@ -64,7 +64,7 @@ class Formatter:
 
 class Format(Formatter, Pattern):
     def format(self, *args, **kwargs):
-        return self.format(**dict(*args, **kwargs))
+        return self.format(*args, **kwargs)
 
 
 class Jinja(Formatter, Pattern):
@@ -73,17 +73,17 @@ class Jinja(Formatter, Pattern):
 
         import jinja2
 
-        return jinja2.Template(self).render(*args, **sys.modules, **kwargs)
+        return jinja2.Template(self).render({**sys.modules, **dict(*args, **kwargs)})
 
 
 class Dollar(Formatter, Pattern):
     def format(self, *args, **kwargs):
         import string
 
-        return string.Template(self).safe_substitute(*args, **kwargs)
+        return string.Template(self).safe_substitute(dict(*args, **kwargs))
 
 
-class E(Formatter, Pattern):
+class JsonE(Formatter, Pattern):
     type: "dict"
     EVAL = "$eval"
     JSON = "$json"
