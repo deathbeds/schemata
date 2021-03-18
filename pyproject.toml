@@ -24,7 +24,8 @@ app = ["typer", "jinja2"]
 web = ["fastapi", "jinja2"]
 tasks = ["doit"]
 ipython = ["IPython"]
-test = ["pytest", "hypothesis", "hypothesis-jsonschema", "pytest-cov"]
+template = ["jinja2", "json-e"]
+test = ["pytest", "hypothesis", "hypothesis-jsonschema", "pytest-cov", "jinja2", "json-e"]
 
 [tool.flit.scripts]
 
