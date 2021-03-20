@@ -22,9 +22,12 @@ def type_example(x):
 class BaseTest(unittest.TestCase):
     def test_base(x):
         assert Any.new_type() is Any
+        assert len(list(Any.children())) > 150
 
     def test_forward(x):
         assert Forward("builtins.range").instance() is range
+        with pytest.raises(ConsentException):
+            Forward("abcde").instance()
 
 
 class LiteralTest(unittest.TestCase):
@@ -298,6 +301,9 @@ class ExoticTest(unittest.TestCase):
                 (List > 1) < 10,
                 (List >= 1) <= 10,
                 List[String] * 10,
+                List[String, Integer],
+                Tuple[[String, Integer]],
+                Tuple[Integer],
                 Float - Integer,
                 OneOf[Bool],
                 OneOf[Null],
@@ -406,3 +412,43 @@ class StringTest(unittest.TestCase):
         assert JsonE[{"foo": {JsonE.EVAL: "foo"}, "bar": {JsonE.EVAL: "bar"}}](
             foo=1, bar="hello"
         ) == {"foo": 1, "bar": "hello"}
+
+
+class PyTypeTest(unittest.TestCase):
+    def test_pytypes(x):
+        def f():
+            pass
+
+        import functools
+
+        assert Sys["functools"]() is Sys["functools"].instance() is functools
+
+        assert (
+            Sys["functools.partial"]()
+            is Sys["functools.partial"].instance()
+            is functools.partial
+        )
+
+        assert isinstance(int, Sys["functools.partial"])
+
+        assert not isinstance(int, Py["functools.partial"])
+
+        assert isinstance(functools.partial(f), Py["functools.partial"])
+
+        assert Py["builtins.range"]() is range
+
+        with pytest.raises(TypeError):
+            Instance["builtins.range"]()
+
+        assert Instance["builtins.range"](10) == range(10)
+        assert isinstance(range(10), Instance["builtins.range"])
+
+        import urllib
+
+        import inspect
+
+        assert Instance["urllib.request.Request"].__signature__ == inspect.signature(
+            urllib.request.Request
+        )
+        assert Instance[Integer](10) == 10
+        assert Instance[list]([1]) == [1]

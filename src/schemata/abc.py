@@ -27,14 +27,27 @@ class Interface:
     def default(cls, *args, **kwargs):  # pragma: no cover
         pass
 
+    # compare types to determine if they are equal
+    @abc.abstractclassmethod
+    def compare(cls, type):  # pragma: no cover
+        pass
+
+    # instantiate a schemata type
     @abc.abstractclassmethod
     def instance(cls, *args, **kwargs):  # pragma: no cover
         pass
 
+    # validate whether an object is an instance of a schemata type
     @abc.abstractclassmethod
     def validate(cls, *args):  # pragma: no cover
         pass
 
+    # validate whether an object is a subclass of a schemata type
+    @abc.abstractclassmethod
+    def validate_type(cls, *args):  # pragma: no cover
+        pass
+
+    # generate a hypothesis strategy for the schemata type
     @abc.abstractclassmethod
     def strategy(cls, *args):  # pragma: no cover
         pass
@@ -47,13 +60,23 @@ class Interface:
     def exit(cls, *e):  # pragma: no cover
         pass
 
+    # attach a signature and other interactive properties to a type.
+    # a refector is needed to make this work
+    @abc.abstractclassmethod
+    def sign(cls):  # pragma: no cover
+        pass
+
+    # generate an example of the schemata type
     def example(cls):
         return cls.strategy().example()
 
+    # return the content media type of the schemata type
     @abc.abstractclassmethod
     def mediatype(cls, *args, **kwargs):  # pragma: no cover
         pass
 
+    # a generate method for creating new schemata types and cache the methods
+    # the caching is unnecessary with the compare method
     def new_type(cls, **kwargs):
         # new_type is our alias for making a new type.
         if not isinstance(cls, tuple):
@@ -97,6 +120,7 @@ class Interface:
     def annotations(cls):
         return getattr(object, "__annotations__", {})
 
+    # annotate a schemata type with rdf and python metadata
     def annotate(cls, t=None, in_place=False, **kwargs):
         TYPE = "@type"
         if t is not None:
@@ -106,9 +130,8 @@ class Interface:
             return cls
         return Generic.new_type(cls, **kwargs)
 
-    # type classmethods
+    # generate all the children of a schemata type
     def children(cls, deep=True):  # pragma: no cover
-        from .protocols import Protocol
 
         if not deep:
             yield from cls.__subclasses__()
@@ -116,13 +139,11 @@ class Interface:
         yield cls
 
         for cls in cls.__subclasses__():
-            if issubclass(cls, Protocol):
-                continue
             if hasattr(cls, "children"):
-                v = getattr(cls, "children")
-                if callable(v):
+                if callable(cls.children):
                     yield from cls.children()
 
+    # return the rdf vocab being used to describe the schemata type
     def vocab(cls):
         CONTEXT, VOCAB = "@context", "@vocab"
         for x in cls.__mro__:
@@ -130,9 +151,6 @@ class Interface:
             if CONTEXT in a:
                 if VOCAB in a[CONTEXT]:
                     return a[CONTEXT][VOCAB]
-
-    def choices(cls):
-        return cls.schema(0).get("enum", [])
 
     # staticmethods
     @staticmethod

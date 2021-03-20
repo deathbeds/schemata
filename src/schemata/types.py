@@ -493,20 +493,42 @@ Generic.types[
 ] = Dict
 
 
+class ConsentException(BaseException):
+    pass
+
+
 class Forward(ForwardRef, _root=_root):
+    # an overloaded forward reference method that allows both strings and literals.
     def __new__(cls, object):
+        # only check string Forward References.
         if isinstance(object, str):
             self = super().__new__(cls)
             self.__init__(object)
             return self
 
+    def consent(self):
+        # it would be dangerous too allow any forward reference anytime.
+        # consent means that the end user has imported the namespace in sys.modules
+        # this will indicate consent
+        import sys
+
+        if isinstance(self.__forward_arg__, str):
+            module = self.__forward_arg__.partition(".")[0]
+            if module not in sys.modules:
+                raise ConsentException(
+                    f"Import {module} to consent to making forward references to its attributes."
+                )
+
     def _evaluate(self, force=False, globals=None, locals=None):
+        import sys
+
         if self.__forward_evaluated__:
             return self.__forward_value__
         if not globals or locals:
             # we've redirected our interests to explicit forward reference off of sys.modules.
             # no errors, just False exceptions
             globals = locals = __import__("sys").modules
+        self.consent()
         self.__forward_value__ = eval(self.__forward_code__, globals, locals)
         self.__forward_evaluated__ = True
         return self.__forward_value__
@@ -520,19 +542,9 @@ class Forward(ForwardRef, _root=_root):
 class Sys(Any):
     """forward reference to python objects."""
 
-    def __init_subclass__(cls, **kwargs):
-        import inspect
-
-        super().__init_subclass__(**kwargs)
-        if hasattr(cls, "value"):
-            try:
-                cls.__signature__ = inspect.signature(cls.value[0])
-            except ValueError:
-                pass
-
     @classmethod
     def validate(cls, *args):
-        return cls.value[0].validate(*args)
+        return args
 
     @classmethod
     def schema(cls, ravel=True):
@@ -541,19 +553,24 @@ class Sys(Any):
             return v.schema(ravel)
         return v
 
-    @classmethod
-    def instance(cls, *args, **kwargs):
+    @staticmethod
+    def get_value(object):
         import typing
 
-        self = super().instance(*args)
-        if hasattr(self, "value"):
-            if isinstance(self.value, typing.Iterable):
-                object = self.value[0]
+        if hasattr(object, "value"):
+            if isinstance(object.value, typing.Iterable):
+                object = object.value[0]
             else:
-                object = self.value
-        else:
-            object = self
-        return call(object)
+                object = object.value
+            if isinstance(object, Forward):
+
+                return call(object)
+            return object
+        return super().instance()
+
+    @classmethod
+    def instance(cls):
+        return cls.get_value(super().instance())
 
     @classmethod
     def new_type(cls, x):
@@ -568,32 +585,33 @@ class Sys(Any):
 
 
 class Py(Sys):
-    # forces the import
-    pass
-
-
-class Cast(Py):
     @classmethod
-    def instance(cls, *args, **kwargs):
-        args = cls.default(*args)
-
-        for i, f in enumerate(cls.value):
-            args, kwargs = (call(f, *args, **kwargs),), {}
-
-        return args[0]
+    def validate(cls, *args):
+        if isinstance(*args, Py.get_value(cls)):
+            return args
+        raise ValidationError(f"{args} is not an instance of {cls}")
 
 
 class Instance(Py):
     # force the import
     # so many schema have a thing, this is ours
     @classmethod
+    def validate(cls, *args):
+        if isinstance(*args, Py.get_value(cls)):
+            return args
+        raise ValidationError(f"{args} is not an instance of {cls}")
+
+    @classmethod
     def instance(cls, *args, **kwargs):
         """kind of like a functor."""
         f = super().instance()
+        # call callables, basically making this a functor
         if callable(f):
             import functools
 
-            return functools.partial(f, *cls.args, **cls.kwargs)(*args, **kwargs)
+            return functools.partial(
+                f, *getattr(cls, "args", tuple()), **getattr(cls, "kwargs", dict())
+            )(*args, **kwargs)
 
         return f
 
@@ -614,10 +632,51 @@ class Instance(Py):
             else:
                 args += (arg,)
 
-        return Generic.new_type(cls, value=(value,), args=args, kwargs=kwargs)
+        cls = Generic.new_type(cls, value=(value,), args=args, kwargs=kwargs)
+
+        import inspect
+
+        try:
+            cls.__signature__ = inspect.signature(cls.get_value(cls))
+        except (ValueError, TypeError, ConsentException):
+            # this a ui thing
+            pass
+        return cls
 
 
-class Kwargs(Instance):
+class Cast(Instance):
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        args, kwargs = (super().instance(*args, **kwargs),), {}
+
+        for i, f in enumerate(cls.value):
+            if i:
+                args, kwargs = (call(f, *args, **kwargs),), {}
+
+        return args[0]
+
+    @classmethod
+    def new_type(cls, object):
+        if not isinstance(object, tuple):
+            object = (object,)
+
+        value, *object = object
+        if isinstance(value, str):
+            value = Forward(value)
+
+        cls = Generic.new_type(cls, value=(value,) + tuple(object))
+
+        import inspect
+
+        try:
+            cls.__signature__ = inspect.signature(cls.get_value(cls))
+        except (ValueError, TypeError, ConsentException):
+            # this a ui thing
+            pass
+        return cls
+
+
+class Kwargs(Cast):
     @classmethod
     def instance(cls, *args, **kwargs):
         """kind of like a functor."""
@@ -706,8 +765,9 @@ class Enum(Validate, Literal, Generic.Plural, type=P.XSD["enumeration"]):
         cls._attach_parent(self)
         return self
 
-    # we need a strategy for extensible type bases.
-    # maybe can get them from all instances.
+    @classmethod
+    def choices(cls):
+        return cls.schema(0)[Enum.alias()]
 
 
 class Pointer(String, String.Format["json-pointer"]):
@@ -1165,4 +1225,4 @@ class Excepts(Conditional, Instance):
             return X(e)
 
 
-del _root
+del _root, ForwardRef
