@@ -90,12 +90,4 @@ jobs:
           restore-keys: |
             ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-test-
       - run: ${{ matrix.pip }} install --find-links=dist schemata[test]
-      - run: |
-          cd dist
-          pytest --pyargs schemata -vv --html=build/test
-      - uses: actions/upload-artifact@v2
-        if: ${{ always() }}
-        with:
-          name: schemata test reports ${{ github.run_number }} ${{ matrix.os }} ${{ matrix.py }}
-          path: |
-            ./build/test
+      - run: cd dist && pytest --pyargs schemata -vv

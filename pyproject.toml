@@ -32,7 +32,6 @@ tasks = ["doit"]
 ipython = ["IPython"]
 template = ["jinja2", "json-e"]
 test = [
-    "ansi2html",
     "hypothesis-jsonschema >=0.19.1",
     "hypothesis",
     "jinja2",
