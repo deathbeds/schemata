@@ -48,8 +48,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu, macos, windows]
-        # TODO: restore pypy3 after https://github.com/Zac-HD/hypothesis-jsonschema/issues/77
-        py: [3.6, 3.9]  #, pypy3]
+        py: [3.6, 3.9, pypy3]
         exclude:
           - os: windows
             py: pypy3
