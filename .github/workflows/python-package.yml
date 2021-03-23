@@ -39,13 +39,7 @@ jobs:
         restore-keys: |
           ${{ env.CACHE_EPOCH }}-${{ runner.os }}-pip-build-
     - run: pip install --ignore-installed --upgrade .[test,ci]
-    - run: pytest -vv --pyargs schemata --durations=5 --cov=schemata --cov-report=term-missing:skip-covered --cov-report=html:build/htmlcov --no-cov-on-fail --cov-fail-under=${{ env.COVERAGE_THRESHOLD }}
-    - uses: actions/upload-artifact@v2
-      if: ${{ always() }}
-      with:
-        name: schemata build reports ${{ github.run_number }}
-        path: |
-          ./build/htmlcov
+    - run: pytest -vv --pyargs schemata --durations=5 --cov=schemata --cov-report=term-missing:skip-covered --no-cov-on-fail --cov-fail-under=${{ env.COVERAGE_THRESHOLD }}
     - run: codecov
 
   test:
