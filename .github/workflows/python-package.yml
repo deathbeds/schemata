@@ -9,7 +9,7 @@ on:
 env:
   CACHE_EPOCH: 1
   # this is only checked in the `build` job
-  COVERAGE_THRESHOLD: 84
+  COVERAGE_THRESHOLD: 83
 
 jobs:
   build:
