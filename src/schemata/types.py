@@ -121,11 +121,12 @@ class List(forms.Lists, Literal, Type["array"]):
         return self
 
     def insert(self, id, value):
-        if id == -1:
-            id = len(self) - 1
+        if id < 0:
+            id += len(self)
 
-        self.validate(self + (args or []))
+        self.validate(self[:id] + [value] + self[id:])
         list.insert(self, id, value)
+
         return self
 
     def pop(self, id=-1):
@@ -135,17 +136,19 @@ class List(forms.Lists, Literal, Type["array"]):
         return list.pop(self, id)
 
     def remove(self, value):
-        return self.pop(self.index(value))
+        self.pop(self.index(value))
+        return self
 
     def __setitem__(self, key, value):
-        if key == -1:
-            key = len(self) - 1
+        if isinstance(key, int):
+            if key < 0:
+                key += len(self)
         if isinstance(key, slice):
             x = list(self)
             x[key] = value
-            cls.validate(x)
+            self.validate(x)
         else:
-            self.validate(self[:key] + [value] + self[key + 1 :])
+            self.validate(self[:key-1] + [value] + self[key + 1 :])
         return list.__setitem__(self, key, value)
 
     __iadd__ = extend
@@ -166,26 +169,20 @@ class Tuple(List, forms.Title["Tuple"]):
 Tuple.register(tuple)
 
 
-class Os(Form):
-    def validate(cls, *args):
-        k = Sys.get_value(cls)
-        if k not in os.environ:
-            raise ValidationError
-        return os.environ[k]
-
-    def object(cls, *args):
+class Environ(forms.Plural):
+    def type(cls, *args):
         if not args:
-            args = cls.values()
-        if len(args) == 2:
-            os.environ[args[0]] = args[1]
-            return
-        elif len(args) > 2:
-            raise ValidationError()
-        return os.getenv(*args)
+            return cls
+        x, *_ = args
+        if isinstance(x, tuple):
+            if len(x) == 2:
+                if not x[0] in os.environ:
+                    os.environ[x[0]] = x[1]
+        return super().type(*args)
 
-    @classmethod
-    def environ(cls):
-        return os.environ
+    def object(cls):
+        return os.getenv(*cls.Environ.form(cls)[:1])
+
 
 
 class Py(Sys):
@@ -267,9 +264,9 @@ class Dict(forms.Dicts, Literal, Type["object"]):
     def __setitem__(self, k, v):
         self.update({k: v})
 
-    def __init_subclass__(cls):
-        if issubclass(cls, cls.Required):
-            cls.__signature__ = Signature.from_type(cls)
+    # def __init_subclass__(cls):
+    #     if issubclass(cls, cls.Required):
+    #         cls.__signature__ = Signature.from_type(cls)
 
     def update(self, *args, **kwargs):
         kwargs = dict(*args, **kwargs)
@@ -485,7 +482,6 @@ class If(Form):
             e = Else.form(cls)
             if e:
                 return e(*args)
-            raise exc
 
     def type(cls, object):
         if isinstance(object, slice):

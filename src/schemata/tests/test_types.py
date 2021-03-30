@@ -34,7 +34,11 @@ class SchemaTest(unittest.TestCase):
             Dict[dict(a=Integer.minimum(0))].schema().ravel().new("/properties/a")
             == Integer
         )
-
+        Generic.Required["a", "b"].schema().new("")
+        Generic.Properties[dict(a=Integer)].schema().ravel().new()
+        assert String[:] is String
+        assert Sys.type() is Sys
+        assert Plural.type() is Plural
 
 class BaseTest(unittest.TestCase):
     def test_forward(x):
@@ -183,6 +187,10 @@ class ContainerTest(unittest.TestCase):
             def c(x: ["a", "b"]):
                 return f"""{x.a} and {x.b}"""
 
+        # build a type from this type for coverage
+        assert T.schema().ravel().new("").schema()
+
+
         assert set(T.schema()["dependencies"]) == set(dict(c=list("ab")))
 
         t = T(a=123, b="abc")
@@ -197,6 +205,9 @@ class ContainerTest(unittest.TestCase):
 
         with raises:
             T(a="wyz", b="abc")
+
+        t._q = 8
+        assert "_q" not in t and t._q == 8
 
     def test_list(x):
         List(List.example())
@@ -216,7 +227,51 @@ class ContainerTest(unittest.TestCase):
             MyList([dict(b="xxx")])
 
             assert MyList([dict(a="a")]) == [dict(a="a")]
+        a = List.minItems(1)([1])
 
+        with raises: a.pop()
+        assert a == [1]
+        with raises: a.remove(1)
+        assert a.append(2) == [1, 2]
+        assert a.remove(1) == [2]
+        a.append(3)
+        assert a.pop(-1) == 3
+        a[-1] = 4
+        assert a == [4]
+            
+        assert a.insert(-1, 2).append(3) == [2, 4, 3]
+
+        a = List[String]()
+
+        with raises: a.append(1)
+
+        assert a.append("a") == ["a"]
+        assert a.insert(0,"b") == ["b", "a"]
+
+        a = List[Integer]([1])
+
+        with raises: a[0] = "a"
+
+        a[0] = 2
+
+        assert a == [2]
+
+        a = (Pipe[range, list]>> List[Integer])(10)
+
+        with raises: a[2:4] = "abc"
+
+        a[2:4] = reversed(a[2:4])
+
+        assert a == [0, 1, 4, 5, 6, 7, 8, 9]
+
+        del a[2]
+        assert a == [0, 1, 5, 6, 7, 8, 9]
+
+        assert List(list(range(10))).map(lambda x: str(x)) == list(map(str, range(10)))
+        v = List[Integer]([-1, -2, 4, 5]).filter(lambda x: x< 0) 
+        assert v == [-1, -2] and v.__class__ ==  List[Integer]
+
+        assert List[Integer]([-1, -2, 4, 5]).filter(lambda x: x< 0) == [-1, -2]
 
 class ExoticTest(unittest.TestCase):
     @hypothesis.strategies.composite
@@ -348,6 +403,7 @@ class PipeTests(unittest.TestCase):
         assert s == "abcde"
         assert hash(Pipe[range, bool:str:list].schema().hashable())
         assert Pipe[range, bool:str:list](10) == list(map(str, filter(bool, range(10))))
+        assert Pipe[:] is Pipe
 
 
 # @hypothesis.given(draw_patches())
@@ -679,6 +735,14 @@ class ManualTests(unittest.TestCase):
             bar=11
         ) == "foo 11"
         assert len(OneOf.form(Json)) == 6
+        v = dict(zip("abc", range(3)))
+        assert Dict(v).map(str) == dict(zip(v.keys(), map(str, v.values())))
+        assert Dict(v).map(Integer).__class__ == Dict[Integer]
+
+        assert Dict(v).filter(lambda x:x>1) == dict(c=2)
+
+        assert Dict(v).map(str.upper, None) ==dict(zip(map(str.upper, v.keys()), v.values()))
+        assert Dict(v).map(str.upper, str) ==dict(zip(map(str.upper, v.keys()), map(str, v.values())))
 
     def test_abc(x):
         assert Dict.type != List.type != Literal.type
@@ -697,6 +761,10 @@ class ManualTests(unittest.TestCase):
         assert Literal.type() is Literal
         assert Literal.pytype("thing") is String
         assert Literal.pytype(range) is type
+        assert Literal.type() is Literal
+        with raises: (Integer^Number)(1)
+
+        assert (Integer^Number)(1.1) == 1.1        
 
     def test_just(x):
         assert Juxt[range](10) == range(10)
@@ -727,9 +795,25 @@ def test_if():
     with raises:
         t(2.2)
 
+    with raises: If[Integer::String](1.1)
 
+    assert If[Integer::String](1) == 1
 def test_file(pytester):
     pytester.makefile(".yaml", tester="a: b")
     s = File("tester.yaml").read()
     assert isinstance(s, str)
     assert s.loads() == dict(a="b")
+    pytester.makefile(".txt", tester="a file")
+    assert File.read("tester.txt") == "a file"
+
+
+def test_environ():
+     import os
+     assert Environ.type() is Environ
+     assert Environ["FOO"]() is None
+     assert "FOO" not in os.environ
+     assert Environ["FOO", "123"]() == "123"
+     
+     assert "FOO" in os.environ
+
+

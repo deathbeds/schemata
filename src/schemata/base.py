@@ -165,15 +165,15 @@ class Schema(dict):
 
         return Schema(next)
 
-    def new(x, pointer):
+    def new(x, pointer=None):
+        if pointer is None:
+            pointer = ""
         import jsonpointer
 
         t = None
         schema = jsonpointer.resolve_pointer(x, pointer)
-        a = Generic.Form, Generic.Plural
-        plural = {
-            bool(i): {x.form(): x for x in x.__subclasses__() if x not in a}
-            for i, x in enumerate(a)
+        types = {
+            y.form(): y for x in (Generic.Form, Generic.Plural, Generic.Mapping, Generic.Nested) for y in x.__subclasses__()
         }
         m = dict(
             boolean=Generic.Bool,
@@ -184,22 +184,14 @@ class Schema(dict):
             object=Generic.Dict,
         )
         for k, v in schema.items():
-            if k == "type":
-                if v in m:
-                    if t is None:
-                        t = m[v]
-                    else:
-                        t = t + m[v]
-                    continue
-            for b in [False, True]:
-                if k in plural[b]:
-                    if b:
-                        if isinstance(v, list):
-                            v = tuple(v)
-                    if t is None:
-                        t = plural[b][k][v]
-                    else:
-                        t = t + plural[b][k][v]
+            if k in types:
+                if k == "type":
+                    v = m.get(k, v)
+                
+                if t is None:
+                    t = types[k][v]
+                else:
+                    t = t + types[k][v]
         return t
 
     def validate(self, x):
@@ -233,8 +225,6 @@ class Schema(dict):
         return self
 
     def __contains__(self, x):
-        if isinstance(x, Generic):
-            x = x.schema()
         if isinstance(x, dict):
             for k, v in x.items():
                 if self.get(k, object()) != v:
@@ -376,10 +366,6 @@ class Generic(Interface, abc.ABCMeta):
         with suppress(AttributeError):
             cls.__annotations__ = Schema.merge(*cls.__mro__)
 
-        with suppress(AttributeError):
-            if issubclass(cls, cls.Required):
-                cls.__signature__ = Signature.from_type(cls)
-
         if is_list and t is not None:
             return cls[Generic.type((cls.Dict,) + t)]
 
@@ -453,16 +439,10 @@ class Generic(Interface, abc.ABCMeta):
     def __pos__(cls):
         return cls
 
-    # incremental operations
-    def __i__(cls, op, object):
-        cls.__annotations__.update(getattr(cls, f"__{op}__", object).__annotations__)
-        return cls
-
     def __r__(cls, op, object):
         return getattr(Generic, f"__{op}__")(object, cls)
 
     for x in ("add", "sub", "rshift", "lshift", "or", "and", "xor", "mul"):
-        locals()[f"__i{x}__"] = functools.partialmethod(__i__, x)
         locals()[f"__r{x}__"] = functools.partialmethod(__r__, x)
 
     del x
@@ -516,12 +496,7 @@ class Generic(Interface, abc.ABCMeta):
         return x
 
     def type(cls, **kwargs):
-        # type is our form for making a new type.
         if not isinstance(cls, tuple):
-            if not kwargs:
-                return cls
-
-            # we always treat classes as tuples
             cls = (cls,)
         return type(cls[0].__name__, cls, kwargs)
 
@@ -651,12 +626,7 @@ class Sys(Type):
         if not args:
             return cls
         x, *_ = args
-        if x is None:
-            return cls
 
-        if isinstance(x, (slice)):
-            if None is x.start is x.stop is x.step:
-                return cls
         cls = cls + cls.AtType[x]
         with suppress(ConsentException, ValueError, TypeError):
             t = cls.pytype()
@@ -686,17 +656,17 @@ class Default(Form):
 
 
 class Plural(Form):
-    def type(cls, object=None, **kwargs):
-        if isinstance(object, list):
-            object = tuple(object)
+    def type(cls, *args):
+        if not args:
+            return cls
 
-        if not isinstance(object, tuple):
-            object = (object,)
-        if not object:
-            if not kwargs:
-                return cls
+        if not isinstance(*args, tuple):
+            if isinstance(*args, list):
+                args = tuple(*args),
+            else:
+                args = args,
 
-        return Form.type.__func__(cls, object, **kwargs)
+        return Form.type.__func__(cls, *args)
 
     @classmethod
     def form(cls, *args):  # pragma: no cover
