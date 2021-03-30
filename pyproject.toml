@@ -21,6 +21,7 @@ requires = [
     "pyld",
     "uritemplate",
     "typing >=3.7.4 ; python_version < '3.7'",
+    "strict_rfc3339",
 ]
 
 [tool.flit.metadata.urls]
