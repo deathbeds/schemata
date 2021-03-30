@@ -39,6 +39,7 @@ test = [
     "json-e",
     "pytest-cov",
     "pytest",
+    "pyyaml"
 ]
 ci = ["codecov"]
 
