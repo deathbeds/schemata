@@ -115,37 +115,6 @@ class Signature(inspect.Signature):
             ]
         )
 
-    # create a concrete type from the signature using the schemata as an intermediate.
-    def to_type(self):
-        s, additional = {}, None
-        required = ()
-        for p in self.parameters.values():
-            if p.annotation == inspect._empty:
-                continue
-            t = p.annotation
-            if p.kind == inspect.Parameter.VAR_KEYWORD:
-                additional = Generic.AdditionalProperties[p.annotation]
-                continue
-
-            if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
-                required += (p.name,)
-
-            elif p.kind == inspect.Parameter.KEYWORD_ONLY:
-                pass
-
-            else:
-                raise BaseException(f"can't integer {p.kind}")
-
-            if p.default != inspect._empty:
-                t = t + Default[t.default]
-
-            s[p.name] = t
-
-        t = Dict[s]
-        if additional is not None:
-            t = t + additional
-        return t
-
     def to_typer(self):
         # change the default value to a typer.Option or typer.Argument
         # change the annotation to a typer compliant type
