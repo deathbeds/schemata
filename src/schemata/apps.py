@@ -26,7 +26,7 @@ class Test(App["unittest.main"]):
 
     def object(cls, *args, **k):
         main, (_, *v) = super().object(), Form.AtType.form(cls)
-        k["module"] = v and v[0] or __import__("__main__")
+        k["module"] = __import__("__main__")
 
         def load_tests(loader, tests, ignore):
             nonlocal k

@@ -64,7 +64,11 @@ class MaxLength(Numeric):
 
 
 class Pattern(Form):
-    pass
+    @classmethod
+    def type(cls, *x):
+        import re
+
+        return super().type(re.compile(*x))
 
 
 class Format(Form):
@@ -251,15 +255,6 @@ class AtGraph(Plural):
 class Literals(metaclass=Generic):
     def pipe(self, f, *args, **kwargs):
         return call(f, self, *args, **kwargs)
-
-    # def __rich__(x):
-    #     with suppress(AttributeError, TypeError):
-    #         return super().__rich__()
-    #     if not isinstance(x, str):
-    #         x = str(x)
-    #     if "://" in x:
-    #         return f"[link={x}]{x}[/link]"
-    #     return x
 
 
 class Strings(Literals):

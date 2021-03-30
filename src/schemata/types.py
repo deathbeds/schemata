@@ -5,8 +5,19 @@ import sys
 import typing
 
 from . import forms
-from .base import (Form, Forward, Generic, Path, Sys, Type, ValidationError,
-                   ValidationErrors, call, identity, suppress)
+from .base import (
+    Form,
+    Forward,
+    Generic,
+    Path,
+    Sys,
+    Type,
+    ValidationError,
+    ValidationErrors,
+    call,
+    identity,
+    suppress,
+)
 from .signatures import Signature
 
 
@@ -14,8 +25,10 @@ from .signatures import Signature
 # implementations of python types like int, float, list, dict with they advantage that they may be described
 # in rdf notation.
 class Literal(forms.Literals, Type):
-    def type(cls, x):
-        return cls + cls.Default[x]
+    def type(cls, *x):
+        if x:
+            return cls.default(*x)
+        return cls
 
     @classmethod
     def pytype(cls, *args):
@@ -185,16 +198,6 @@ class Py(Sys):
             return args
         raise ValidationError(f"{args} is not an object of {cls}")
 
-    def type(cls, object, **kwargs):
-        if object is None:
-            return identity
-
-        if isinstance(object, (slice)):
-            if None is object.start is object.stop is object.step:
-                return identity
-
-        return super().type(object, **kwargs)
-
 
 class Instance(Py):
     @classmethod
@@ -286,11 +289,16 @@ class Dict(forms.Dicts, Literal, Type["object"]):
         return self
 
     def pop(self, key, default=None):
-        call(self, {k: v for k, v in self.items() if k != key})
+        try:
+            v = self[key]
+        except KeyError:
+            return default
+        self.validate({k: v for k, v in self.items() if k != key})
         try:
             return dict.pop(self, key, default)
         finally:
-            self._update_display()
+            with suppress(AttributeError):
+                self._update_display()
 
     @classmethod
     def object(cls, *args, **kwargs):
@@ -326,10 +334,8 @@ class Dict(forms.Dicts, Literal, Type["object"]):
         return cls.validate(kwargs)
 
     @classmethod
-    def validate(cls, *args, **kwargs):
+    def validate(cls, *args):
         if args:
-            if kwargs:
-                args = (dict(*args, **kwargs),)
             args = (Type.validate.__func__(cls, *args),)
         k = cls.Keys.form(cls)
         if args and k:
@@ -339,7 +345,10 @@ class Dict(forms.Dicts, Literal, Type["object"]):
         return args[0] if args else dict()
 
     @classmethod
-    def type(cls, x):
+    def type(cls, *args):
+        if not args:
+            return cls
+        x, *_ = args
         if isinstance(x, dict):
             return cls.properties(x)
         if isinstance(x, tuple):
@@ -357,14 +366,18 @@ class Enum(Form.Plural, Literal):
     def object(cls, *args, **kwargs):
         # self.value = cls.validate(self)
         # cls.attach_parent(self)
-        return cls.validate(Literal(args[0] if args else Enum.form(cls)[0]))
+        enum = Enum.form(cls)
+        self = cls.validate(Literal(args[0] if args else enum[0]))
+        if len(enum) is 1 and isinstance(*enum, dict):
+            return enum[0].get(self)
+        return self
 
     @classmethod
     def choices(cls):
         e = Enum.form(cls)
         if len(e) is 1 and isinstance(e[0], dict):
             # Enum is defined as a plural form
-            return e[0]
+            return tuple(*e)
         return e
 
 
@@ -372,6 +385,12 @@ Enum.register(__import__("enum").Enum)
 
 
 class Cycler(Enum):
+    @classmethod
+    def form(cls, *args):
+        if args:
+            return cls.Enum.form(*args)
+        return cls.Enum.form()
+
     def object(cls):
         return __import__("itertools").cycle(cls.choices())
 
@@ -382,12 +401,14 @@ class Composite(Type):
     def validate(cls, object):
         # composites use the object creation for typing checking
         return cls.object(object)
+
     @classmethod
     def object(cls, *args):
         if not args:
             with suppress(AttributeError):
-                args = super().object(),
+                args = (super().object(),)
         return args
+
 
 class AnyOf(Form.Nested, Composite):
     def object(cls, *args):
@@ -445,6 +466,7 @@ class Not(Composite):
             x, *_ = args
 
             return cls.attach_parent(x)
+        raise ValidationError
 
 
 class Else(Form):
@@ -455,9 +477,8 @@ class Then(Form):
     pass
 
 
-class If(Literal):
+class If(Form):
     def object(cls, *args):
-        args = cls.default(*args)
         try:
             args = (If.form(cls)(*args),)
             t = Then.form(cls)

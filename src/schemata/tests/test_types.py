@@ -20,11 +20,31 @@ def type_example(x):
     return x.strategy().map(lambda y: (x, y))
 
 
+class CallTest(unittest.TestCase):
+    def test_call(x):
+        assert identity(1) == 1
+        assert identity(1, []) == 1
+        assert call(range, 10) == range(10)
+        assert call(1, 10) == 1
+
+
+class SchemaTest(unittest.TestCase):
+    def test_schema(x):
+        assert (
+            Dict[dict(a=Integer.minimum(0))].schema().ravel().new("/properties/a")
+            == Integer
+        )
+
+
 class BaseTest(unittest.TestCase):
     def test_forward(x):
         assert Forward("builtins.range").object() is range
         with pytest.raises(ConsentException):
             Forward("abcde").object()
+        assert Forward(range) is range
+        v = Forward("builtins.range")
+
+        assert v() is v() is range
 
 
 class LiteralTest(unittest.TestCase):
@@ -80,6 +100,17 @@ class LiteralTest(unittest.TestCase):
             E("c")
         assert E("b") == "b"
 
+        assert Enum[dict(a=1)]("a") == 1
+
+        assert Enum["a"]("a") == "a"
+
+        with raises:
+            Enum["a"]("b")
+
+        c = Cycler["a", "b", "c"]()
+
+        assert next(c) == "a" and next(c) == "b" and next(c) == "c" and next(c) == "a"
+
 
 false = (0, "", [], {})
 true = (1.0, "a", ["a"], {"a": bool})
@@ -121,6 +152,18 @@ class ContainerTest(unittest.TestCase):
         d = Dict[List]()
         assert "a" not in d
         assert d["a"] == [] and d == dict(a=[])
+        assert Dict.default(lambda: dict(a=11))() == dict(a=11)
+
+        d = Dict[dict(a=Integer[1])].required("a")()
+
+        with raises:
+            d.pop("a")
+
+        assert d.pop("b", 22) == 22
+
+        d["b"] = 33
+
+        assert d.pop("b") == 33
 
     def test_bunch(x):
         class T(Bunch):
@@ -163,7 +206,7 @@ class ContainerTest(unittest.TestCase):
         with raises:
             MyList([dict(b="xxx")])
 
-        assert MyList([dict(a="a")]) == [dict(a="a")]
+            assert MyList([dict(a="a")]) == [dict(a="a")]
 
 
 class ExoticTest(unittest.TestCase):
@@ -294,6 +337,8 @@ class PipeTests(unittest.TestCase):
         s = String("abc")
         s += "de"
         assert s == "abcde"
+        assert hash(Pipe[range, bool:str:list].schema().hashable())
+        assert Pipe[range, bool:str:list](10) == list(map(str, filter(bool, range(10))))
 
 
 # @hypothesis.given(draw_patches())
@@ -489,7 +534,8 @@ class ManualTests(unittest.TestCase):
             String.maxLength(3)("abcd")
         with raises:
             forms.Pattern["^foo"]("bar")
-
+        assert isinstance("this", String.pattern("^this"))
+        assert not isinstance("his", String.pattern("^this"))
         assert forms.Pattern["^foo"]("foo bar") == "foo bar"
         assert strings.DateTime("2018-11-13T20:20:39+00:00") == __import__(
             "datetime"
@@ -530,6 +576,12 @@ class ManualTests(unittest.TestCase):
         assert strings.JsonString('{"a": "b"}').loads() == dict(a="b")
 
         assert isinstance(strings.Markdown("# this").loads(), Generic.ContentMediaType)
+
+    def test_default(x):
+        # only going to return the default value
+        assert Default[1](2) == 1
+        assert Default[1]() == 1
+        assert Default[lambda: 1]() == 1
 
     def test_list(x):
         assert List() == [] == list()
@@ -624,6 +676,15 @@ class ManualTests(unittest.TestCase):
         assert not issubclass(Dict, Dict.Keys)
         assert not issubclass(Dict, Generic.Nested)
         assert issubclass(String["abc"], Default)
+        assert Generic.pytype() is typing.Any
+        with raises:
+            (-String)("abc")
+        assert (-String)(1) == 1
+        assert (+String) is String
+        assert isinstance(Generic.Items.form(Tuple[[int, str]]), tuple)
+        # this might not be right...
+        assert issubclass(Dict.MinProperties[3], Dict.minProperties(3))
+        assert Dict.type() is Dict
 
     def test_just(x):
         assert Juxt[range](10) == range(10)
@@ -637,3 +698,19 @@ class ManualTests(unittest.TestCase):
         assert (range >> Juxt[(lambda x: x % 2) : str : list])(10) == list(
             map(str, range(1, 10, 2))
         )
+
+
+class FileTest(unittest.TestCase):
+    def test_file(x):
+        assert isinstance(Dir(""), Path) and isinstance(Dir(""), Literal)
+        assert isinstance(File(""), Path) and isinstance(File(""), Literal)
+
+
+def test_if():
+    t = If[String : String.maxLength(3) : Integer]
+    assert t("abc") == "abc"
+    assert t(11) == 11
+    with raises:
+        t("abcd")
+    with raises:
+        t(2.2)

@@ -47,8 +47,9 @@ class AutoFocus(Ui):
 class Rich(Ui):
     def _ipython_display_(self):
         import rich
+
         rich.print(self)
-        
+
     def __rich__(x, t=None):
         import typing
 
