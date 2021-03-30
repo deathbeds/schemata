@@ -399,7 +399,9 @@ class Generic(Interface, abc.ABCMeta):
         return hash(cls.schema().hashable())
 
     def __subclasscheck__(cls, x):
-
+        t = type.__subclasscheck__(cls, x)
+        if t:
+            return True
         with suppress(AttributeError):
             a, b = x.schema(), cls.schema()
             if any(a) and any(b):
@@ -504,7 +506,8 @@ class Generic(Interface, abc.ABCMeta):
     def attach_parent(cls, x):
         if isinstance(x, (type(None), bool)):
             return x
-        x.parent = cls
+        with suppress(AttributeError):
+            x.parent = cls
         return x
 
     def type(cls, **kwargs):
@@ -574,7 +577,7 @@ class Form(metaclass=Generic):
             # these definitely need to be cached to avoid redundancies in testing.
             cls.hypothesis_strategies[cls] = __import__(
                 "hypothesis_jsonschema"
-            ).from_schema(cls.schema())
+            ).from_schema(cls.schema().ravel())
         return cls.hypothesis_strategies[cls]
 
 
@@ -640,7 +643,11 @@ class Sys(Type):
         return args
 
     def type(cls, x, **kwargs):
-        return cls + cls.AtType[x]
+        cls = cls + cls.AtType[x]
+        with suppress(ConsentException, ValueError, TypeError):
+            t = cls.pytype()
+            cls.__signature__ = inspect.signature(t)
+        return cls
 
     def pytype(cls):
         x, *_ = cls.AtType.form(cls)

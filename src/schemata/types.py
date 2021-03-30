@@ -181,7 +181,7 @@ class Os(Form):
 
 class Py(Sys):
     def validate(cls, *args):
-        if isinstance(*args, *cls.AtType.form(cls)[:1]):
+        if isinstance(*args, cls.pytype()):
             return args
         raise ValidationError(f"{args} is not an object of {cls}")
 
@@ -294,6 +294,9 @@ class Dict(forms.Dicts, Literal, Type["object"]):
 
     @classmethod
     def object(cls, *args, **kwargs):
+        if not args or kwargs:
+            if issubclass(cls, cls.Default):
+                return super().object()
         if not all(isinstance(x, dict) for x in args):
             raise ValidationError
         kwargs = super().object(dict(*args, **kwargs))
@@ -328,12 +331,11 @@ class Dict(forms.Dicts, Literal, Type["object"]):
             if kwargs:
                 args = (dict(*args, **kwargs),)
             args = (Type.validate.__func__(cls, *args),)
-        if issubclass(cls, Form.Keys):
-            k = cls.Keys.form(cls)
-            if args and k:
-                for x in list(*args):
-                    if not isinstance(x, k):
-                        raise ValidationError(f"not all keys are objects of {k}")
+        k = cls.Keys.form(cls)
+        if args and k:
+            for x in list(*args):
+                if not isinstance(x, k):
+                    raise ValidationError(f"not all keys are objects of {k}")
         return args[0] if args else dict()
 
     @classmethod
@@ -380,10 +382,16 @@ class Composite(Type):
     def validate(cls, object):
         # composites use the object creation for typing checking
         return cls.object(object)
-
+    @classmethod
+    def object(cls, *args):
+        if not args:
+            with suppress(AttributeError):
+                args = super().object(),
+        return args
 
 class AnyOf(Form.Nested, Composite):
     def object(cls, *args):
+        args = super().object(*args)
         ts = AnyOf.form(cls)
         for t in ts:
             try:
@@ -396,6 +404,7 @@ class AnyOf(Form.Nested, Composite):
 
 class AllOf(Form.Nested, Composite):
     def object(cls, *args):
+        args = super().object(*args)
         result = {}
         for t in AllOf.form(cls):
             result.setdefault("x", call(t, *args))
@@ -407,6 +416,7 @@ class AllOf(Form.Nested, Composite):
 
 class OneOf(Form.Nested, Composite):
     def object(cls, *args, **kwargs):
+        args = super().object(*args)
         i, x = 0, None
         for t in OneOf.form(cls):
             try:
@@ -427,10 +437,10 @@ class OneOf(Form.Nested, Composite):
         raise ValidationError()
 
 
-class Not(Form):
+class Not(Composite):
     def object(cls, *args):
         try:
-            super().object(*args)
+            cls.form(cls)(*args)
         except ValidationErrors:
             x, *_ = args
 

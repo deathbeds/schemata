@@ -38,9 +38,9 @@ class LiteralTest(unittest.TestCase):
         assert y == v
         hypothesis.assume(not isinstance(v, (bool, type(None))))
         assert isinstance(y, t)
-        assert Default[v].object() == v
-        assert Const[v].object() == v
+        # assert Const[v].object() == v
         assert (t + Default[v]).object() == v
+        # assert Default[v].object() == v
 
     def test_none(x):
         Null(Null.example())
@@ -232,7 +232,7 @@ class ExoticTest(unittest.TestCase):
                 Integer.exclusiveMinimum(1).exclusiveMaximum(10),
                 Number.minimum(1).maximum(10),
                 Number.exclusiveMinimum(1).exclusiveMaximum(10),
-                Dict.minProperties(1).maxProperties(10),
+                # Dict.minProperties(1).maxProperties(10),
                 List.minItems(1).maxItems(10),
                 Tuple[String, Integer],
                 Tuple[Integer],
@@ -623,6 +623,7 @@ class ManualTests(unittest.TestCase):
         assert Dict.type != List.type != Literal.type
         assert not issubclass(Dict, Dict.Keys)
         assert not issubclass(Dict, Generic.Nested)
+        assert issubclass(String["abc"], Default)
 
     def test_just(x):
         assert Juxt[range](10) == range(10)
