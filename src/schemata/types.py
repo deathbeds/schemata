@@ -1,1228 +1,504 @@
-import pathlib
+import functools
+import mimetypes
+import os
+import sys
 import typing
 
-try:
-    from typing import _ForwardRef as ForwardRef
-
-    _root = True
-except ImportError:
-    from typing import ForwardRef
-
-    _root = False
-
-from . import protocols as P
-from .base import Any, Generic, ValidationError, ValidationErrors, call
-
-Path = type(pathlib.Path())
-
-del pathlib
-
-Any.annotate(P.RDFS["Resource"], in_place=True)
+from . import forms
+from .base import (Form, Forward, Generic, Path, Sys, Type, ValidationError,
+                   ValidationErrors, call, identity, suppress)
+from .signatures import Signature
 
 
-class Literal(Any, type=P.RDFS["Literal"], vocab=P.PROPS.vocab()):
-    """the Literal is the bridge between actual python types and Generic types, they emit concrete
-    implementations of python types like int, float, list, dict with they advantage that they may be described
-    in rdf notation."""
+# the Literal is the bridge between actual python types and Generic types, they emit concrete
+# implementations of python types like int, float, list, dict with they advantage that they may be described
+# in rdf notation.
+class Literal(forms.Literals, Type):
+    def type(cls, x):
+        return cls + cls.Default[x]
 
     @classmethod
-    def instance(cls, *args):
-
-        # update the arguments with the defaults or constant if defined
-        args = cls.default(*args)
-
-        # map to the schema type
-        p = tuple(map(type, args))
-        if p in Generic.types:
-            p = (Generic.types[p],)
-
-        if issubclass(cls, p):
-            return super().instance(*args)
-        return call(*p, *args)
+    def pytype(cls, *args):
+        if args:
+            m = {str: String, float: Number, int: Integer, list: List, dict: Dict}
+            t = type(*args)
+            if t in m:
+                return m[t]
+            return t
+        return super().pytype()
 
 
-class Validate:
-    # jsonschema validation
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        value = super().instance(*args, **kwargs)
-        if issubclass(cls, Composite):
-            # this would have already been validated because now we'd be augmenting the base calsses
-            return value
-        return cls.validate(value)[0]
-
-    @classmethod
-    def validate(cls: typing.Union[Generic, dict], *args):
-        import jsonschema
-
-        args = cls.default(*args)
-        if not isinstance(cls, dict):
-            cls = cls.schema()
-        try:
-            jsonschema.Draft7Validator(
-                cls, format_checker=jsonschema.draft7_format_checker
-            ).validate(*args)
-        except BaseException as e:
-            # raise the schemamata validation error to make checking easier
-            raise e
-        return args
-
-
-class Const(Any, Generic.Alias):
-    # a constant
-    def instance(cls, *args, **kwargs):
-        return cls.default(*args, **kwargs)[0]
-
-
-class Default(Const):
-    # a default
+class Null(Literal, Type["null"]):
     pass
-
-
-class Type(Any, Generic.Alias):
-    pass
-
-
-class Null(Validate, Literal, Type["null"], type=P.RDF["nil"]):
-    def instance(cls, *args, **kwargs):
-        cls.validate(*cls.default(*args, **kwargs))
-
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or (None,)
 
 
 Null.register(type(None))
 
-Generic.types[
-    type(None),
-] = Null
+
+class Bool(Literal, Type["boolean"]):
+    pass
 
 
-class Bool(Validate, Literal, Type["boolean"], type=P.XSD["boolean"]):
-    def instance(cls, *args, **kwargs):
-        args = cls.default(*args, **kwargs)
-        return cls.validate(*args)[0]
-
-    @classmethod
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or (bool(),)
-
-
-Generic.types[
-    bool,
-] = Bool
 Bool.register(bool)
 
 
-class String(Validate, Literal, Type["string"], str, type=P.XSD["string"]):
-    @classmethod
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or (str(),)
-
-
-Generic.types[
-    str,
-] = String
-
-
-class File(Validate, Literal, Type["string"], Path):
-
-    __loader__: String = str
-    __dumper__: String = str
+class String(forms.Strings, Literal, Type["string"]):
+    def loads(self):
+        return self
 
     @classmethod
-    def _get_value_type(cls, object):
-        v = getattr(cls, "value", None)
-        if v is None:
-            v = type(object)
-        return v
+    def dumps(cls, x):
+        return x
+
+
+class Dir(Literal, Path):
+    def object(cls, *args):
+        return Path.__new__(Path(*args).is_file() and File or Dir, *args)
+
+
+class Glob:
+    pass
+
+
+class File(Dir):
+    def object(cls, *args):
+        return Path.__new__(File, *args)
 
     def read(self):
-        t = self._get_value_type(self)
-        f = lambda x: x
-        # if "__loader__" in t.__annotations__:
-        #     f = t.__annotations__["__loader__"]
-        return f(t.__loader__(self.read_text()))
+        if isinstance(self, str):
+            self = File(self)
+
+        t, _ = mimetypes.guess_type("*" + self.suffix)
+
+        if t:
+            for cls in Generic.Code.__subclasses__():
+                if cls.schema().get("mimeType") == t:
+                    return cls.load(self.read_text())
+
+        return self.read_text()
 
     def write(self, object):
-        return self.write_text(self._get_value_type(self).__dumper__(object))
+        return self.write_text(object)
 
 
-Generic.types[
-    Path,
-] = File
+class Number(forms.Numbers, Literal, Type["number"]):
+    pass
 
 
-class Number(Validate, Literal, Type["number"], float, type=P.XSD["decimal"]):
-    @classmethod
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or (float(),)
+Float = Number
 
 
-Float = (
-    Number  # number is canonical, but too many times i reach for float so i aliased it
-)
-Generic.types[
-    float,
-] = Number
+class Integer(forms.Numbers, Literal, Type["integer"]):
+    pass
 
 
-class Integer(Validate, Literal, Type["integer"], int, type=P.XSD["integer"]):
-    @classmethod
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or (int(),)
+class List(forms.Lists, Literal, Type["array"]):
+    def object(cls, *args):
+        if args:
+            if isinstance(*args, (set, tuple)):
+                args = (list(*args),)
+        return cls.validate(super().object(*args))
 
+    def type(cls, x):
+        return cls + cls.Items[x]
 
-Generic.types[
-    int,
-] = Integer
+    # fluent list api
+    def append(self, object):
+        return self.extend((object,))
 
+    def extend(self, args=None):
+        self + (args or [])
+        list.extend(self, args or [])
+        return self
 
-class List(Validate, Literal, Type["array"], list, type=P.RDF["List"]):
-    @classmethod
-    def default(cls, *args, **kwargs):
-        return super().default(*args, **kwargs) or ([],)
+    def insert(self, id, value):
+        if id == -1:
+            id = len(self) - 1
 
-    @classmethod
-    def new_type(cls, object):
-        if isinstance(object, dict):
-            object = Dict[object]
-        if isinstance(object, (list, tuple)):
-            return Tuple[list(object)]
-        return cls + cls.Items[object]
+        self.validate(self + (args or []))
+        list.insert(self, id, value)
+        return self
 
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        # build the default
-        if args or kwargs:
-            args = cls.validate(*args, **kwargs)
+    def pop(self, id=-1):
+        if id == -1:
+            id = len(self) - 1
+        self.validate(self[:id] + self[id + 1 :])
+        return list.pop(self, id)
+
+    def remove(self, value):
+        return self.pop(self.index(value))
+
+    def __setitem__(self, key, value):
+        if key == -1:
+            key = len(self) - 1
+        if isinstance(key, slice):
+            x = list(self)
+            x[key] = value
+            cls.validate(x)
         else:
-            args = cls.default(*args, **kwargs)
-        self = list.__new__(cls)
+            self.validate(self[:key] + [value] + self[key + 1 :])
+        return list.__setitem__(self, key, value)
 
-        list.__init__(self, *args)
-        return self.validate(self)[0]
+    __iadd__ = extend
 
+    def __add__(self, object):
+        if isinstance(object, tuple):
+            object = list(object)
+        return type(self)(list.__add__(self, object))
 
-Generic.types[
-    list,
-] = List
-
-
-class Tuple(List, type=P.RDF["Alt"]):
-    @classmethod
-    def new_type(cls, object):
-        if isinstance(object, list):
-            object = tuple(object)
-        if not isinstance(object, tuple):
-            object = (object,)
-        return cls + cls.Items[list(object)]
+    def __delitem__(self, x):
+        return self.pop(x)
 
 
-Generic.types[
-    tuple,
-] = Tuple
+class Tuple(List, forms.Title["Tuple"]):
+    pass
+
+
 Tuple.register(tuple)
 
 
-class Set(List, type=P.RDF["Bag"]):
-    pass
-
-
-Generic.types[
-    set,
-] = Set
-
-Set.register(set)
-
-
-class Dict(Validate, Literal, Type["object"], dict):
-    def __missing__(self, key):
-        cls = type(self)
-        if issubclass(cls, Generic.AdditionalProperties):
-            if not issubclass(cls, Generic.Properties):
-                dict.__setitem__(
-                    self,
-                    key,
-                    call(cls.schema(0)[Generic.AdditionalProperties.alias()]),
-                )
-                return self
-        return dict.__missing__(self, key)
-
-    @classmethod
-    def default(cls, *args, **kwargs):
-        import inspect
-
-        if args:
-            if all(isinstance(x, dict) for x in args):
-                pass
-            else:
-                sig = inspect.signature(cls)
-                if sig != inspect.signature(Dict):
-                    if sig.parameters:
-                        for i, p in enumerate(sig.parameters.values()):
-                            if i == len(args):
-                                break
-                            if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD:
-                                kwargs[p.name] = args[i]
-                        args, kwargs = (dict(**kwargs),) + args[i:], {}
-        if not all(isinstance(x, dict) for x in args):
-            raise ValidationError("can't interpret non-dictionary objects.")
-
-        if not args:
-            args = super().default() or (dict(*args, **kwargs),)
-
-        object = args[0]
-
-        s = cls.schema(0)
-        p = s.get("properties", {})
-
-        order = list(p)
-        if Generic.Dependencies.alias() in s:
-            d = s[Generic.Dependencies.alias()]
-            o = set(list(d) + sum(d.values(), []))
-            order = [x for x in order if x not in d]
-            rank = {k: sum(map(list(d).__contains__, v)) for k, v in d.items()}
-            order += sorted(rank, key=rank.get)
-
-        for k in order:
-            # after initializing a dict we have all of the defaults on
-            # the properties in the schema and we call them direcly from the types.
-            if k in object:
-                continue
-
-            v = p[k]
-
-            if isinstance(v, Generic):
-                if not issubclass(v, Const):
-                    continue
-
-            object[k], *_ = v.default()
-
-            if callable(object[k]):
-                try:
-                    object[k] = call(object[k])
-                except TypeError:
-                    object[k] = call(object[k], object)
-        x = dict.__new__(cls, object)
-        x.update(object)
-        return (x,)
-
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        # build the default
-        try:
-            self = dict.__new__(cls)
-            d = cls.default(*args, **kwargs)
-            dict.__init__(self, *d)
-            return self.validate(self)[0]
-        except (TypeError, ValueError) as e:
-            raise ValidationError()
-
-    @classmethod
-    def new_type(cls, object):
-        if isinstance(object, dict):
-            return cls + Generic.Properties[object]
-
-        if isinstance(object, tuple):
-            pass  # allow key types to be defined
-
-        # in jsonschema we can only have string keys
-        if issubclass(cls, cls.AdditionalProperties):
-            return super().new_type(cls)
-
-        return cls + cls.AdditionalProperties[object]
-
-    @staticmethod
-    def _type_to_signature(cls):
-        import inspect
-
-        from .types import Cast
-
-        s = cls.schema(0)
-
-        p = s.get("properties", {})
-
-        a = []
-        required = s.get("required", [])
-        for k in required:
-            try:
-                a += (
-                    inspect.Parameter(
-                        k,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        annotation=p[k],
-                    ),
-                )
-            except (ValueError, TypeError):
-                return inspect.signature(Dict)
-
-        for k in p:
-            if k in required:
-                continue
-
-            v = p[k]
-            if isinstance(v, type) and issubclass(v, Const):
-                d, *_ = v.default()
-                if not callable(d):
-                    a += (
-                        inspect.Parameter(
-                            k,
-                            inspect.Parameter.KEYWORD_ONLY,
-                            annotation=p[k],
-                            default=d,
-                        ),
-                    )
-                continue
-
-            a += (
-                inspect.Parameter(
-                    k,
-                    inspect.Parameter.KEYWORD_ONLY,
-                    annotation=p[k],
-                ),
-            )
-
-        return inspect.Signature(a)
-
-    @classmethod
-    def _infer_dependencies(cls):
-        import collections
-        import inspect
-
-        from .types import Py
-
-        # accumulate dependencies and required schema values in this method
-        deps, required = collections.defaultdict(set), []
-
-        deps.update(
-            {k: set(v) for k, v in cls.schema().get("dependencies", {}).items()}
-        )
-
-        props = cls.schema(0).get("properties", {})
-
-        for k in props:
-            if not hasattr(cls, k):
-                if isinstance(props[k], type):
-                    if not issubclass(props[k], Default):
-                        required += (k,)
-
-            else:
-                if isinstance(props[k], type):
-                    if not issubclass(props[k], Default):
-                        props[k] += Default[getattr(cls, k)]
-                else:
-                    props[k] += Default[getattr(cls, k)]
-
-        for k in dir(cls):
-
-            try:
-                # get the atttribute value
-                v = getattr(cls, k)
-            except AttributeError:
-                continue
-
-            if not callable(v):
-                # ignore callables, but we should probably treat these as defaults
-                continue
-
-            try:
-                # get the signature of the callable.
-                s = inspect.signature(v)
-            except ValueError:
-                continue
-
-            n = k
-
-            if s.return_annotation in props:
-                if s.return_annotation in required:
-                    required.pop(required.index(s.return_annotation))
-                    props[s.return_annotation] += Default[v]
-                    n = s.return_annotation
-
-            for x in s.parameters.values():
-                if x.annotation == inspect._empty:
-                    continue
-
-                if isinstance(x.annotation, str):
-                    deps[n].add(x.annotation)
-
-                elif isinstance(x.annotation, (tuple, list)):
-                    [deps[n].add(x) for x in x.annotation]
-
-            deps.pop(inspect._empty, None)
-            if len(deps):
-                cls.__annotations__["dependencies"] = {
-                    k: list(v) for k, v in deps.items() if k in props
-                }
-
-            if required:
-                cls.__annotations__["required"] = required
-
-            # the first parameter to self tells up what the
-            # return type depends on
-
-            # the return type tells us the default that we can append
-
-    def __init_subclass__(cls, **kwargs):
-        ANNOTATIONS = "__annotations__"
-
-        # we should change the vocab here
-        super().__init_subclass__(**kwargs)
-        hold = dict(properties={}, dependencies={}, required=[])
-        body = {}
-        for x in reversed(cls.__mro__):
-            a = getattr(x, ANNOTATIONS, {})
-            for h in hold:
-                if h in a:
-                    if isinstance(hold[h], dict):
-                        hold[h].update(a[h])
-                    elif isinstance(hold[h], list):
-                        hold[h].append(a[h])
-
-        for k, v in hold.items():
-            if v:
-                cls.__annotations__[k] = v
-
-        cls._infer_dependencies()
-        cls.__signature__ = cls._type_to_signature(cls)
-
-
-Generic.types[
-    dict,
-] = Dict
-
-
-class ConsentException(BaseException):
-    pass
-
-
-class Forward(ForwardRef, _root=_root):
-    # an overloaded forward reference method that allows both strings and literals.
-    def __new__(cls, object):
-        # only check string Forward References.
-        if isinstance(object, str):
-            self = super().__new__(cls)
-            self.__init__(object)
-            return self
-
-    def consent(self):
-        # it would be dangerous too allow any forward reference anytime.
-        # consent means that the end user has imported the namespace in sys.modules
-        # this will indicate consent
-        import sys
-
-        if isinstance(self.__forward_arg__, str):
-            module = self.__forward_arg__.partition(".")[0]
-            if module not in sys.modules:
-                raise ConsentException(
-                    f"Import {module} to consent to making forward references to its attributes."
-                )
-
-    def _evaluate(self, force=False, globals=None, locals=None):
-        import sys
-
-        if self.__forward_evaluated__:
-            return self.__forward_value__
-        if not globals or locals:
-            # we've redirected our interests to explicit forward reference off of sys.modules.
-            # no errors, just False exceptions
-            globals = locals = __import__("sys").modules
-        self.consent()
-        self.__forward_value__ = eval(self.__forward_code__, globals, locals)
-        self.__forward_evaluated__ = True
-        return self.__forward_value__
-
-    def instance(self):
-        return self._evaluate()
-
-    __call__ = instance
-
-
-class Sys(Any):
-    """forward reference to python objects."""
-
-    @classmethod
+class Os(Form):
     def validate(cls, *args):
-        return args
+        k = Sys.get_value(cls)
+        if k not in os.environ:
+            raise ValidationError
+        return os.environ[k]
+
+    def object(cls, *args):
+        if not args:
+            args = cls.values()
+        if len(args) == 2:
+            os.environ[args[0]] = args[1]
+            return
+        elif len(args) > 2:
+            raise ValidationError()
+        return os.getenv(*args)
 
     @classmethod
-    def schema(cls, ravel=True):
-        v = cls.value[0]
-        if hasattr(v, "schema"):
-            return v.schema(ravel)
-        return v
-
-    @staticmethod
-    def get_value(object):
-        import typing
-
-        if hasattr(object, "value"):
-            if isinstance(object.value, typing.Iterable):
-                object = object.value[0]
-            else:
-                object = object.value
-            if isinstance(object, Forward):
-
-                return call(object)
-            return object
-        return super().instance()
-
-    @classmethod
-    def instance(cls):
-        return cls.get_value(super().instance())
-
-    @classmethod
-    def new_type(cls, x):
-        if isinstance(x, str):
-            x = Forward(x)
-        if not isinstance(x, tuple):
-            if isinstance(x, list):
-                x = tuple(x)
-            else:
-                x = (x,)
-        return Generic.new_type(len(x) is 1 and cls or Cast, value=x)
+    def environ(cls):
+        return os.environ
 
 
 class Py(Sys):
-    @classmethod
     def validate(cls, *args):
-        if isinstance(*args, Py.get_value(cls)):
+        if isinstance(*args, *cls.AtType.form(cls)[:1]):
             return args
-        raise ValidationError(f"{args} is not an instance of {cls}")
+        raise ValidationError(f"{args} is not an object of {cls}")
+
+    def type(cls, object, **kwargs):
+        if object is None:
+            return identity
+
+        if isinstance(object, (slice)):
+            if None is object.start is object.stop is object.step:
+                return identity
+
+        return super().type(object, **kwargs)
 
 
 class Instance(Py):
-    # force the import
-    # so many schema have a thing, this is ours
     @classmethod
-    def validate(cls, *args):
-        if isinstance(*args, Py.get_value(cls)):
-            return args
-        raise ValidationError(f"{args} is not an instance of {cls}")
-
-    @classmethod
-    def instance(cls, *args, **kwargs):
+    def object(cls, *args, **kwargs):
         """kind of like a functor."""
-        f = super().instance()
         # call callables, basically making this a functor
-        if callable(f):
-            import functools
-
-            return functools.partial(
-                f, *getattr(cls, "args", tuple()), **getattr(cls, "kwargs", dict())
-            )(*args, **kwargs)
-
-        return f
-
-    @classmethod
-    def new_type(cls, object):
-        if not isinstance(object, tuple):
-            object = (object,)
-
-        args, kwargs = (), {}
-        value, *object = object
-        if isinstance(value, str):
-            value = Forward(value)
-
-        for arg in object:
-            if isinstance(arg, slice):
-                kwargs[arg.start] = arg.stop
-                # use the step as a signature
-            else:
-                args += (arg,)
-
-        cls = Generic.new_type(cls, value=(value,), args=args, kwargs=kwargs)
-
-        import inspect
-
-        try:
-            cls.__signature__ = inspect.signature(cls.get_value(cls))
-        except (ValueError, TypeError, ConsentException):
-            # this a ui thing
-            pass
-        return cls
+        return call(
+            super().object(),
+            *(cls.Args.form(cls) or ()),
+            *args,
+            **{**(cls.Kwargs.form(cls) or {}), **kwargs},
+        )
 
 
-class Cast(Instance):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        args, kwargs = (super().instance(*args, **kwargs),), {}
-
-        for i, f in enumerate(cls.value):
-            if i:
-                args, kwargs = (call(f, *args, **kwargs),), {}
-
+class Pipe(Instance):
+    def object(cls, *args, **kwargs):
+        for f in cls.AtType.form(cls):
+            args, kwargs = (call(f, *args, **kwargs),), {}
         return args[0]
 
-    @classmethod
-    def new_type(cls, object):
-        if not isinstance(object, tuple):
-            object = (object,)
 
-        value, *object = object
-        if isinstance(value, str):
-            value = Forward(value)
-
-        cls = Generic.new_type(cls, value=(value,) + tuple(object))
-
-        import inspect
-
-        try:
-            cls.__signature__ = inspect.signature(cls.get_value(cls))
-        except (ValueError, TypeError, ConsentException):
-            # this a ui thing
-            pass
-        return cls
+class Star(Pipe):
+    def object(cls, *args, **kwargs):
+        return super().object(**dict(*args, **kwargs))
 
 
-class Kwargs(Cast):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        """kind of like a functor."""
-        return super().instance(**dict(*args, **kwargs))
-
-
-class Do(Instance):
+class Do(Pipe):
     # so many schema have a thing, this is ours
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        """kind of like a functor."""
-        super().instance(*args, **kwargs)
-        return args[0]
+    def object(cls, *args, **kwargs):
+        super().object(*args, **kwargs)
+        return (args + (None,))[0]
 
 
-class Juxt(Py):
-    @classmethod
-    def new_type(cls, object):
-        a = dict()
-        if callable(object):
-            return object
-
-        elif isinstance(object, str):
-            return Instance[object]
-
-        elif isinstance(object, slice):
-            f = Function()
-            if object.start:
-                f = f.filter(object.start)
-            if object.stop:
-                f = f.map(object.stop)
-            if object.step:
-                f = f.append(object.step)
-            return f
-
-        elif isinstance(object, (typing.Sequence, typing.Set)):
-            a["type"] = type(object)
-            a["value"] = list(map(Juxt.new_type, object))
-
-        elif isinstance(object, typing.Container):
-            a["type"] = type(object)
-            a["value"] = tuple(
-                Juxt.new_type((isinstance(k, str) and k.format or k, v))
-                for k, v in object.items()
+class Juxt(Instance):
+    def type(cls, object):
+        if isinstance(object, slice):
+            object = slice(
+                object.start and Juxt[object.start],
+                object.stop and Juxt[object.stop],
+                object.step and Juxt[object.step],
             )
 
-        return Generic.new_type(cls, **a)
+        if callable(object):
+            return object
+        elif isinstance(object, str):
+            pass
+        elif not isinstance(object, str) and isinstance(
+            object, (typing.Sequence, typing.Set)
+        ):
+            return super().type((type(object), *map(Juxt.type, object)))
+
+        elif isinstance(object, typing.Container):
+            # convert dictionary containers to key, value pairs
+            return super().type(
+                (
+                    type(object),
+                    *tuple(
+                        Juxt.type((isinstance(k, str) and k.format or k, v))
+                        for k, v in object.items()
+                    ),
+                )
+            )
+        return Instance[object]
+
+    def object(cls, *args, **kwargs):
+        t, *v = cls.AtType.form(cls)
+        return t(call(x, *args, **kwargs) for x in v)
+
+
+class Dict(forms.Dicts, Literal, Type["object"]):
+    def __setitem__(self, k, v):
+        self.update({k: v})
+
+    def __init_subclass__(cls):
+        if issubclass(cls, cls.Required):
+            cls.__signature__ = Signature.from_type(cls)
+
+    def update(self, *args, **kwargs):
+        kwargs = dict(*args, **kwargs)
+        r = type(self).Required.form(self) or ()
+        x = self.force_update(type(self).object(**{**self, **kwargs}))
+        with suppress(AttributeError):
+            x._update_display()
+
+        return x
+
+    def force_update(self, *args, **kwargs):
+        dict.update(self, dict(*args, **kwargs))
+        return self
+
+    def pop(self, key, default=None):
+        call(self, {k: v for k, v in self.items() if k != key})
+        try:
+            return dict.pop(self, key, default)
+        finally:
+            self._update_display()
 
     @classmethod
-    def instance(cls, *args, **kwargs):
+    def object(cls, *args, **kwargs):
+        if not all(isinstance(x, dict) for x in args):
+            raise ValidationError
+        kwargs = super().object(dict(*args, **kwargs))
+        p, d, r = (
+            cls.Properties.form(cls),
+            dict(cls.Dependencies.form(cls)),
+            cls.Required.form(cls),
+        )
+        for k, v in p.items():
+            if k in d:
+                continue
 
-        if hasattr(cls, "type"):
-            if isinstance(cls.value, typing.Iterable):
-                return cls.type(call(x, *args, **kwargs) for x in cls.value)
-            return cls.type(cls.value)
+            if k not in kwargs and issubclass(v, cls.Default):
+                kwargs.force_update({k: cls.Default.form(v)})
 
-        if callable(cls.value):
-            return call(cls.value, *args, **kwargs)
-        return cls.value
+        while d:
+            for x in list(d):
+                if all(x in kwargs for x in d[x]):
+                    v = cls.Default.form(cls.Properties.form(cls)[x])
+
+                    kwargs.force_update({x: v(kwargs)})
+                    d.pop(x)
+                    break
+            else:
+                break
+
+        return cls.validate(kwargs)
+
+    @classmethod
+    def validate(cls, *args, **kwargs):
+        if args:
+            if kwargs:
+                args = (dict(*args, **kwargs),)
+            args = (Type.validate.__func__(cls, *args),)
+        if issubclass(cls, Form.Keys):
+            k = cls.Keys.form(cls)
+            if args and k:
+                for x in list(*args):
+                    if not isinstance(x, k):
+                        raise ValidationError(f"not all keys are objects of {k}")
+        return args[0] if args else dict()
+
+    @classmethod
+    def type(cls, x):
+        if isinstance(x, dict):
+            return cls.properties(x)
+        if isinstance(x, tuple):
+            if len(x) <= 2:
+                cls = cls + cls.Keys[x[0]]
+
+            if len(x) == 2:
+                cls = cls.additionalProperties(x)
+
+            return cls
+        return cls.additionalProperties(x)
 
 
-from . import aliases, aliases as A  # isort:skip
-
-aliases.Type = Type
-
-
-class Uri(String, Generic.Format["uri"], type=P.XSD["anyURI"]):
-    def get(*args, **kwargs):
-        return __import__("requests").get(self, *args, **kwargs)
-
-
-# at this point we have everything we need to build other string and number types.
-from .strings import *  # isort:skip
-from .numbers import *  # isort:skip
-
-
-class Enum(Validate, Literal, Generic.Plural, type=P.XSD["enumeration"]):
-    """
-    >>> Enum[1, 2](10)
-    ...
-
-    """
-
-    def instance(cls, *args, **kwargs):
-        self = super().instance(*args, **kwargs)
-        cls._attach_parent(self)
-        return self
+class Enum(Form.Plural, Literal):
+    def object(cls, *args, **kwargs):
+        # self.value = cls.validate(self)
+        # cls.attach_parent(self)
+        return cls.validate(Literal(args[0] if args else Enum.form(cls)[0]))
 
     @classmethod
     def choices(cls):
-        return cls.schema(0)[Enum.alias()]
+        e = Enum.form(cls)
+        if len(e) is 1 and isinstance(e[0], dict):
+            # Enum is defined as a plural form
+            return e[0]
+        return e
 
 
-class Pointer(String, String.Format["json-pointer"]):
-    @classmethod
-    def instance(cls, *args):
-        if len(args) > 1:
-            args = (__import__("jsonpointer").JsonPointer.from_parts(args).path,)
-        return super().instance(*args)
-
-    def apply(self, object):
-        # a pointer can be called against an object to resolve
-        return __import__("jsonpointer").resolve_pointer(object, self)
-
-    def __truediv__(self, object):
-        return Pointer(self + "/" + object)
+Enum.register(__import__("enum").Enum)
 
 
-class Composite(Literal):
-    """a schemaless alias type mixin, the name of the class is used to derive others"""
+class Cycler(Enum):
+    def object(cls):
+        return __import__("itertools").cycle(cls.choices())
 
-    @classmethod
+
+class Composite(Type):
+    """a schemaless form type mixin, the name of the class is used to derive others"""
+
     def validate(cls, object):
-        # composites use the instance creation for typing checking
-        return cls.instance(object)
+        # composites use the object creation for typing checking
+        return cls.object(object)
 
 
-class Nested:
-    @classmethod
-    def new_type(cls, object):
-        # post process the created type to avoid nesting in the
-        # schema representation.
-        self = super().new_type(object)
-        s = self.schema(0)
-        n = cls.alias()
-        order = []
-        for x in s[n]:
-            if isinstance(x, type) and issubclass(x, cls):
-                order += x.schema(0)[n]
-            elif x not in order:
-                order.append(x)
-        self.__annotations__[n] = order
-        return self
-
-
-class AnyOf(Nested, Composite, Generic.Plural):
-    @classmethod
-    def instance(cls, *args):
-        import typing
-
-        args = cls.default(*args)
-        schema = cls.schema(False)
-        p = schema[AnyOf.alias()]
-        for t in p:
+class AnyOf(Form.Nested, Composite):
+    def object(cls, *args):
+        ts = AnyOf.form(cls)
+        for t in ts:
             try:
                 x = call(t, *args)
-                return cls._attach_parent(x)
-            except ValidationErrors:
-                if t is p[-1]:
+                return cls.attach_parent(x)
+            except ValidationErrors + (ValueError,):
+                if t is ts[-1]:
                     raise ValidationError()
 
 
-class AllOf(Nested, Composite, Generic.Plural):
-    @classmethod
-    def instance(cls, *args):
-
-        args = cls.default(*args)
-        schema = cls.schema(False)
+class AllOf(Form.Nested, Composite):
+    def object(cls, *args):
         result = {}
-        for t in schema[AllOf.alias()]:
+        for t in AllOf.form(cls):
             result.setdefault("x", call(t, *args))
 
         x = result.get("x", args[0])
 
-        return cls._attach_parent(x)
+        return cls.attach_parent(x)
 
 
-class OneOf(Nested, Composite, Generic.Plural):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        args = cls.default(*args)
-        schema = cls.schema(False)
+class OneOf(Form.Nested, Composite):
+    def object(cls, *args, **kwargs):
         i, x = 0, None
-        for t in schema[OneOf.alias()]:
+        for t in OneOf.form(cls):
             try:
                 if i:
                     call(t, *args, **kwargs)
                 else:
                     x = call(t, *args, **kwargs)
+
                 i += 1
             except ValidationErrors as e:
                 continue
-
             if i > 1:
                 break
 
         if i == 1:
-            return cls._attach_parent(x)
+            return cls.attach_parent(x)
 
         raise ValidationError()
 
 
-class Not(Composite, Generic.Alias):
-    @classmethod
-    def instance(cls, *args):
+class Not(Form):
+    def object(cls, *args):
         try:
-            super().instance(*args)
+            super().object(*args)
         except ValidationErrors:
             x, *_ = args
 
-            return cls._attach_parent(x)
+            return cls.attach_parent(x)
+
+
+class Else(Form):
+    pass
+
+
+class Then(Form):
+    pass
 
 
 class If(Literal):
-    @classmethod
-    def instance(cls, *args):
-
+    def object(cls, *args):
         args = cls.default(*args)
-        s = cls.schema(False)
-        i, t, e = s.get(If.alias()), s.get("then"), s.get("else")
-        if isinstance(*args, i):
-            e = t
-        if isinstance(e, Generic):
-            if issubclass(e, cls):
-                return super().instance(*args)
-            return e.instance(*args)
-        return Literal.__new__(e, *args)
+        try:
+            args = (If.form(cls)(*args),)
+            t = Then.form(cls)
+            if t:
+                return t(*args)
+            return args[0]
+        except ValidationErrors as exc:
+            e = Else.form(cls)
+            if e:
+                return e(*args)
+            raise exc
 
-    def new_type(cls, object):
-
-        payload = {}
+    def type(cls, object):
         if isinstance(object, slice):
-            if object.start is not None:
-                payload[If.alias()] = object.start
+            cls = super().type(object.start)
             if object.stop is not None:
-                payload["then"] = object.stop
+                cls = cls + Then[object.stop]
             if object.step is not None:
-                payload["else"] = object.step
-        if payload:
-            return Generic.new_type(cls, __annotations__=payload)
+                cls = cls + Else[object.step]
         return cls
 
 
 class Json(
     List ^ Dict ^ String ^ Number ^ Bool ^ Null,
-    Generic.ContentMediaType["application/json"],
+    Form.ContentMediaType["application/json"],
 ):
-    import json
+    pass
 
-    loader = json.loads
-    dumper = json.dumps
-    del json
 
+class Bunch(Dict):
+    def __getattribute__(self, k):
+        if not k.startswith("_"):
+            if Form.Properties.form(type(self)):
+                try:
+                    return dict.__getitem__(self, k)
+                except KeyError:
+                    pass
 
-# json patching methods
-class Patch:
-    """the patch class implements the json patch protocol, for lazy updating and validation to lists and dictionaries"""
+        return object.__getattribute__(self, k)
 
-    ADD = dict(op="add")
-    REMOVE = dict(op="remove")
-    REPLACE = dict(op="replace")
-    COPY = dict(op="copy")
-    MOVE = dict(op="move")
-    TEST = dict(op="test")
+    def __setattr__(self, k, v):
+        if not k.startswith("_"):
+            if Generic.Properties.form(type(self)):
+                self[k] = v
+                return
 
-    _depth = _push_mode = 0
+        return object.__setattr__(self, k, v)
 
-    def __enter__(self):
-        self._depth += 1
-        return self
 
-    def __exit__(self, *e):
-        self._depth -= 1
-        if not self._depth:
-            # a depth indicates we should not collect our patches, verify and apply them.
-            self.verify()
+class Set(List, Form.Title["Set"], Form.UniqueItems[True]):
+    pass
 
-    def verify(self):
-        with self.push_mode():
-            # push the changes to a temporary object
-            x = self.inc()
 
-        try:
-            # validate the object
-            self.validate(x)
-        except ValidationErrors as e:
-            raise e
-        else:
-            self.apply_patch()
-        finally:
-            self.reset()
-
-    def push_mode(self):
-        # enter a push mode state where the dictionary can apply standard changes,
-        # otherwise we only record the patches
-        import contextlib
-
-        @contextlib.contextmanager
-        def push_mode():
-            self._push_mode += 1
-            yield self
-            self._push_mode -= 1
-
-        return push_mode()
-
-    def apply_patch(self):
-        """apply the stored json patches to the object"""
-        import jsonpatch
-
-        with self.push_mode():
-            try:
-                jsonpatch.apply_patch(self, self._patches, in_place=True)
-            finally:
-                self.reset()
-        return self
-
-    def inc(self):
-        """created a temporary instance of the patched object"""
-        import jsonpatch
-
-        if not hasattr(self, "_patches"):
-            self._patches, self._applied_patches = [], []
-
-        t = type(self)
-        with self.push_mode():
-            self._tmp = jsonpatch.apply_patch(
-                [list, dict][issubclass(type(self), dict)](self),
-                self._patches,
-                in_place=False,
-            )
-
-        return self._tmp
-
-    def resolve(self, x):
-        # resolve a jsonpointer reference on self
-        import jsonpointer
-
-        with self.push_mode():
-            self = jsonpointer.resolve_pointer(self, Patch.pointer(x))
-        return self
-
-    def add_patches(self, *patch):
-        # add patches to a queue of chances to be applied
-        if not hasattr(self, "_patches"):
-            self._patches, self._applied_patches = [], []
-
-        for p in patch:
-            if "from" in p:
-                p["from"] = Patch.pointer(p["from"])
-            p["path"] = Patch.pointer(p["path"])
-            self._patches.append(p)
-
-        return self
-
-    def reset(self):
-        self._depth = self._push_mode = 0
-        for x in (self._patches, self._applied_patches):
-            while x:
-                if isinstance(x, list):
-                    x.pop()
-                elif isinstance(x, dict):
-                    x.popitem()
-
-    # jsonpointer method
-    @staticmethod
-    def pointer(x):
-        import jsonpointer
-
-        if isinstance(x, tuple):
-            return jsonpointer.JsonPointer.from_parts(x).path
-
-        if not isinstance(x, str):
-            if x == -1:
-                x = "-"
-            else:
-                x = str(x)
-
-        if isinstance(x, str):
-            if x.startswith("/"):
-                return jsonpointer.JsonPointer(x).path
-            return Patch.pointer((x,))
-        raise BaseException("dunno")
-
-    # json patch methods
-    def add(self, key, value):
-        # add patch
-        return self.add_patches(dict(path=key, value=value, **self.ADD))
-
-    def remove(self, key, *default):
-        # remove patch
-        # we can and might want to include the value in the patch
-        return self.add_patches(dict(path=key, **self.REMOVE))
-
-    def move(self, key, target):
-        # move patch
-        if key == -1:
-            key = len(self) - 1
-        if target == -1:
-            target = len(self) - 1
-
-        return self.add_patches(dict(path=target, **{"from": key}, **self.MOVE))
-
-    def copy(self, key, target):
-        # copy patch
-        return self.add_patches(dict(path=target, **{"from": key}, **self.COPY))
-
-    def replace(self, key, value):
-        # replace patch
-        return self.add_patches(dict(path=key, value=value, **self.REPLACE))
-
-
-from .objects import *  # isort:skip
-from .arrays import *  # isort:skip
-
-
-class Pipe(Py):
-    # this is used as an instance, not a type, it falls back to pipe
-    @classmethod
-    def new_type(cls, x):
-        if not isinstance(x, tuple):
-            x = (x,)
-
-        return cls.append(x)
-
-    @classmethod
-    def instance(cls, *args):
-        self = super().instance()
-        self.value = tuple(args)
-        return self
-
-    def append(*args):
-        if not args:
-            return Pipe()
-        self, *args = args
-
-        if issubclass(type(self), Pipe):
-            self.value += tuple(args)
-            return self
-        return Pipe().append(*args)
-
-    __add__ = __sub__ = __getitem__ = __rshift__ = append
-
-    def map(self, value):
-        return self.append(functools.partial(map, value))
-
-    __mul__ = __imul__ = map
-
-    def filter(self, value):
-        return self.append(functools.partial(filter, value))
-
-    __truediv__ = __itruediv__ = filter
-
-    def reduce(self, value):
-        init = None
-        if isinstance(value, tuple):
-            value, init = value
-        if init:
-            return self.append(lambda x: functools.reduce(value, x, init))
-        return self.append(functools.partial(functools.reduce, value))
-
-    __floordiv__ = reduce
-
-    def groupby(self, value):
-        import itertools
-
-        return self.append(
-            lambda v: {x: list(y) for x, y in itertools.groupby(v, value)}
-        )
-
-    __matmul__ = groupby
-
-    def do(self, object):
-        return self.append(Do[Juxt[object]])
-
-    __lshift__ = do
-
-    def iff(self, object):
-        p = object
-        if isinstance(object, (tuple, type)):
-            p = lambda x: isinstance(x, object)
-        return Iff[self.append(p)]
-
-    def ifthen(self, object):
-        return IfThen[self, object]
-
-    def ifnot(self, object):
-        return IfNot[self, object]
-
-    def excepts(self, object):
-        return Excepts[self, object]
-
-    def complement(self):
-        return Pipe(Not[self])
-
-    def pipe(self):
-        return Cast[self.value]
-
-    def __call__(self, *args, **kwargs):
-        return self.pipe()(*args, **kwargs)
-
-
-class X(BaseException):
-    def __bool__(self):
-        return False
-
-
-class Conditional:
-    @classmethod
-    def new_type(cls, object):
-        p, v = object, tuple()
-        if isinstance(p, tuple):
-            p, v, *_ = p
-        cls = super().new_type(object)
-        cls.predicate, cls.value = p, v
-        return cls
-
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        args = cls.default(*args)
-        return call(cls.predicate, *args, **kwargs)
-
-
-class Iff(Conditional, Pipe):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        x = super().instance(*args, **kwargs)
-        if x:
-            return call(cls.value, *args, **kwargs)
-        return args[0]
-
-
-class IfThen(Conditional, Pipe):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        x = super().instance(*args, **kwargs)
-        if x:
-            return call(cls.value, x)
-        return args[0]
-
-
-class IfNot(Conditional, Pipe):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        x = super().instance(*args, **kwargs)
-        if x:
-            return args[0]
-        return call(cls.value, *args, **kwargs)
-
-
-class Excepts(Conditional, Instance):
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        try:
-            return super().instance(*args, **kwargs)
-        except cls.value or () as e:
-            return X(e)
-
-
-del _root, ForwardRef
+Set.register(set)

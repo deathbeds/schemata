@@ -1,31 +1,14 @@
-"""Semantically enrich python types.
-
-schemata defines an ephemeral/optional type system for python that relies on
-rdf type representations to map to and from python types.
-
-the primary application of schemata is to enrich the outputs with meaning. in this
-framing, schemata is superfluous to the user, but their notebooks will
-have improved reproducible qualities.
-
-notebooks have primarily grown as a substrate for literature that is enhanced
-by mimetypes that provide visual meaning. in this context, there are sufficient
-literacy skills required to responsibly derive meaning from the document. 
-
-schemata extends notebooks to be linked data documents that augment the
-existing mimetypes with semantic rdf types.
-
-we should raise errors as rdf too.
-"""
+"""Semantically enrich python types."""
 __version__ = "0.0.1"
 
-from . import types as T
+# from .abc import Schema
+
+from .base import *  # isort:skip
+from . import apps, forms, strings
 
 from .types import *  # isort:skip
-from . import app, types  # isort:skip
 
-__import__("jsonschema").Draft7Validator.TYPE_CHECKER.redefine(
-    "array", lambda c, x: isinstance(x, (list, tuple))
-)
+# from .strings import *
 
 
 def load_ipython_extension(shell):  # pragma: no cover
