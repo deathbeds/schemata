@@ -80,13 +80,12 @@ class Regex(String, String.Format["regex"]):
         return re.compile(super().object(*args))
 
 
-class Fstring(String, Form):
-    @classmethod
+class Fstring(String):
     def type(cls, object):
         import parse
 
-        cls = super().type(_parse._match_re)
-        return cls
+        _parse = parse.compile(object)
+        return cls + cls.Pattern[_parse._match_re]
 
 
 class Parse(Instance["parse.compile"]):
@@ -108,37 +107,10 @@ class Jinja(Instance["jinja2.Template"]):
 
 
 class Code(String):
-    @classmethod
-    def load(cls, object):
-        return cls(object)
-
     def type(cls, object):
         if object.startswith("."):
             return cls + Generic.FileExtension[object]
         return cls + Generic.MimeType[object]
-
-    def _repr_html_(self):
-        import pygments
-
-        s = type(self).schema()
-        lexer = None
-        for e in s.get("fileExtension", ()):
-            try:
-                lexer = pygments.lexers.get_lexer_for_filename("*" + e)
-                break
-            except:
-                pass
-        if lexer is None:
-            lexer = pygments.lexers.get_lexer_for_mimetype(
-                s.get("mimeType", "text/plain")
-            )
-        return pygments.highlight(
-            self,
-            lexer,
-            pygments.formatters.HtmlFormatter(
-                linenos="table", wrapcode=True, noclasses=True
-            ),
-        )
 
 
 class Toml(Code, String.MimeType["application/toml"], String.FileExtension[".toml"]):

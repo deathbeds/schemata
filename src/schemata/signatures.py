@@ -100,15 +100,13 @@ class Signature(inspect.Signature):
 
     @classmethod
     def from_type(cls, object):
-        if hasattr(object, "schema"):
-            return cls.from_schema(object.schema())
-        return cls(object)
+        return cls.from_schema(object.schema())
 
     @classmethod
     def from_re(cls, object):
         return Signature(
             [
-                inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
+                # inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
                 *(
                     inspect.Parameter(x, inspect.Parameter.KEYWORD_ONLY)
                     for x in sorted(object.groupindex)
@@ -160,7 +158,7 @@ def get_typer_parameter(p):
 
     import typer
 
-    from .abc import Generic
+    from .base import Generic
 
     k = {}
     if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD:
@@ -206,9 +204,8 @@ def get_typer_parameter(p):
 def get_non_schemata_types(cls):
     import abc
 
-    from schemata import Container, Display, Generic, call
-
-    from .base import Any, Form, Plural
+    from .base import Form, Generic, Plural, call
+    from .forms import Mapping
 
     try:
         t = list(filter(bool, map(call, abc._get_dump(cls)[0])))
@@ -217,6 +214,5 @@ def get_non_schemata_types(cls):
     return t + [
         x
         for x in cls.__mro__
-        if x is not object
-        and not issubclass(x, (Container, Form, Plural, Any, Display))
+        if x is not object and not issubclass(x, (Mapping, Form, Plural))
     ]

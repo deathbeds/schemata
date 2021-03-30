@@ -45,6 +45,10 @@ class Pattern(Form):
 
         return super().type(re.compile(*x))
 
+    @classmethod
+    def pattern(cls):
+        return Pattern.form(cls)
+
 
 class Format(Form):
     pass
@@ -96,6 +100,7 @@ class UniqueItems(Form):
 
 class Properties(Mapping):
     pass
+
 
 class AdditionalProperties(Form):
     def __missing__(self, key):
@@ -205,6 +210,7 @@ class AtGraph(Plural):
 class Literals(metaclass=Generic):
     pass
 
+
 class Strings(Literals):
     lowercased = lowercased
 
@@ -236,6 +242,7 @@ class Lists(Literals):
 class Dicts(Literals):
     def _prepare_type(x, *args):
         from .types import Dict
+
         if len(args) == 1:
             K, V = None, *args
         elif len(args) == 2:

@@ -40,6 +40,7 @@ class SchemaTest(unittest.TestCase):
         assert Sys.type() is Sys
         assert Plural.type() is Plural
 
+
 class BaseTest(unittest.TestCase):
     def test_forward(x):
         assert Forward("builtins.range").object() is range
@@ -190,7 +191,6 @@ class ContainerTest(unittest.TestCase):
         # build a type from this type for coverage
         assert T.schema().ravel().new("").schema()
 
-
         assert set(T.schema()["dependencies"]) == set(dict(c=list("ab")))
 
         t = T(a=123, b="abc")
@@ -229,36 +229,41 @@ class ContainerTest(unittest.TestCase):
             assert MyList([dict(a="a")]) == [dict(a="a")]
         a = List.minItems(1)([1])
 
-        with raises: a.pop()
+        with raises:
+            a.pop()
         assert a == [1]
-        with raises: a.remove(1)
+        with raises:
+            a.remove(1)
         assert a.append(2) == [1, 2]
         assert a.remove(1) == [2]
         a.append(3)
         assert a.pop(-1) == 3
         a[-1] = 4
         assert a == [4]
-            
+
         assert a.insert(-1, 2).append(3) == [2, 4, 3]
 
         a = List[String]()
 
-        with raises: a.append(1)
+        with raises:
+            a.append(1)
 
         assert a.append("a") == ["a"]
-        assert a.insert(0,"b") == ["b", "a"]
+        assert a.insert(0, "b") == ["b", "a"]
 
         a = List[Integer]([1])
 
-        with raises: a[0] = "a"
+        with raises:
+            a[0] = "a"
 
         a[0] = 2
 
         assert a == [2]
 
-        a = (Pipe[range, list]>> List[Integer])(10)
+        a = (Pipe[range, list] >> List[Integer])(10)
 
-        with raises: a[2:4] = "abc"
+        with raises:
+            a[2:4] = "abc"
 
         a[2:4] = reversed(a[2:4])
 
@@ -268,10 +273,11 @@ class ContainerTest(unittest.TestCase):
         assert a == [0, 1, 5, 6, 7, 8, 9]
 
         assert List(list(range(10))).map(lambda x: str(x)) == list(map(str, range(10)))
-        v = List[Integer]([-1, -2, 4, 5]).filter(lambda x: x< 0) 
-        assert v == [-1, -2] and v.__class__ ==  List[Integer]
+        v = List[Integer]([-1, -2, 4, 5]).filter(lambda x: x < 0)
+        assert v == [-1, -2] and v.__class__ == List[Integer]
 
-        assert List[Integer]([-1, -2, 4, 5]).filter(lambda x: x< 0) == [-1, -2]
+        assert List[Integer]([-1, -2, 4, 5]).filter(lambda x: x < 0) == [-1, -2]
+
 
 class ExoticTest(unittest.TestCase):
     @hypothesis.strategies.composite
@@ -739,10 +745,14 @@ class ManualTests(unittest.TestCase):
         assert Dict(v).map(str) == dict(zip(v.keys(), map(str, v.values())))
         assert Dict(v).map(Integer).__class__ == Dict[Integer]
 
-        assert Dict(v).filter(lambda x:x>1) == dict(c=2)
+        assert Dict(v).filter(lambda x: x > 1) == dict(c=2)
 
-        assert Dict(v).map(str.upper, None) ==dict(zip(map(str.upper, v.keys()), v.values()))
-        assert Dict(v).map(str.upper, str) ==dict(zip(map(str.upper, v.keys()), map(str, v.values())))
+        assert Dict(v).map(str.upper, None) == dict(
+            zip(map(str.upper, v.keys()), v.values())
+        )
+        assert Dict(v).map(str.upper, str) == dict(
+            zip(map(str.upper, v.keys()), map(str, v.values()))
+        )
 
     def test_abc(x):
         assert Dict.type != List.type != Literal.type
@@ -762,9 +772,10 @@ class ManualTests(unittest.TestCase):
         assert Literal.pytype("thing") is String
         assert Literal.pytype(range) is type
         assert Literal.type() is Literal
-        with raises: (Integer^Number)(1)
+        with raises:
+            (Integer ^ Number)(1)
 
-        assert (Integer^Number)(1.1) == 1.1        
+        assert (Integer ^ Number)(1.1) == 1.1
 
     def test_just(x):
         assert Juxt[range](10) == range(10)
@@ -795,9 +806,12 @@ def test_if():
     with raises:
         t(2.2)
 
-    with raises: If[Integer::String](1.1)
+    with raises:
+        If[Integer::String](1.1)
 
     assert If[Integer::String](1) == 1
+
+
 def test_file(pytester):
     pytester.makefile(".yaml", tester="a: b")
     s = File("tester.yaml").read()
@@ -808,12 +822,42 @@ def test_file(pytester):
 
 
 def test_environ():
-     import os
-     assert Environ.type() is Environ
-     assert Environ["FOO"]() is None
-     assert "FOO" not in os.environ
-     assert Environ["FOO", "123"]() == "123"
-     
-     assert "FOO" in os.environ
+    import os
+
+    assert Environ.type() is Environ
+    assert Environ["FOO"]() is None
+    assert "FOO" not in os.environ
+    assert Environ["FOO", "123"]() == "123"
+
+    assert "FOO" in os.environ
 
 
+def test_sig():
+    def f(*, bar, foo, **kwargs):
+        pass
+
+    assert Signature.from_re(
+        strings.Fstring["the {foo} is {bar}"].pattern()
+    ) == inspect.signature(f)
+
+    class T(Dict):
+        z: String = "abc"
+        w: Float
+        y: Integer
+        x: String
+        v: List
+
+        def y(x: "w"):
+            return int(x["w"])
+
+        def x(x: "y"):
+            return str(x["y"])
+
+        def v(x: "x"):
+            return list(x["x"])
+
+    def f(w: Number, *, z: String["abc"] = "abc"):
+        pass
+
+    assert Signature.from_type(T) == inspect.signature(f)
+    Signature.from_type(T).to_typer()

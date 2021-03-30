@@ -148,7 +148,7 @@ class List(forms.Lists, Literal, Type["array"]):
             x[key] = value
             self.validate(x)
         else:
-            self.validate(self[:key-1] + [value] + self[key + 1 :])
+            self.validate(self[: key - 1] + [value] + self[key + 1 :])
         return list.__setitem__(self, key, value)
 
     __iadd__ = extend
@@ -182,7 +182,6 @@ class Environ(forms.Plural):
 
     def object(cls):
         return os.getenv(*cls.Environ.form(cls)[:1])
-
 
 
 class Py(Sys):

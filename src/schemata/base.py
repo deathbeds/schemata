@@ -173,7 +173,9 @@ class Schema(dict):
         t = None
         schema = jsonpointer.resolve_pointer(x, pointer)
         types = {
-            y.form(): y for x in (Generic.Form, Generic.Plural, Generic.Mapping, Generic.Nested) for y in x.__subclasses__()
+            y.form(): y
+            for x in (Generic.Form, Generic.Plural, Generic.Mapping, Generic.Nested)
+            for y in x.__subclasses__()
         }
         m = dict(
             boolean=Generic.Bool,
@@ -187,7 +189,7 @@ class Schema(dict):
             if k in types:
                 if k == "type":
                     v = m.get(k, v)
-                
+
                 if t is None:
                     t = types[k][v]
                 else:
@@ -662,9 +664,9 @@ class Plural(Form):
 
         if not isinstance(*args, tuple):
             if isinstance(*args, list):
-                args = tuple(*args),
+                args = (tuple(*args),)
             else:
-                args = args,
+                args = (args,)
 
         return Form.type.__func__(cls, *args)
 
