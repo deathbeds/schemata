@@ -1,3 +1,4 @@
-from . import types as T
+from .types import Integer, Number
 
-PositiveInteger = T.Integer > 0
+class PositiveInteger(Integer, Integer.Minimum[0]):
+    pass

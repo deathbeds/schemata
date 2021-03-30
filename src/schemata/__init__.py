@@ -4,7 +4,7 @@ __version__ = "0.0.1"
 # from .abc import Schema
 
 from .base import *  # isort:skip
-from . import apps, forms, strings
+from . import apps, forms, strings, numbers
 
 from .types import *  # isort:skip
 
