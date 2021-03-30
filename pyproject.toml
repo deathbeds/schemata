@@ -10,21 +10,41 @@ author-email = "tony.fast@gmail.com"
 classifiers = []
 home-page = "https://github.com/deathbeds/schemata.git"
 keywords = ""
-license = "MIT License"
+license = "MIT"
 maintainer = "tonyfast"
 maintainer-email = "tony.fast@gmail.com"
 module = "schemata"
-requires = ["jsonschema", "jsonpatch", "pyld", "uritemplate"]
+requires = [
+  "jsonschema",
+  "jsonpatch",
+  "pyld",
+  "uritemplate",
+  "typing >=3.7.4 ; python_version < '3.7'",
+  "strict_rfc3339",
+]
 requires-python = ">=3.6"
 
 [tool.flit.metadata.urls]
 
 [tool.flit.metadata.requires-extra]
 app = ["typer", "jinja2"]
-web = ["fastapi", "jinja2"]
-tasks = ["doit"]
+ci = ["codecov"]
 ipython = ["IPython"]
-test = ["pytest", "hypothesis", "hypothesis-jsonschema"]
+tasks = ["doit"]
+template = ["jinja2", "json-e"]
+test = [
+  "hypothesis-jsonschema >=0.19.1",
+  "hypothesis",
+  "jinja2",
+  "json-e",
+  "parse",
+  "pytest-cov",
+  "pytest",
+  "pyyaml",
+  "toml",
+  "typer"
+]
+web = ["fastapi", "jinja2"]
 
 [tool.flit.scripts]
 
@@ -32,3 +52,11 @@ test = ["pytest", "hypothesis", "hypothesis-jsonschema"]
 include = []
 
 [tool.flit.entrypoints]
+
+[tool.coverage.run]
+omit = [
+  "*/tests/*",
+]
+
+[tool.coverage.html]
+directory = "docs/coverage"

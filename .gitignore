@@ -1,6 +1,6 @@
+__pycache__
+.coverage
+.doit*
 .hypothesis
-*checkpoint*
 *.pyc
-.doit.db.bak
-.doit.db.dat
-.doit.db.dir
+*checkpoint*

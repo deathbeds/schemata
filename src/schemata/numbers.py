@@ -1,4 +1,5 @@
-from . import literal as L
-from . import protocols as P
+from .types import Integer, Number
 
-PositiveInteger = (L.Integer > 0).annotate(P.XSD["positiveInteger"])
+
+class PositiveInteger(Integer, Integer.Minimum[0]):
+    pass
