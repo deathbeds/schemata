@@ -14,8 +14,14 @@ license = "MIT"
 maintainer = "tonyfast"
 maintainer-email = "tony.fast@gmail.com"
 module = "schemata"
-requires = ["jsonschema", "jsonpatch", "pyld", "uritemplate", "typing >=3.7.4 ; python_version < '3.7'"]
 requires-python = ">=3.6"
+requires = [
+    "jsonschema",
+    "jsonpatch",
+    "pyld",
+    "uritemplate",
+    "typing >=3.7.4 ; python_version < '3.7'",
+]
 
 [tool.flit.metadata.urls]
 
@@ -25,7 +31,15 @@ web = ["fastapi", "jinja2"]
 tasks = ["doit"]
 ipython = ["IPython"]
 template = ["jinja2", "json-e"]
-test = ["pytest", "hypothesis", "hypothesis-jsonschema", "pytest-cov", "jinja2", "json-e"]
+test = [
+    "hypothesis-jsonschema >=0.19.1",
+    "hypothesis",
+    "jinja2",
+    "json-e",
+    "pytest-cov",
+    "pytest",
+]
+ci = ["codecov"]
 
 [tool.flit.scripts]
 
@@ -36,7 +50,8 @@ include = []
 
 [tool.coverage.run]
 omit = [
-    "src/schemata/tests/*" ]
+    "*/tests/*",
+]
 
 [tool.coverage.html]
 directory = "docs/coverage"
