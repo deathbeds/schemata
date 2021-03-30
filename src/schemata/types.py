@@ -59,10 +59,6 @@ class String(forms.Strings, Literal, Type["string"]):
     def loads(self):
         return self
 
-    @classmethod
-    def dumps(cls, x):
-        return x
-
 
 class Dir(Literal, Path):
     def object(cls, *args):
@@ -77,21 +73,21 @@ class File(Dir):
     def object(cls, *args):
         return Path.__new__(File, *args)
 
+    def mimetype(self):
+        t, _ = mimetypes.guess_type("*" + self.suffix)
+        return t
+
     def read(self):
         if isinstance(self, str):
             self = File(self)
-
-        t, _ = mimetypes.guess_type("*" + self.suffix)
-
+        t = self.mimetype()
         if t:
             for cls in Generic.Code.__subclasses__():
-                if cls.schema().get("mimeType") == t:
-                    return cls.load(self.read_text())
+                print(Generic.MimeType.form(cls), t)
+                if Generic.MimeType.form(cls) == t:
+                    return cls(self.read_text())
 
         return self.read_text()
-
-    def write(self, object):
-        return self.write_text(object)
 
 
 class Number(forms.Numbers, Literal, Type["number"]):

@@ -82,7 +82,13 @@ class LiteralTest(unittest.TestCase):
         String(String.example())
 
         assert String() == str() == "" == String("")
-        assert String("abc") == str("abc") == "abc" == String("abc")
+        assert (
+            String("abc")
+            == str("abc")
+            == "abc"
+            == String("abc")
+            == String("abc").loads()
+        )
 
     def test_numbers(x):
         Number(Number.example())
@@ -100,6 +106,7 @@ class LiteralTest(unittest.TestCase):
             E("c")
         assert E("b") == "b"
 
+        assert Enum[dict(a=1)].choices() == ("a",)
         assert Enum[dict(a=1)]("a") == 1
 
         assert Enum["a"]("a") == "a"
@@ -107,7 +114,9 @@ class LiteralTest(unittest.TestCase):
         with raises:
             Enum["a"]("b")
 
-        c = Cycler["a", "b", "c"]()
+        C = Cycler["a", "b", "c"]
+        assert Cycler.form(C) == ("a", "b", "c")
+        c = C()
 
         assert next(c) == "a" and next(c) == "b" and next(c) == "c" and next(c) == "a"
 
@@ -685,6 +694,9 @@ class ManualTests(unittest.TestCase):
         # this might not be right...
         assert issubclass(Dict.MinProperties[3], Dict.minProperties(3))
         assert Dict.type() is Dict
+        assert Literal.type() is Literal
+        assert Literal.pytype("thing") is String
+        assert Literal.pytype(range) is type
 
     def test_just(x):
         assert Juxt[range](10) == range(10)
@@ -714,3 +726,10 @@ def test_if():
         t("abcd")
     with raises:
         t(2.2)
+
+
+def test_file(pytester):
+    pytester.makefile(".yaml", tester="a: b")
+    s = File("tester.yaml").read()
+    assert isinstance(s, str)
+    assert s.loads() == dict(a="b")

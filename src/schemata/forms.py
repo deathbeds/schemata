@@ -216,7 +216,7 @@ class MimeType(Form):
         import mimetypes
 
         t = MimeType.form(cls)
-        for e in t and FileExtension.form(cls) or ():
+        for e in FileExtension.form(cls) if t else ():
             mimetypes.add_type(t, e)
 
 

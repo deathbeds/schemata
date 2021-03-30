@@ -383,6 +383,8 @@ class Generic(Interface, abc.ABCMeta):
         if is_list and t is not None:
             return cls[Generic.type((cls.Dict,) + t)]
 
+        with suppress(NameError):
+            cls.__init_subclass__()
         return cls
 
     def __getitem__(cls, x):
@@ -621,7 +623,7 @@ class Type(Form):
             return args[0]
         with suppress(AttributeError):
             if not (args or kwargs):
-                args = super().object(),
+                args = (super().object(),)
         if pytype is not None:
             self = pytype.__new__(cls, *args, **kwargs)
             try:
