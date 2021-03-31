@@ -41,6 +41,7 @@ test = [
   "pytest-cov",
   "pytest",
   "pyyaml",
+  "requests",
   "toml",
   "typer"
 ]
@@ -60,3 +61,6 @@ omit = [
 
 [tool.coverage.html]
 directory = "docs/coverage"
+
+[tool.pytest.ini_options]
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
