@@ -1,7 +1,11 @@
-from .types import Form, Py, suppress
+import sys
+
+from .base import forward_strings
+from .types import Form, Generic, Instance, Py, Signature, suppress
 
 
-class App(Py):
+class App(Instance):
+    # suppress SystemExit in IPython
     @classmethod
     def suppress(cls):
         ipy = False
@@ -9,6 +13,41 @@ class App(Py):
             ipy = bool(sys.modules["IPython"].get_ipython())
         return suppress(*(ipy and (SystemExit,) or ()))
 
+
+class Test(App["unittest.main"]):
+    """run doc and unit tests"""
+
+    def object(cls, *args, **k):
+        # k holds the keywords passed to unittest.man
+        # args are the sys args
+        k["module"] = k.get("module", __import__("__main__"))
+
+        def load_tests(loader, tests, ignore):
+            nonlocal k
+            import doctest
+
+            tests.addTests(
+                doctest.DocTestSuite(k["module"], optionflags=doctest.ELLIPSIS)
+            )
+            return tests
+
+        k["module"].load_tests = load_tests
+
+        if args and len(args) == 1 and isinstance(args[0], str):
+            args = args[0].split()
+
+        # default to this cause it works and i dont know why
+        k["argv"] = args or ["discover"]
+
+        try:
+
+            with suppress(SystemExit):
+                return super().object(**k)
+        finally:
+            del k["module"].load_tests
+
+
+class Typer(App["typer.Typer"]):
     @classmethod
     def run(cls, argv=None):
         if isinstance(argv, str):
@@ -20,34 +59,6 @@ class App(Py):
     def help(cls):
         return cls.run("-h")
 
-
-class Test(App["unittest.main"]):
-    """run doc and unit tests"""
-
-    def object(cls, *args, **k):
-        main, (_, *v) = super().object(), Form.AtType.form(cls)
-        k["module"] = __import__("__main__")
-
-        def load_tests(loader, tests, ignore):
-            nonlocal k
-            tests.addTests(__import__("doctest").DocTestSuite(k["module"]))
-            return tests
-
-        k["module"].load_tests = load_tests
-
-        if args and len(args) == 1 and isinstance(args[0], str):
-            args = args[0].split()
-
-        k["argv"] = args or ["discover"]
-
-        try:
-            with suppress(SystemExit):
-                return main(**k)
-        finally:
-            del k["module"].load_tests
-
-
-class Typer(App["typer.Typer"]):
     @staticmethod
     def wrap(f):
         def wrap(*args, **kwargs):
@@ -64,35 +75,42 @@ class Typer(App["typer.Typer"]):
         return wrap
 
     def object(cls, *args, **kwargs):
+        import typer
+
         kwargs["name"] = kwargs.get("name", cls.Title.form(cls) or cls.__name__)
         kwargs["add_completion"] = False
-        context_settings = dict(help_option_names=["-h", "--help"])
-        kwargs["context_settings"] = context_settings
+        default_context_settings = dict(help_option_names=["-h", "--help"])
+        kwargs["context_settings"] = default_context_settings
 
-        app, (_, *v) = super().object()(*args, **kwargs), Form.AtType.form(cls)
-        for i, v in v:
-            name, help = v.__name__, None
-            if isinstance(v, Generic):
+        # split the application and things it is going to call.
+        app, *to = forward_strings(*Form.AtType.form(cls))
+        app = app(**kwargs)
+        for i, x in enumerate(to):
+            n, help = x.__name__, None
+            if isinstance(x, Generic):
 
-                if issubclass(v, App):
-                    app.add_typer(v.object())
+                if issubclass(x, App):
+                    app.add_typer(x.object())
                     continue
-                elif issubclass(v, Sys):
-                    x = v
-                    while issubclass(x, Sys):
+                elif issubclass(x, cls.Sys):
+                    y = x
+                    while issubclass(x, cls.Sys):
                         u = x.values()
                         if u:
                             x = u[0]
                         else:
                             break
-                        name = x.__name__
+                        n = x.__name__
                 else:
-                    s = v.schema()
-                    name = cls.Title.form(cls) or name
+                    n = cls.Title.form(cls) or n
                     help = cls.Description.form(cls) or help
 
-            name = name[0].lower() + name[1:]
-            app.command(name, context_settings=context_settings, help=help)(cls.wrap(v))
+            n = cls.String.lowercased(n)
+            app.command(
+                n,
+                context_settings=default_context_settings,
+                help=help,
+            )(cls.wrap(x))
 
         return app
 

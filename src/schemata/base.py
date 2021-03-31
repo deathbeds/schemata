@@ -46,6 +46,10 @@ class ConsentException(BaseException):
     pass
 
 
+def forward_strings(*args):
+    return tuple(Forward(x)() if isinstance(x, str) else x for x in args)
+
+
 # a universal call (functor) method for calling schemata objects.
 def call(f, *args, **kwargs):
 
@@ -152,7 +156,11 @@ class Schema(dict):
                     if isinstance(types[k], dict):
                         next[k].update(v)
                     elif isinstance(next[k], tuple):
-                        next[k] += v
+                        for u in v:
+                            if isinstance(u, str):
+                                if u in next[k]:
+                                    continue
+                            next[k] += (u,)
                 else:
                     next[k] = v
 
@@ -633,14 +641,10 @@ class Sys(Type):
         with suppress(ConsentException, ValueError, TypeError):
             t = cls.pytype()
             cls.__signature__ = inspect.signature(t)
-
         return cls
 
     def pytype(cls):
-        x, *_ = cls.AtType.form(cls)
-        if isinstance(x, str):
-            x = Forward(x)()
-        return x
+        return forward_strings(*cls.AtType.form(cls)[:1])[0]
 
 
 class Const(Form):

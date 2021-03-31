@@ -861,3 +861,12 @@ def test_sig():
 
     assert Signature.from_type(T) == inspect.signature(f)
     Signature.from_type(T).to_typer()
+
+
+def _typer_doctest():
+    """
+    >>> with suppress(SystemExit): apps.Typer[Dict[dict(a=Integer.minimum(0).maximum(10))]].help()
+    Usage: ... [OPTIONS]...
+    Options:
+      --a INTEGER RANGE  [required]
+      -h, --help         Show this message and exit."""
