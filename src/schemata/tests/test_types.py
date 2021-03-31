@@ -894,7 +894,7 @@ def _typer_doctest():
 
 
 def test_uri():
-    import mock
+    from unittest import mock
     import requests
 
     t = strings.UriTemplate("https://{name}.com")
