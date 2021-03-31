@@ -869,4 +869,8 @@ def _typer_doctest():
     Usage: ... [OPTIONS]...
     Options:
       --a INTEGER RANGE  [required]
-      -h, --help         Show this message and exit."""
+      -h, --help         Show this message and exit.
+
+
+    >>> with suppress(SystemExit): apps.Typer[Dict[dict(a=Integer.minimum(0).maximum(10))]].run("--a 5")
+    {'a': 5}"""

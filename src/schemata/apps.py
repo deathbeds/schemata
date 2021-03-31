@@ -1,6 +1,6 @@
 import sys
 
-from .base import forward_strings
+from .base import call, forward_strings
 from .types import Form, Generic, Instance, Py, Signature, suppress
 
 
@@ -64,10 +64,6 @@ class Typer(App["typer.Typer"]):
         def wrap(*args, **kwargs):
             x = call(f, *args, **kwargs)
             if not isinstance(x, (type(None), int)):
-                try:
-                    from rich import print
-                except:
-                    pass
                 print(x)
 
         wrap.__signature__ = Signature.from_type(f).to_typer()
@@ -95,7 +91,7 @@ class Typer(App["typer.Typer"]):
                 elif issubclass(x, cls.Sys):
                     y = x
                     while issubclass(x, cls.Sys):
-                        u = x.values()
+                        u = cls.AtType.form(x)
                         if u:
                             x = u[0]
                         else:
