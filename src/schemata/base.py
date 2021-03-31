@@ -1,6 +1,6 @@
-"""the base types for schemata
+"""base metaclasses, forms, and types for schemata
 
-in this module we introduce the schemata type api
+this module defines the core type constructors for schemata.
 """
 
 import abc
@@ -10,8 +10,7 @@ import inspect
 import types
 import typing
 
-from . import util, exceptions
-from .exceptions import ConsentException, ValidationError, ValidationErrors
+from . import exceptions, util
 
 
 # the Interface represents all of the bespoke type api features we provide through schemata.
@@ -134,15 +133,12 @@ class Generic(Interface, abc.ABCMeta):
                 return cls
         return cls.type(x)
 
-    # here we add symbolic methods to the type for easier composition
-    # we take advantage of the getitem method for this reason
     def __add__(cls, object):
         return Generic.type((cls, object))
 
     def __sub__(cls, object):
         return cls.AllOf[cls, cls.Not[object]]
 
-    # bit shift operators
     def __rshift__(cls, object):
         return Generic.Pipe[cls, object]
 
@@ -168,7 +164,7 @@ class Generic(Interface, abc.ABCMeta):
         try:
             cls.validate(object)
             return True
-        except ValidationErrors:
+        except exceptions.ValidationErrors:
             return False
 
     def __eq__(cls, object):
@@ -229,20 +225,7 @@ class Generic(Interface, abc.ABCMeta):
     def example(cls):
         return cls.strategy().example()
 
-    # generate all the children of a schemata type
-    def children(cls, deep=True):  # pragma: no cover
-
-        if not deep:
-            yield from cls.__subclasses__()
-            return
-        yield cls
-
-        for cls in cls.__subclasses__():
-            if hasattr(cls, "children"):
-                if callable(cls.children):
-                    yield from cls.children()
-
-    def attach_parent(cls, x):
+    def _attach_parent(cls, x):
         if isinstance(x, (type(None), bool)):
             return x
         with util.suppress(AttributeError):
@@ -383,8 +366,8 @@ class Sys(Type):
         x, *_ = args
 
         cls = cls + cls.AtType[x]
-        
-        with util.suppress(ConsentException, ValueError, TypeError):
+
+        with util.suppress(exceptions.ConsentException, ValueError, TypeError):
             t = cls.pytype()
             cls.__signature__ = inspect.signature(t)
         return cls
@@ -428,6 +411,7 @@ class Plural(Form):
 class AtType(Plural):
     pass
 
+
 class Numeric(Form):
     pass
 
@@ -468,11 +452,9 @@ class Pattern(Form):
     def type(cls, *x):
         import re
 
-        return super().type(re.compile(*x))
-
-    @classmethod
-    def pattern(cls):
-        return Pattern.form(cls)
+        if isinstance(*x, str):
+            x = (re.compile(*x),)
+        return super().type(*x)
 
 
 class Format(Form):
@@ -565,7 +547,10 @@ class Keys(Form):
 
 
 class ContentMediaType(Form):
-    pass
+    def __init_subclass__(cls):
+        t = cls.ContentMediaType.form(cls)
+        for e in cls.FileExtension.form(cls) if t else ():
+            __import__("mimetypes").add_type(t, e)
 
 
 class Examples(Plural):
@@ -589,15 +574,6 @@ class Optional(Form):
 
 class FileExtension(Plural):
     pass
-
-
-class MimeType(Form):
-    def __init_subclass__(cls):
-        import mimetypes
-
-        t = MimeType.form(cls)
-        for e in FileExtension.form(cls) if t else ():
-            mimetypes.add_type(t, e)
 
 
 class Args(Plural):
@@ -691,7 +667,7 @@ class Dicts(Literals):
             return t({k: v for k, v in x.items() if V(v)})
         if V is None:
             return t({k: v for k, v in x.items() if K(k)})
-        return t({k: v for k, v in x.items() if K(v) and V(v)})
+        return t({k: v for k, v in x.items() if K(k) and V(v)})
 
     def map(x, *args):
         t, K, V = x._prepare_type(*args)

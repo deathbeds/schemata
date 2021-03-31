@@ -1,4 +1,4 @@
-from .import base, util
+from . import base, util
 
 
 class Ui(base.Form):

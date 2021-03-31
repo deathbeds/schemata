@@ -8,9 +8,8 @@ import jsonpatch
 import pytest
 
 from schemata import *
+from schemata import base, util
 from schemata.util import *
-from schemata.util import *
-from schemata import util, base
 
 r = raises = pytest.raises(ValidationErrors)
 
@@ -453,8 +452,7 @@ class StringTest(unittest.TestCase):
         t = strings.UriTemplate(
             "https://api.github.com/search/issues?q={query}{&page,per_page,sort,order}"
         )
-        assert callable(t)
-        assert t(query="heart") == "https://api.github.com/search/issues?q=heart"
+        assert t.uri(query="heart") == "https://api.github.com/search/issues?q=heart"
 
     # def test_templates(x):
     #     assert Format["pos arg {}, kwarg {foo}"]("hi", foo=2) == "pos arg hi, kwarg 2"
@@ -640,9 +638,6 @@ class ManualTests(unittest.TestCase):
 
         assert strings.Pointer("a", "b") == "/a/b"
 
-        with raises:
-            strings.Pointer("{1}")
-
         assert strings.Yaml("a: b").loads() == dict(a="b")
 
         assert strings.Toml("a = 'b'").loads() == dict(a="b")
@@ -757,6 +752,25 @@ class ManualTests(unittest.TestCase):
             zip(map(str.upper, v.keys()), map(str, v.values()))
         )
 
+        assert Dict(dict(zip(map(str, range(3)), range(3)))).filter(
+            "1".__eq__, (1).__eq__
+        ) == {"1": 1}
+        assert Dict(dict(zip(map(str, range(3)), range(3)))).filter(
+            "1".__eq__, None
+        ) == {"1": 1}
+        assert (
+            Dict(dict(zip(map(str, range(3)), range(3)))).filter("1".__eq__, (2).__eq__)
+            == {}
+        )
+
+        v = dict(zip([1, "a", 3], list("abc")))
+        assert Dict(v).map(String ^ Integer, String) == v and isinstance(
+            Dict(v).map(String ^ Integer, String), Dict[String ^ Integer, String]
+        )
+        assert Dict(v).map(String ^ Integer, None) == v and isinstance(
+            Dict(v).map(String ^ Integer, String), Dict[String ^ Integer, None]
+        )
+
     def test_abc(x):
         assert Dict.type != List.type != Literal.type
         assert not issubclass(Dict, Dict.Keys)
@@ -840,7 +854,7 @@ def test_sig():
         pass
 
     assert Signature.from_re(
-        strings.Fstring["the {foo} is {bar}"].pattern()
+        strings.Fstring["the {foo} is {bar}"].schema()["pattern"]
     ) == inspect.signature(f)
 
     class T(Dict):
@@ -877,3 +891,51 @@ def _typer_doctest():
 
     >>> with suppress(SystemExit): apps.Typer[Dict[dict(a=Integer.minimum(0).maximum(10))]].run("--a 5")
     {'a': 5}"""
+
+
+def test_uri():
+    import mock
+    import requests
+
+    t = strings.UriTemplate("https://{name}.com")
+    assert "https://test.com" == t.uri(name="test")
+
+    r = requests.Response()
+    r.url = t.uri(name="test")
+    with mock.patch("requests.get", return_value=r) as request:
+        assert Uri().get() == r
+
+
+def test_pointer():
+    v = dict(a=[None, dict(b=2)])
+    assert strings.Pointer("a") == "/a"
+
+    assert strings.Pointer("a", 1, "b") == "/a/1/b"
+
+    assert strings.Pointer() == ""
+    assert strings.Pointer().resolve(v) == v
+    assert strings.Pointer("a").resolve(v) == v["a"]
+    assert strings.Pointer("a", 1).resolve(v) == v["a"][1]
+    assert strings.Pointer("a", 1, "b").resolve(v) == v["a"][1]["b"]
+    assert (strings.Pointer("/a/1") / "b").resolve(v) == v["a"][1]["b"]
+
+
+def test_parse():
+    p = strings.Parse["this {} is {name}"]
+
+    assert p(11, name=9).schema().ravel() == {
+        "type": "string",
+        "pattern": "^this (.+?) is (?P<name>.+?)$",
+    }
+
+    assert p(11, name=9) == "this 11 is 9"
+
+
+def test_load_dump():
+    assert strings.Toml.dumps(dict(a="b")) == 'a = "b"\n'
+    assert strings.Toml('''a = "b"''').loads() == dict(a="b")
+    assert strings.Yaml("""a: b""").loads() == dict(a="b")
+    assert strings.Yaml.dumps(dict(a="b")) == "a: b\n"
+    assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
+    assert strings.JsonString.dumps(dict(a="b")) == '{"a": "b"}'
+    assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")

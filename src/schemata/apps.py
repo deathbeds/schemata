@@ -2,6 +2,7 @@ import sys
 
 from . import base, types, util
 
+
 class App(types.Instance):
     # suppress SystemExit in IPython
     @classmethod

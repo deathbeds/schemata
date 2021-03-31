@@ -1,3 +1,22 @@
+"""schemata utility functions and classes.
+
+functions and non-schemata classes live in this module.
+"""
+
+__all__ = (
+    "identity",
+    "filter_map",
+    "forward_strings",
+    "call",
+    "lowercased",
+    "to_pydantic",
+    "Signature",
+    "Schema",
+    "Forward",
+    "suppress",
+    "Path",
+)
+
 import sys
 import typing
 from contextlib import suppress
@@ -276,7 +295,7 @@ def get_typer_parameter(p):
 def get_non_schemata_types(cls):
     import abc
 
-    from .base import Form, Generic, Plural, Mapping
+    from .base import Form, Generic, Mapping, Plural
 
     try:
         t = list(filter(bool, map(call, abc._get_dump(cls)[0])))
@@ -382,8 +401,6 @@ class Schema(dict):
     def ravel(self):
         from .base import Generic
 
-        if isinstance(self, typing.Pattern):
-            return self.pattern
         if isinstance(self, dict):
             d = Schema(zip(self, map(Schema.ravel, self.values())))
             for k in list(d):
@@ -397,6 +414,13 @@ class Schema(dict):
             return d
         if isinstance(self, (tuple, list)):
             return list(map(Schema.ravel, self))
+
+        if "parse" in sys.modules:
+            if isinstance(self, sys.modules["parse"].Parser):
+                self = self._match_re
+
+        if isinstance(self, typing.Pattern):
+            return self.pattern
 
         if isinstance(self, Generic):
             return Schema.ravel(self.schema())
@@ -417,6 +441,7 @@ class Schema(dict):
     def hashable(x, t=None):
         if t is None:
             t = ()
+
         if isinstance(x, type):
             if x not in t:
                 t += (x,)
@@ -440,8 +465,9 @@ class Schema(dict):
 
 
 def to_pydantic_annotations(cls):
-    import typing_extensions
     import pydantic
+    import typing_extensions
+
     fields = {
         "title": "title",
         "description": "description",

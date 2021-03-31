@@ -4,7 +4,7 @@ import os
 import sys
 import typing
 
-from . import base, util, exceptions
+from . import base, exceptions, util
 
 
 # the Literal is the bridge between actual python types and base.Generic types, they emit concrete
@@ -44,7 +44,6 @@ Bool.register(bool)
 class String(base.Strings, Literal, base.Type["string"]):
     def loads(self):
         return self
-
 
 
 class Number(base.Numbers, Literal, base.Type["number"]):
@@ -220,10 +219,6 @@ class Dict(base.Dicts, Literal, base.Type["object"]):
     def __setitem__(self, k, v):
         self.update({k: v})
 
-    # def __init_subclass__(cls):
-    #     if issubclass(cls, cls.Required):
-    #         cls.__signature__ = Signature.from_type(cls)
-
     def update(self, *args, **kwargs):
         kwargs = dict(*args, **kwargs)
         r = type(self).Required.form(self) or ()
@@ -310,11 +305,11 @@ class Dict(base.Dicts, Literal, base.Type["object"]):
             return cls
         return cls.additionalProperties(x)
 
-    @classmethod
-    def pydantic(cls):
-        from .util import to_pydantic
 
-        return to_pydantic(cls)
+class Uri(String, String.Format["uri"]):
+    def get(self, *args, **kwargs):
+        return __import__("requests").get(self, *args, **kwargs)
+
 
 class Dir(Literal, util.Path):
     def object(cls, *args):
@@ -338,9 +333,8 @@ class File(Dir):
             self = File(self)
         t = self.mimetype()
         if t:
-            for cls in base.Generic.Code.__subclasses__():
-                print(base.Generic.MimeType.form(cls), t)
-                if base.Generic.MimeType.form(cls) == t:
+            for cls in base.Generic.String.__subclasses__():
+                if base.Generic.ContentMediaType.form(cls) == t:
                     return cls(self.read_text())
 
         return self.read_text()
@@ -349,7 +343,7 @@ class File(Dir):
 class Enum(base.Form.Plural, Literal):
     def object(cls, *args, **kwargs):
         # self.value = cls.validate(self)
-        # cls.attach_parent(self)
+        # cls._attach_parent(self)
         enum = Enum.form(cls)
         self = cls.validate(Literal(args[0] if args else enum[0]))
         if len(enum) is 1 and isinstance(*enum, dict):
@@ -401,7 +395,7 @@ class AnyOf(base.Form.Nested, Composite):
         for t in ts:
             try:
                 x = util.call(t, *args)
-                return cls.attach_parent(x)
+                return cls._attach_parent(x)
             except exceptions.ValidationErrors + (ValueError,):
                 if t is ts[-1]:
                     raise exceptions.ValidationError()
@@ -416,7 +410,7 @@ class AllOf(base.Form.Nested, Composite):
 
         x = result.get("x", args[0])
 
-        return cls.attach_parent(x)
+        return cls._attach_parent(x)
 
 
 class OneOf(base.Form.Nested, Composite):
@@ -437,7 +431,7 @@ class OneOf(base.Form.Nested, Composite):
                 break
 
         if i == 1:
-            return cls.attach_parent(x)
+            return cls._attach_parent(x)
 
         raise exceptions.ValidationError()
 
@@ -449,7 +443,7 @@ class Not(Composite):
         except exceptions.ValidationErrors:
             x, *_ = args
 
-            return cls.attach_parent(x)
+            return cls._attach_parent(x)
         raise exceptions.ValidationError
 
 
