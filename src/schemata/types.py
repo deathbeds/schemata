@@ -14,11 +14,8 @@ from .base import (
     Type,
     ValidationError,
     ValidationErrors,
-    call,
-    identity,
-    suppress,
 )
-from .signatures import Signature
+from .util import Signature, call, identity, suppress
 
 
 # the Literal is the bridge between actual python types and Generic types, they emit concrete
@@ -352,6 +349,20 @@ class Dict(forms.Dicts, Literal, Type["object"]):
 
             return cls
         return cls.additionalProperties(x)
+
+    @classmethod
+    def pydantic(cls):
+        import pydantic
+
+        return type(
+            cls.__name__,
+            (pydantic.BaseModel,),
+            dict(
+                Config=type(
+                    "Config", (object,), dict(schema_extra=cls.schema().ravel())
+                )
+            ),
+        )
 
 
 class Enum(Form.Plural, Literal):
