@@ -10,18 +10,8 @@ import inspect
 import types
 import typing
 
+from . import util, exceptions
 from .exceptions import ConsentException, ValidationError, ValidationErrors
-from .util import (
-    Forward,
-    Path,
-    Schema,
-    Signature,
-    call,
-    filter_map,
-    forward_strings,
-    lowercased,
-    suppress,
-)
 
 
 # the Interface represents all of the bespoke type api features we provide through schemata.
@@ -80,7 +70,7 @@ class Generic(Interface, abc.ABCMeta):
 
         # we always set a new annotation on the class to avoid and unexpected
         # inheritence confusion.
-        kwargs[ANNOTATIONS] = Schema(kwargs.get(ANNOTATIONS, {}))
+        kwargs[ANNOTATIONS] = util.Schema(kwargs.get(ANNOTATIONS, {}))
 
         for k in tuple(
             k
@@ -127,13 +117,13 @@ class Generic(Interface, abc.ABCMeta):
         # attach all new types to the Generic so they are easy to access
         setattr(Generic, cls.__name__, getattr(Generic, cls.__name__, cls))
 
-        with suppress(AttributeError):
-            cls.__annotations__ = Schema.merge(*cls.__mro__)
+        with util.suppress(AttributeError):
+            cls.__annotations__ = util.Schema.merge(*cls.__mro__)
 
         if is_list and t is not None:
             return cls[Generic.type((cls.Dict,) + t)]
 
-        with suppress(NameError):
+        with util.suppress(NameError):
             cls.__init_subclass__()
         return cls
 
@@ -166,7 +156,7 @@ class Generic(Interface, abc.ABCMeta):
         t = type.__subclasscheck__(cls, x)
         if t:
             return True
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             a, b = x.schema(), cls.schema()
             if any(a) and any(b):
                 if a in b:
@@ -255,7 +245,7 @@ class Generic(Interface, abc.ABCMeta):
     def attach_parent(cls, x):
         if isinstance(x, (type(None), bool)):
             return x
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             x.parent = cls
         return x
 
@@ -278,7 +268,7 @@ class Form(metaclass=Generic):
 
     def __new__(cls, *args, **kwargs):
         # schemata types bubble up instances from the bottom rather than top down.
-        with suppress(NotImplementedError):
+        with util.suppress(NotImplementedError):
             return cls.object(*args, **kwargs)
         return cls.validate(*args)
 
@@ -297,17 +287,17 @@ class Form(metaclass=Generic):
     def form(cls, *args):  # pragma: no cover
         n, *_ = cls.__name__.partition("_")
         if n.startswith("At"):
-            n = "@" + lowercased(n[2:])
+            n = "@" + util.lowercased(n[2:])
         if cls.__name__.endswith("_"):
-            n = "$" + lowercased(n)
-        n = lowercased(n)
+            n = "$" + util.lowercased(n)
+        n = util.lowercased(n)
         if not args:
             return n  #  lowercase x
         x, *_ = args
         if not isinstance(x, type):
             x = type(x)
         if x is not Generic:
-            with suppress(AttributeError):
+            with util.suppress(AttributeError):
                 return x.schema().get(n)
 
     @classmethod
@@ -327,6 +317,7 @@ class Form(metaclass=Generic):
 
 _type_mapping = dict(number=float, integer=int, string=str, array=list, object=dict)
 _default_mapping = dict(null=type(None), boolean=bool)
+_python_mapping = {**_type_mapping, **_default_mapping}
 
 
 class Type(Form):
@@ -360,7 +351,7 @@ class Type(Form):
                 except:
                     args = (pytype(),)
             return args[0]
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             if not (args or kwargs):
                 args = (super().object(),)
         if pytype is not None:
@@ -374,7 +365,7 @@ class Type(Form):
 
     @classmethod
     def pytype(cls):
-        return {**_type_mapping, **_default_mapping}.get(cls.Type.form(cls))
+        return _python_mapping.get(cls.Type.form(cls))
 
 
 class Sys(Type):
@@ -392,13 +383,14 @@ class Sys(Type):
         x, *_ = args
 
         cls = cls + cls.AtType[x]
-        with suppress(ConsentException, ValueError, TypeError):
+        
+        with util.suppress(ConsentException, ValueError, TypeError):
             t = cls.pytype()
             cls.__signature__ = inspect.signature(t)
         return cls
 
     def pytype(cls):
-        return forward_strings(*cls.AtType.form(cls)[:1])[0]
+        return util.forward_strings(*cls.AtType.form(cls)[:1])[0]
 
 
 class Const(Form):
@@ -411,7 +403,7 @@ class Default(Form):
     def object(cls, *args, **kwargs):
         x = Default.form(cls)
         if callable(x):
-            return call(x, *args, **kwargs)
+            return util.call(x, *args, **kwargs)
         return x
 
 
@@ -435,3 +427,276 @@ class Plural(Form):
 
 class AtType(Plural):
     pass
+
+class Numeric(Form):
+    pass
+
+
+class Nested(Plural):
+    @classmethod
+    def type(cls, object):
+        x = super().type(object)
+        v = ()
+        for y in cls.form(x):
+            if issubclass(y, cls):
+                v += cls.form(y)
+            else:
+                v += (y,)
+        x.__annotations__[cls.form()] = v
+        return x
+
+
+class Mapping(Form):
+    @classmethod
+    def form(cls, *args):  # pragma: no cover
+        return super().form(*args) or {}
+
+
+# json schema formes
+
+
+class MinLength(Numeric):
+    pass
+
+
+class MaxLength(Numeric):
+    pass
+
+
+class Pattern(Form):
+    @classmethod
+    def type(cls, *x):
+        import re
+
+        return super().type(re.compile(*x))
+
+    @classmethod
+    def pattern(cls):
+        return Pattern.form(cls)
+
+
+class Format(Form):
+    pass
+
+
+class MultipleOf(Numeric):
+    pass
+
+
+class Minimum(Numeric):
+    pass
+
+
+class Maximum(Numeric):
+    pass
+
+
+class ExclusiveMaximum(Numeric):
+    pass
+
+
+class ExclusiveMinimum(Numeric):
+    pass
+
+
+class Items(Form):
+    pass
+
+
+class Contains(Form):
+    pass
+
+
+class AdditionalItems(Form):
+    pass
+
+
+class MinItems(Numeric):
+    pass
+
+
+class MaxItems(Numeric):
+    pass
+
+
+class UniqueItems(Form):
+    pass
+
+
+class Properties(Mapping):
+    pass
+
+
+class AdditionalProperties(Form):
+    def __missing__(self, key):
+        cls = type(self)
+        p = AdditionalProperties.form(cls)
+        if p:
+            self.update({key: util.call(p)})
+        return self[key]
+
+
+class Dependencies(Mapping):
+    pass
+
+
+class Required(Plural):
+    pass
+
+
+class PropertyNames(Mapping):
+    pass
+
+
+class MinProperties(Numeric):
+    pass
+
+
+class MaxProperties(Numeric):
+    pass
+
+
+class PatternProperties(Mapping):
+    pass
+
+
+class Keys(Form):
+    pass
+
+
+class ContentMediaType(Form):
+    pass
+
+
+class Examples(Plural):
+    pass
+
+
+class Title(Form):
+    pass
+
+
+class Description(Form):
+    pass
+
+
+# schemata specific formes
+
+
+class Optional(Form):
+    pass
+
+
+class FileExtension(Plural):
+    pass
+
+
+class MimeType(Form):
+    def __init_subclass__(cls):
+        import mimetypes
+
+        t = MimeType.form(cls)
+        for e in FileExtension.form(cls) if t else ():
+            mimetypes.add_type(t, e)
+
+
+class Args(Plural):
+    pass
+
+
+class Kwargs(Mapping):
+    pass
+
+
+class AtContext(Mapping):
+    pass
+
+
+class AtVocab(Form):
+    pass
+
+
+class AtBase(Form):
+    pass
+
+
+class AtLanguage(Form):
+    pass
+
+
+class AtId(Form):
+    pass
+
+
+class AtGraph(Plural):
+    pass
+
+
+class Literals(metaclass=Generic):
+    pass
+
+
+class Strings(Literals):
+    lowercased = util.lowercased
+
+
+class Numbers(Literals):
+    pass
+
+
+class Lists(Literals):
+    def map(x, f):
+        cls = type(x)
+        if isinstance(f, type):
+            return cls[type](list(map(f, x)))
+        return cls(list(map(f, x)))
+
+    def filter(x, f):
+        return type(x)(list(filter(f, x)))
+
+    def groupby(x, f):
+        import itertools
+
+        from .types import Dict
+
+        v = {k: list(v) for k, v in itertools.groupby(x, f)}
+        t = Dict[(f, type(x)) if isinstance(f, type) else type(x)]
+        return t(v)
+
+
+class Dicts(Literals):
+    def _prepare_type(x, *args):
+        from .types import Dict
+
+        if len(args) == 1:
+            K, V = None, *args
+        elif len(args) == 2:
+            K, V = args
+        t = Generic.Dict
+        if K is None:
+            if isinstance(V, type):
+                t = t[V]
+            return t, K, V
+        else:
+            if isinstance(K, type):
+                t = t[(K,) if isinstance(V, type) else (K, V)]
+            elif isinstance(V, type):
+                t = t[V]
+
+        return t, K, V
+
+    def filter(x, *args):
+        t, K, V = x._prepare_type(*args)
+        if K is None:
+            return t({k: v for k, v in x.items() if V(v)})
+        if V is None:
+            return t({k: v for k, v in x.items() if K(k)})
+        return t({k: v for k, v in x.items() if K(v) and V(v)})
+
+    def map(x, *args):
+        t, K, V = x._prepare_type(*args)
+        if K is None:
+            return t({k: V(v) for k, v in x.items()})
+        if V is None:
+            return t({K(k): v for k, v in x.items()})
+        return t({K(k): V(v) for k, v in x.items()})

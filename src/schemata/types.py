@@ -4,24 +4,13 @@ import os
 import sys
 import typing
 
-from . import forms
-from .base import (
-    Form,
-    Forward,
-    Generic,
-    Path,
-    Sys,
-    Type,
-    ValidationError,
-    ValidationErrors,
-)
-from .util import Signature, call, identity, suppress
+from . import base, util, exceptions
 
 
-# the Literal is the bridge between actual python types and Generic types, they emit concrete
+# the Literal is the bridge between actual python types and base.Generic types, they emit concrete
 # implementations of python types like int, float, list, dict with they advantage that they may be described
 # in rdf notation.
-class Literal(forms.Literals, Type):
+class Literal(base.Literals, base.Type):
     def type(cls, *x):
         if x:
             return cls.default(*x)
@@ -38,67 +27,38 @@ class Literal(forms.Literals, Type):
         return super().pytype()
 
 
-class Null(Literal, Type["null"]):
+class Null(Literal, base.Type["null"]):
     pass
 
 
 Null.register(type(None))
 
 
-class Bool(Literal, Type["boolean"]):
+class Bool(Literal, base.Type["boolean"]):
     pass
 
 
 Bool.register(bool)
 
 
-class String(forms.Strings, Literal, Type["string"]):
+class String(base.Strings, Literal, base.Type["string"]):
     def loads(self):
         return self
 
 
-class Dir(Literal, Path):
-    def object(cls, *args):
-        return Path.__new__(Path(*args).is_file() and File or Dir, *args)
 
-
-class Glob:
-    pass
-
-
-class File(Dir):
-    def object(cls, *args):
-        return Path.__new__(File, *args)
-
-    def mimetype(self):
-        t, _ = mimetypes.guess_type("*" + self.suffix)
-        return t
-
-    def read(self):
-        if isinstance(self, str):
-            self = File(self)
-        t = self.mimetype()
-        if t:
-            for cls in Generic.Code.__subclasses__():
-                print(Generic.MimeType.form(cls), t)
-                if Generic.MimeType.form(cls) == t:
-                    return cls(self.read_text())
-
-        return self.read_text()
-
-
-class Number(forms.Numbers, Literal, Type["number"]):
+class Number(base.Numbers, Literal, base.Type["number"]):
     pass
 
 
 Float = Number
 
 
-class Integer(forms.Numbers, Literal, Type["integer"]):
+class Integer(base.Numbers, Literal, base.Type["integer"]):
     pass
 
 
-class List(forms.Lists, Literal, Type["array"]):
+class List(base.Lists, Literal, base.Type["array"]):
     def object(cls, *args):
         if args:
             if isinstance(*args, (set, tuple)):
@@ -159,14 +119,14 @@ class List(forms.Lists, Literal, Type["array"]):
         return self.pop(x)
 
 
-class Tuple(List, forms.Title["Tuple"]):
+class Tuple(List, base.Title["Tuple"]):
     pass
 
 
 Tuple.register(tuple)
 
 
-class Environ(forms.Plural):
+class Environ(base.Plural):
     def type(cls, *args):
         if not args:
             return cls
@@ -181,11 +141,11 @@ class Environ(forms.Plural):
         return os.getenv(*cls.Environ.form(cls)[:1])
 
 
-class Py(Sys):
+class Py(base.Sys):
     def validate(cls, *args):
         if isinstance(*args, cls.pytype()):
             return args
-        raise ValidationError(f"{args} is not an object of {cls}")
+        raise exceptions.ValidationError(f"{args} is not an object of {cls}")
 
 
 class Instance(Py):
@@ -193,7 +153,7 @@ class Instance(Py):
     def object(cls, *args, **kwargs):
         """kind of like a functor."""
         # call callables, basically making this a functor
-        return call(
+        return util.call(
             super().object(),
             *(cls.Args.form(cls) or ()),
             *args,
@@ -204,7 +164,7 @@ class Instance(Py):
 class Pipe(Instance):
     def object(cls, *args, **kwargs):
         for f in cls.AtType.form(cls):
-            args, kwargs = (call(f, *args, **kwargs),), {}
+            args, kwargs = (util.call(f, *args, **kwargs),), {}
         return args[0]
 
 
@@ -253,10 +213,10 @@ class Juxt(Instance):
 
     def object(cls, *args, **kwargs):
         t, *v = cls.AtType.form(cls)
-        return t(call(x, *args, **kwargs) for x in v)
+        return t(util.call(x, *args, **kwargs) for x in v)
 
 
-class Dict(forms.Dicts, Literal, Type["object"]):
+class Dict(base.Dicts, Literal, base.Type["object"]):
     def __setitem__(self, k, v):
         self.update({k: v})
 
@@ -268,7 +228,7 @@ class Dict(forms.Dicts, Literal, Type["object"]):
         kwargs = dict(*args, **kwargs)
         r = type(self).Required.form(self) or ()
         x = self.force_update(type(self).object(**{**self, **kwargs}))
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             x._update_display()
 
         return x
@@ -286,7 +246,7 @@ class Dict(forms.Dicts, Literal, Type["object"]):
         try:
             return dict.pop(self, key, default)
         finally:
-            with suppress(AttributeError):
+            with util.suppress(AttributeError):
                 self._update_display()
 
     @classmethod
@@ -295,7 +255,7 @@ class Dict(forms.Dicts, Literal, Type["object"]):
             if issubclass(cls, cls.Default):
                 return super().object()
         if not all(isinstance(x, dict) for x in args):
-            raise ValidationError
+            raise exceptions.ValidationError
         kwargs = super().object(dict(*args, **kwargs))
         p, d, r = (
             cls.Properties.form(cls),
@@ -325,12 +285,12 @@ class Dict(forms.Dicts, Literal, Type["object"]):
     @classmethod
     def validate(cls, *args):
         if args:
-            args = (Type.validate.__func__(cls, *args),)
+            args = (base.Type.validate.__func__(cls, *args),)
         k = cls.Keys.form(cls)
         if args and k:
             for x in list(*args):
                 if not isinstance(x, k):
-                    raise ValidationError(f"not all keys are objects of {k}")
+                    raise exceptions.ValidationError(f"not all keys are objects of {k}")
         return args[0] if args else dict()
 
     @classmethod
@@ -352,20 +312,41 @@ class Dict(forms.Dicts, Literal, Type["object"]):
 
     @classmethod
     def pydantic(cls):
-        import pydantic
+        from .util import to_pydantic
 
-        return type(
-            cls.__name__,
-            (pydantic.BaseModel,),
-            dict(
-                Config=type(
-                    "Config", (object,), dict(schema_extra=cls.schema().ravel())
-                )
-            ),
-        )
+        return to_pydantic(cls)
+
+class Dir(Literal, util.Path):
+    def object(cls, *args):
+        return util.Path.__new__(util.Path(*args).is_file() and File or Dir, *args)
 
 
-class Enum(Form.Plural, Literal):
+class Glob:
+    pass
+
+
+class File(Dir):
+    def object(cls, *args):
+        return util.Path.__new__(File, *args)
+
+    def mimetype(self):
+        t, _ = mimetypes.guess_type("*" + self.suffix)
+        return t
+
+    def read(self):
+        if isinstance(self, str):
+            self = File(self)
+        t = self.mimetype()
+        if t:
+            for cls in base.Generic.Code.__subclasses__():
+                print(base.Generic.MimeType.form(cls), t)
+                if base.Generic.MimeType.form(cls) == t:
+                    return cls(self.read_text())
+
+        return self.read_text()
+
+
+class Enum(base.Form.Plural, Literal):
     def object(cls, *args, **kwargs):
         # self.value = cls.validate(self)
         # cls.attach_parent(self)
@@ -398,7 +379,7 @@ class Cycler(Enum):
         return __import__("itertools").cycle(cls.choices())
 
 
-class Composite(Type):
+class Composite(base.Type):
     """a schemaless form type mixin, the name of the class is used to derive others"""
 
     def validate(cls, object):
@@ -408,49 +389,49 @@ class Composite(Type):
     @classmethod
     def object(cls, *args):
         if not args:
-            with suppress(AttributeError):
+            with util.suppress(AttributeError):
                 args = (super().object(),)
         return args
 
 
-class AnyOf(Form.Nested, Composite):
+class AnyOf(base.Form.Nested, Composite):
     def object(cls, *args):
         args = super().object(*args)
         ts = AnyOf.form(cls)
         for t in ts:
             try:
-                x = call(t, *args)
+                x = util.call(t, *args)
                 return cls.attach_parent(x)
-            except ValidationErrors + (ValueError,):
+            except exceptions.ValidationErrors + (ValueError,):
                 if t is ts[-1]:
-                    raise ValidationError()
+                    raise exceptions.ValidationError()
 
 
-class AllOf(Form.Nested, Composite):
+class AllOf(base.Form.Nested, Composite):
     def object(cls, *args):
         args = super().object(*args)
         result = {}
         for t in AllOf.form(cls):
-            result.setdefault("x", call(t, *args))
+            result.setdefault("x", util.call(t, *args))
 
         x = result.get("x", args[0])
 
         return cls.attach_parent(x)
 
 
-class OneOf(Form.Nested, Composite):
+class OneOf(base.Form.Nested, Composite):
     def object(cls, *args, **kwargs):
         args = super().object(*args)
         i, x = 0, None
         for t in OneOf.form(cls):
             try:
                 if i:
-                    call(t, *args, **kwargs)
+                    util.call(t, *args, **kwargs)
                 else:
-                    x = call(t, *args, **kwargs)
+                    x = util.call(t, *args, **kwargs)
 
                 i += 1
-            except ValidationErrors as e:
+            except exceptions.ValidationErrors as e:
                 continue
             if i > 1:
                 break
@@ -458,29 +439,29 @@ class OneOf(Form.Nested, Composite):
         if i == 1:
             return cls.attach_parent(x)
 
-        raise ValidationError()
+        raise exceptions.ValidationError()
 
 
 class Not(Composite):
     def object(cls, *args):
         try:
             cls.form(cls)(*args)
-        except ValidationErrors:
+        except exceptions.ValidationErrors:
             x, *_ = args
 
             return cls.attach_parent(x)
-        raise ValidationError
+        raise exceptions.ValidationError
 
 
-class Else(Form):
+class Else(base.Form):
     pass
 
 
-class Then(Form):
+class Then(base.Form):
     pass
 
 
-class If(Form):
+class If(base.Form):
     def object(cls, *args):
         try:
             args = (If.form(cls)(*args),)
@@ -488,7 +469,7 @@ class If(Form):
             if t:
                 return t(*args)
             return args[0]
-        except ValidationErrors as exc:
+        except exceptions.ValidationErrors as exc:
             e = Else.form(cls)
             if e:
                 return e(*args)
@@ -505,7 +486,7 @@ class If(Form):
 
 class Json(
     List ^ Dict ^ String ^ Number ^ Bool ^ Null,
-    Form.ContentMediaType["application/json"],
+    base.Form.ContentMediaType["application/json"],
 ):
     pass
 
@@ -513,7 +494,7 @@ class Json(
 class Bunch(Dict):
     def __getattribute__(self, k):
         if not k.startswith("_"):
-            if Form.Properties.form(type(self)):
+            if base.Form.Properties.form(type(self)):
                 try:
                     return dict.__getitem__(self, k)
                 except KeyError:
@@ -523,14 +504,14 @@ class Bunch(Dict):
 
     def __setattr__(self, k, v):
         if not k.startswith("_"):
-            if Generic.Properties.form(type(self)):
+            if base.Generic.Properties.form(type(self)):
                 self[k] = v
                 return
 
         return object.__setattr__(self, k, v)
 
 
-class Set(List, Form.Title["Set"], Form.UniqueItems[True]):
+class Set(List, base.Form.Title["Set"], base.Form.UniqueItems[True]):
     pass
 
 

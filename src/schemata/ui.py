@@ -1,10 +1,10 @@
-from .forms import Form, lowercased
+from .import base, util
 
 
-class Ui(Form):
+class Ui(base.Form):
     @classmethod
     def form(cls, *args):
-        return super().form(*args) if args else f"ui:{lowercased(cls.__name__)}"
+        return super().form(*args) if args else f"ui:{util.lowercased(cls.__name__)}"
 
     def __init_subclass__(cls):
         setattr(Ui, cls.__name__, getattr(Ui, cls.__name__, cls))
@@ -13,7 +13,7 @@ class Ui(Form):
 class Widget(Ui):
     def __init_subclass__(cls):
         super().__init_subclass__()
-        cls.__annotations__["ui:widget"] = lowercased(cls.__name__)
+        cls.__annotations__["ui:widget"] = util.lowercased(cls.__name__)
 
 
 class Radio(Widget):

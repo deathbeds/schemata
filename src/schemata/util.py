@@ -276,8 +276,7 @@ def get_typer_parameter(p):
 def get_non_schemata_types(cls):
     import abc
 
-    from .base import Form, Generic, Plural, call
-    from .forms import Mapping
+    from .base import Form, Generic, Plural, Mapping
 
     try:
         t = list(filter(bool, map(call, abc._get_dump(cls)[0])))
@@ -382,6 +381,7 @@ class Schema(dict):
 
     def ravel(self):
         from .base import Generic
+
         if isinstance(self, typing.Pattern):
             return self.pattern
         if isinstance(self, dict):
@@ -437,3 +437,52 @@ class Schema(dict):
             return tuple(Schema.hashable(x, t) for x in x)
 
         return x
+
+
+def to_pydantic_annotations(cls):
+    import typing_extensions
+    import pydantic
+    fields = {
+        "title": "title",
+        "description": "description",
+        "const": "const",
+        "gt": "minimumExclusive",
+        "ge": "minimum",
+        "lt": "maximumExclusive",
+        "le": "maximum",
+        "multipleOf": "multipleOf",
+        "minItems": "minItems",
+        "maxItems": "maxItems",
+        "minLength": "minLength",
+        "maxLength": "maxLength",
+        "regex": "regex",
+    }
+
+    a = {}
+    for k, v in cls.Properties.form(cls).items():
+        s = v.schema()
+        a[k] = typing_extensions.Annotated[
+            cls.Type.pytype.__func__(v),
+            pydantic.Field(
+                s.get("default", ...),
+                **{
+                    fields.get(k, k): v
+                    for k, v in s.items()
+                    if k not in {"type", "default"}
+                },
+            ),
+        ]
+    return a
+
+
+def to_pydantic(cls):
+    import pydantic
+
+    return type(
+        cls.__name__,
+        (pydantic.BaseModel,),
+        dict(
+            __annotations__=to_pydantic_annotations(cls),
+            Config=type("Config", (), dict(schema_extra=cls.schema().ravel())),
+        ),
+    )

@@ -1,17 +1,15 @@
 import sys
 
-from .base import call, forward_strings
-from .types import Form, Generic, Instance, Py, Signature, suppress
+from . import base, types, util
 
-
-class App(Instance):
+class App(types.Instance):
     # suppress SystemExit in IPython
     @classmethod
     def suppress(cls):
         ipy = False
         if "IPython" in sys.modules:
             ipy = bool(sys.modules["IPython"].get_ipython())
-        return suppress(*(ipy and (SystemExit,) or ()))
+        return util.suppress(*(ipy and (SystemExit,) or ()))
 
 
 class Test(App["unittest.main"]):
@@ -62,11 +60,11 @@ class Typer(App["typer.Typer"]):
     @staticmethod
     def wrap(f):
         def wrap(*args, **kwargs):
-            x = call(f, *args, **kwargs)
+            x = util.call(f, *args, **kwargs)
             if not isinstance(x, (type(None), int)):
                 print(x)
 
-        wrap.__signature__ = Signature.from_type(f).to_typer()
+        wrap.__signature__ = util.Signature.from_type(f).to_typer()
 
         return wrap
 
@@ -79,11 +77,11 @@ class Typer(App["typer.Typer"]):
         kwargs["context_settings"] = default_context_settings
 
         # split the application and things it is going to call.
-        app, *to = forward_strings(*Form.AtType.form(cls))
+        app, *to = util.forward_strings(*cls.AtType.form(cls))
         app = app(**kwargs)
         for i, x in enumerate(to):
             n, help = x.__name__, None
-            if isinstance(x, Generic):
+            if isinstance(x, base.Generic):
 
                 if issubclass(x, App):
                     app.add_typer(x.object())

@@ -1,13 +1,13 @@
-from .types import Form, Instance, String
+from . import types, base
 
 
-class Uri(String, String.Format["uri"]):
+class Uri(types.String, types.String.Format["uri"]):
     def get(*args, **kwargs):
         return __import__("requests").get(self, *args, **kwargs)
 
 
 # set default datetimes to now
-class DateTime(String, String.Format["date-time"]):
+class DateTime(types.String, types.String.Format["date-time"]):
     @classmethod
     def object(cls, *args):
         import datetime
@@ -19,35 +19,35 @@ class DateTime(String, String.Format["date-time"]):
         )
 
 
-class Date(DateTime, String.Format["date"]):
+class Date(DateTime, types.String.Format["date"]):
     @classmethod
     def object(cls, *args):
         return super().object(str.__add__(*args, "T00:00:00+00:00"))
 
 
-class Time(DateTime, String.Format["time"]):
+class Time(DateTime, types.String.Format["time"]):
     @classmethod
     def object(cls, *args):
         return super().object("1970-01-01T".__add__(*args))
 
 
-class Email(String, String.Format["email"]):
+class Email(types.String, types.String.Format["email"]):
     pass
 
 
-class HostName(String, String.Format["hostname"]):
+class HostName(types.String, types.String.Format["hostname"]):
     pass
 
 
-class IPv4(String, String.Format["ipyv4"]):
+class IPv4(types.String, types.String.Format["ipyv4"]):
     pass
 
 
-class IPv6(String, String.Format["ipyv6"]):
+class IPv6(types.String, types.String.Format["ipyv6"]):
     pass
 
 
-class Pointer(String, String.Format["json-pointer"]):
+class Pointer(types.String, types.String.Format["json-pointer"]):
     def object(cls, *args):
         if len(args) > 1:
             args = (__import__("jsonpointer").JsonPointer.from_parts(args).path,)
@@ -61,7 +61,7 @@ class Pointer(String, String.Format["json-pointer"]):
         return Pointer(self + "/" + object)
 
 
-class UriTemplate(String, String.Format["uri-template"]):
+class UriTemplate(types.String, types.String.Format["uri-template"]):
     # conventions for uri templates
     # a UriTemplate is template for ids, we make it callable to resolve to Uri
     # with get, post, patch, head, options, ... methods
@@ -72,7 +72,7 @@ class UriTemplate(String, String.Format["uri-template"]):
         return Uri(uritemplate.URITemplate(self).expand(**kwargs))
 
 
-class Regex(String, String.Format["regex"]):
+class Regex(types.String, types.String.Format["regex"]):
     @classmethod
     def object(cls, *args):
         import re
@@ -80,7 +80,7 @@ class Regex(String, String.Format["regex"]):
         return re.compile(super().object(*args))
 
 
-class Fstring(String):
+class Fstring(types.String):
     def type(cls, object):
         import parse
 
@@ -88,13 +88,13 @@ class Fstring(String):
         return cls + cls.Pattern[_parse._match_re]
 
 
-class Parse(Instance["parse.compile"]):
+class Parse(types.Instance["parse.compile"]):
     @classmethod
     def type(cls, *args):
         return cls + cls.Args[args] + cls.Pattern[parse.compile(*args)._match_re]
 
 
-class Jinja(Instance["jinja2.Template"]):
+class Jinja(types.Instance["jinja2.Template"]):
     @classmethod
     def object(cls, *args, **kwargs):
         import jinja2
@@ -106,14 +106,14 @@ class Jinja(Instance["jinja2.Template"]):
         return cls + cls.Args[args]
 
 
-class Code(String):
+class Code(types.String):
     def type(cls, object):
         if object.startswith("."):
             return cls + Generic.FileExtension[object]
         return cls + Generic.MimeType[object]
 
 
-class Toml(Code, String.MimeType["application/toml"], String.FileExtension[".toml"]):
+class Toml(Code, types.String.MimeType["application/toml"], types.String.FileExtension[".toml"]):
     def loads(object):
         import toml
 
@@ -130,8 +130,8 @@ class Toml(Code, String.MimeType["application/toml"], String.FileExtension[".tom
 
 class Yaml(
     Code,
-    String.MimeType["text/x-yaml"],
-    String.FileExtension[".yaml", ".yml"],
+    types.String.MimeType["text/x-yaml"],
+    types.String.FileExtension[".yaml", ".yml"],
 ):
     def loads(object):
         import yaml
@@ -147,8 +147,8 @@ class Yaml(
 
 class JsonString(
     Code,
-    String.MimeType["application/json"],
-    String.FileExtension[".json", ".ipynb"],
+    types.String.MimeType["application/json"],
+    types.String.FileExtension[".json", ".ipynb"],
 ):
     def loads(object):
         import json
@@ -166,8 +166,8 @@ class JsonString(
 
 class Markdown(
     Code,
-    String.MimeType["text/x-markdown"],
-    String.FileExtension[".md"],
+    types.String.MimeType["text/x-markdown"],
+    types.String.FileExtension[".md"],
 ):
     def __rich__(self):
         import rich.markdown
@@ -175,19 +175,19 @@ class Markdown(
         return rich.markdown.Markdown(self)
 
     def loads(self):
-        return (String + String.ContentMediaType["text/markdown"])(str(self))
+        return (types.String + types.String.ContentMediaType["text/markdown"])(str(self))
 
 
 class Html(
-    String,
-    String.ContentMediaType["text/html"],
-    String.MimeType["text/html"],
-    String.FileExtension[".html"],
+    types.String,
+    types.String.ContentMediaType["text/html"],
+    types.String.MimeType["text/html"],
+    types.String.FileExtension[".html"],
 ):
     pass
 
 
-class Md(String, Form.ContentMediaType["text/markdown"]):
+class Md(types.String, base.Form.ContentMediaType["text/markdown"]):
     def __rich__(x, indent=0):
         import textwrap
 

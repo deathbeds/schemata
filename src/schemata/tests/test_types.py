@@ -8,6 +8,9 @@ import jsonpatch
 import pytest
 
 from schemata import *
+from schemata.util import *
+from schemata.util import *
+from schemata import util, base
 
 r = raises = pytest.raises(ValidationErrors)
 
@@ -555,9 +558,9 @@ class ManualTests(unittest.TestCase):
         assert isinstance(Json(None), Null)
 
         with raises:
-            forms.Minimum[0](-1)
+            base.Minimum[0](-1)
 
-        assert forms.Minimum[0](1) is 1
+        assert base.Minimum[0](1) is 1
         with raises:
             Dict[dict(a=Integer)](a="abc")
 
@@ -604,10 +607,10 @@ class ManualTests(unittest.TestCase):
         with raises:
             String.maxLength(3)("abcd")
         with raises:
-            forms.Pattern["^foo"]("bar")
+            base.Pattern["^foo"]("bar")
         assert isinstance("this", String.pattern("^this"))
         assert not isinstance("his", String.pattern("^this"))
-        assert forms.Pattern["^foo"]("foo bar") == "foo bar"
+        assert base.Pattern["^foo"]("foo bar") == "foo bar"
         assert strings.DateTime("2018-11-13T20:20:39+00:00") == __import__(
             "datetime"
         ).datetime(2018, 11, 13, 20, 20, 39)
@@ -734,9 +737,9 @@ class ManualTests(unittest.TestCase):
         assert Dict(a=1).map(str).map(String).__class__ == Dict[String]
 
         with raises:
-            forms.Required["a"](dict())
+            base.Required["a"](dict())
 
-        assert forms.Required["a"](dict(a=11)) == dict(a=11)
+        assert base.Required["a"](dict(a=11)) == dict(a=11)
         assert (Dict[dict(bar=Integer)] >> strings.Jinja["foo {{bar}}"])(
             bar=11
         ) == "foo 11"
