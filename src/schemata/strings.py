@@ -142,7 +142,7 @@ class JsonString(
 
 class Markdown(
     types.String,
-    types.String.ContentMediaType["text/x-markdown"],
+    types.String.ContentMediaType["text/markdown"],
     types.String.FileExtension[".md"],
 ):
     _repr_markdown_ = str

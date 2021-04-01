@@ -39,8 +39,7 @@ class SchemaTest(unittest.TestCase):
         Generic.Required["a", "b"].schema().new("")
         Generic.Properties[dict(a=Integer)].schema().ravel().new()
         assert String[:] is String
-        assert Sys.type() is Sys
-        assert Plural.type() is Plural
+        assert base.Plural.type() is base.Plural
 
 
 class BaseTest(unittest.TestCase):
@@ -387,7 +386,6 @@ class ExoticTest(unittest.TestCase):
 
 class PyTests(unittest.TestCase):
     def test_py(x):
-        assert Sys["builtins.range"]() is range
         assert Py["builtins.range"]() is range
 
         with pytest.raises(TypeError):
@@ -470,16 +468,6 @@ class PyTypeTest(unittest.TestCase):
 
         import functools
 
-        assert Sys["functools"]() is Sys["functools"].object() is functools
-
-        assert (
-            Sys["functools.partial"]()
-            is Sys["functools.partial"].object()
-            is functools.partial
-        )
-
-        assert isinstance(int, Sys["functools.partial"])
-
         assert not isinstance(int, Py["functools.partial"])
 
         assert isinstance(functools.partial(f), Py["functools.partial"])
@@ -495,9 +483,9 @@ class PyTypeTest(unittest.TestCase):
         import inspect
         import urllib
 
-        assert Instance["urllib.request.Request"].__signature__ == inspect.signature(
-            urllib.request.Request
-        )
+        # assert Instance["urllib.request.Request"].__signature__ == inspect.signature(
+        #     urllib.request.Request
+        # )
         assert Instance[Integer](10) == 10
         assert Instance[list]([1]) == [1]
 
@@ -772,11 +760,10 @@ class ManualTests(unittest.TestCase):
         )
 
     def test_abc(x):
-        assert Dict.type != List.type != Literal.type
+        assert Dict.type != List.type != base.Type.type
         assert not issubclass(Dict, Dict.Keys)
         assert not issubclass(Dict, Generic.Nested)
         assert issubclass(String["abc"], Default)
-        assert Generic.pytype() is typing.Any
         with raises:
             (-String)("abc")
         assert (-String)(1) == 1
@@ -785,10 +772,8 @@ class ManualTests(unittest.TestCase):
         # this might not be right...
         assert issubclass(Dict.MinProperties[3], Dict.minProperties(3))
         assert Dict.type() is Dict
-        assert Literal.type() is Literal
-        assert Literal.pytype("thing") is String
-        assert Literal.pytype(range) is type
-        assert Literal.type() is Literal
+        assert base.Type.type() is base.Type
+        assert base.Type.type() is base.Type
         with raises:
             (Integer ^ Number)(1)
 
@@ -810,8 +795,8 @@ class ManualTests(unittest.TestCase):
 
 class FileTest(unittest.TestCase):
     def test_file(x):
-        assert isinstance(Dir(""), Path) and isinstance(Dir(""), Literal)
-        assert isinstance(File(""), Path) and isinstance(File(""), Literal)
+        assert isinstance(Dir(""), Path) and isinstance(Dir(""), base.Type)
+        assert isinstance(File(""), Path) and isinstance(File(""), base.Type)
 
 
 def test_if():
@@ -853,7 +838,7 @@ def test_sig():
     def f(*, bar, foo, **kwargs):
         pass
 
-    assert Signature.from_re(
+    assert apps.get_signature(
         strings.Fstring["the {foo} is {bar}"].schema()["pattern"]
     ) == inspect.signature(f)
 
@@ -876,8 +861,7 @@ def test_sig():
     def f(w: Number, *, z: String["abc"] = "abc"):
         pass
 
-    assert Signature.from_type(T) == inspect.signature(f)
-    Signature.from_type(T).to_typer()
+    assert apps.get_signature(T) == inspect.signature(f)
 
 
 def _typer_doctest():
@@ -895,6 +879,7 @@ def _typer_doctest():
 
 def test_uri():
     from unittest import mock
+
     import requests
 
     t = strings.UriTemplate("https://{name}.com")
@@ -939,3 +924,24 @@ def test_load_dump():
     assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
     assert strings.JsonString.dumps(dict(a="b")) == '{"a": "b"}'
     assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
+
+
+def test_dispatch():
+    @util.dispatch
+    def func(x):
+        return str(x)
+
+    @func.register
+    def func_int(x: int):
+        return x
+
+    assert isinstance(func(10), int)
+
+    assert func({}) == str({})
+
+
+def test_ensure_mro_c3():
+    [
+        functools._c3_mro(x)
+        for x in (Null, Bool, Integer, Number, String, List, Dict, Dict[List], Json)
+    ]

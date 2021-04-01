@@ -1,4 +1,7 @@
+import re
 import sys
+import inspect
+import typing
 
 from . import base, types, util
 
@@ -11,6 +14,17 @@ class App(types.Instance):
         if "IPython" in sys.modules:
             ipy = bool(sys.modules["IPython"].get_ipython())
         return util.suppress(*(ipy and (SystemExit,) or ()))
+
+    @classmethod
+    def type(cls, *args):
+        if not args:
+            return cls
+        v = base.Value.form(cls)
+        if isinstance(args[0], (tuple, list)):
+            args = v + args[0]
+        else:
+            args = (v + args,)
+        return super().type(*args)
 
 
 class Test(App["unittest.main"]):
@@ -65,7 +79,7 @@ class Typer(App["typer.Typer"]):
             if not isinstance(x, (type(None), int)):
                 print(x)
 
-        wrap.__signature__ = util.Signature.from_type(f).to_typer()
+        wrap.__signature__ = get_typer(f)
 
         return wrap
 
@@ -78,19 +92,19 @@ class Typer(App["typer.Typer"]):
         kwargs["context_settings"] = default_context_settings
 
         # split the application and things it is going to call.
-        app, *to = util.forward_strings(*cls.AtType.form(cls))
+        app, *to = util.forward_strings(*cls.Value.form(cls))
         app = app(**kwargs)
         for i, x in enumerate(to):
             n, help = x.__name__, None
             if isinstance(x, base.Generic):
 
                 if issubclass(x, App):
-                    app.add_typer(x.object())
+                    app.add_typer(x)
                     continue
-                elif issubclass(x, cls.Sys):
+                elif issubclass(x, cls.Py):
                     y = x
-                    while issubclass(x, cls.Sys):
-                        u = cls.AtType.form(x)
+                    while issubclass(x, cls.Py):
+                        u = cls.Value.form(x)
                         if u:
                             x = u[0]
                         else:
@@ -113,3 +127,133 @@ class Typer(App["typer.Typer"]):
 class Chain(Typer):
     def object(cls, *args, **kwargs):
         return super().object(*args, **kwargs, chain=True)
+
+
+@util.dispatch
+def get_signature(x):
+    return inspect.signature(x)
+
+@get_signature.register
+def _get_signature_from_schema(x:base.Generic):
+    return get_signature(x.schema())
+
+@get_signature.register
+def _get_signature_from_schema(x:re.Pattern):
+    return inspect.Signature(
+            [
+                # inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
+                *(
+                    inspect.Parameter(x, inspect.Parameter.KEYWORD_ONLY)
+                    for x in sorted(x.groupindex)
+                ),
+                inspect.Parameter("kwargs", inspect.Parameter.VAR_KEYWORD),
+            ]
+        )
+@get_signature.register
+def _get_signature_from_schema(s:dict):
+        p = s.get("properties", {})
+
+        a = []
+        required = s.get("required", [])
+        for k in required:
+            try:
+                a += (
+                    inspect.Parameter(
+                        k,
+                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                        annotation=p.get(k, inspect._empty),
+                    ),
+                )
+            except (ValueError, TypeError):
+                return inspect.signature(cls)
+
+        for k in p:
+            if k in required:
+                continue
+
+            v = p[k]
+            if isinstance(v, type) and issubclass(v, base.Default):
+                d = base.Default.form(v)
+                if not callable(d):
+                    a += (
+                        inspect.Parameter(
+                            k,
+                            inspect.Parameter.KEYWORD_ONLY,
+                            annotation=p[k],
+                            default=d,
+                        ),
+                    )
+                continue
+
+            try:
+                a += (
+                    inspect.Parameter(
+                        k,
+                        inspect.Parameter.KEYWORD_ONLY,
+                        annotation=p[k],
+                    ),
+                )
+            except ValueError:
+                pass
+
+        additional = s.get("additionalProperties", True)
+        if not additional:
+            a += (
+                (
+                    inspect.Parameter(
+                        "kwargs",
+                        inspect.Parameter.VAR_KEYWORD,
+                        annotation=inspect._empty
+                        if isinstance(additional, bool)
+                        else additional,
+                    ),
+                ),
+            )
+        return inspect.Signature(a)
+
+def get_typer(x):
+    return inspect.Signature(list(map(get_typer_parameter, get_signature(x).parameters.values())))
+
+def get_typer_parameter(p):
+    import typer
+
+    k = {}
+    if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD:
+        f = typer.Argument
+
+    else:
+        f = typer.Option
+
+    k["default"] = ...
+    if p.default is not inspect._empty:
+        k["default"] = p.default
+
+    a = t = typing.Any
+    if p.annotation is not inspect._empty:
+        import enum
+
+        a = t = p.annotation
+        if isinstance(t, base.Generic):
+            a = t.py()
+            s = t.schema()
+            if a is enum.Enum:
+                c = t.choices()
+                if not isinstance(c, dict):
+                    c = dict(zip(c, c))
+                a = enum.Enum(t.__name__, c)
+            for e in ["", "Exclusive"]:
+                for m in ["maximum", "minimum"]:
+                    n = m + e
+                    if n in s:
+                        k[n[:3]] = s[n]
+
+                        if e == "Exclusive":
+                            k["clamp"] = True
+
+            if "description" in s:
+                k["help"] = s["description"]
+
+    return inspect.Parameter(
+        p.name, p.kind, annotation=a, default=f(k.pop("default"), **k)
+    )
+

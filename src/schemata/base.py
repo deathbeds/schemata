@@ -1,15 +1,14 @@
 """base metaclasses, forms, and types for schemata
 
-this module defines the core type constructors for schemata.
+this module defines the core type constructors for schemata. it does not export any
+actual type implementations, these are composed in the types module
 """
 
 import abc
 import collections
 import functools
 import inspect
-import types
 import typing
-
 from . import exceptions, util
 
 
@@ -32,9 +31,7 @@ class Interface:
         pass
 
     @abc.abstractclassmethod
-    def pytype(cls, *args):  # pragma: no cover
-        if args:
-            return type(*args)
+    def py(cls):  # pragma: no cover
         return typing.Any
 
 
@@ -86,7 +83,7 @@ class Generic(Interface, abc.ABCMeta):
                 if k in kwargs:
                     f = kwargs[k]
                     p[k] = p[k] + cls.Default[f]
-                    if isinstance(f, types.FunctionType):
+                    if isinstance(f, __import__("types").FunctionType):
                         s = inspect.signature(f)
                         for a in s.parameters.values():
                             a = a.annotation
@@ -97,7 +94,7 @@ class Generic(Interface, abc.ABCMeta):
                                     d[k].add(a)
 
                 else:
-                    if not issubclass(p[k], Default):
+                    if not issubclass(p[k], cls.Default):
                         r += (k,)
 
             t = (cls.Properties[p],)
@@ -170,6 +167,11 @@ class Generic(Interface, abc.ABCMeta):
     def __eq__(cls, object):
         if isinstance(object, Generic):
             return cls.schema() == object.schema()
+        with util.suppress(AttributeError):
+            if cls.Py in cls.__mro__:
+                with util.suppress(IndexError):
+                    return object == cls.Py.object.__func__(cls)
+
         return type.__eq__(cls, object)
 
     # conditional operations
@@ -257,12 +259,15 @@ class Form(metaclass=Generic):
 
     # the form makes it easy to create new types from class definitions,
     # the annotations take on the form of the cls which defaults to the lowercase name
-    def type(cls, object=None, **kwargs):
-        if isinstance(object, list):
-            object = tuple(object)
+    def type(cls, *args, **kwargs):
+        if not (args or kwargs):
+            return cls
+
+        if isinstance(*args, list):
+            args = (tuple(*args),)
         return Generic.type(
             cls,
-            __annotations__={cls.form(): object},
+            __annotations__={cls.form(): util.identity(*args)},
             **kwargs,
         )
 
@@ -304,18 +309,17 @@ _python_mapping = {**_type_mapping, **_default_mapping}
 
 
 class Type(Form):
+    @classmethod
+    def concrete_type(cls):
+        return _python_mapping.get(cls.Type.form(cls))
+
+    def py(cls):  # pragma: no cover
+        return cls.concrete_type()
+
     def __init__(self, *args, **kwargs):
         # short circuit initialization below this point and execute it ourselves
         # in the object methods
         pass
-
-    @classmethod
-    def type(cls, *args):
-        cls = super().type(*args)
-        e = _type_mapping.get(Type.form(cls)) or ()
-        if e:
-            return Generic.type((cls, e))
-        return cls
 
     def object(cls, *args, **kwargs):
         if not (args or kwargs) and issubclass(cls, cls.Default):
@@ -326,54 +330,25 @@ class Type(Form):
         if (args or kwargs) and not issubclass(cls, cls.Dict):
             args, kwargs = (cls.validate(*args, **kwargs),), {}
 
-        pytype = cls.pytype()
-        if pytype in {type(None), bool}:
+        t = cls.concrete_type()
+        if t in {type(None), bool}:
             if not args:
                 try:
                     args = (super().object(),)
                 except:
-                    args = (pytype(),)
+                    args = (t(),)
             return args[0]
         with util.suppress(AttributeError):
             if not (args or kwargs):
                 args = (super().object(),)
-        if pytype is not None:
-            self = pytype.__new__(cls, *args, **kwargs)
+        if t is not None:
+            self = t.__new__(cls, *args, **kwargs)
             try:
-                pytype.__init__(self, *args, **kwargs)
+                t.__init__(self, *args, **kwargs)
             except TypeError:
-                pytype.__init__(self)
+                t.__init__(self)
             return self
         return args[0]
-
-    @classmethod
-    def pytype(cls):
-        return _python_mapping.get(cls.Type.form(cls))
-
-
-class Sys(Type):
-    """ reference to python objects."""
-
-    def object(cls, *args, **kwargs):
-        return cls.pytype()
-
-    def validate(cls, *args):
-        return args
-
-    def type(cls, *args, **kwargs):
-        if not args:
-            return cls
-        x, *_ = args
-
-        cls = cls + cls.AtType[x]
-
-        with util.suppress(exceptions.ConsentException, ValueError, TypeError):
-            t = cls.pytype()
-            cls.__signature__ = inspect.signature(t)
-        return cls
-
-    def pytype(cls):
-        return util.forward_strings(*cls.AtType.form(cls)[:1])[0]
 
 
 class Const(Form):
@@ -430,6 +405,14 @@ class Nested(Plural):
         return x
 
 
+class Value(Plural):
+    @classmethod
+    def form(cls, *args):
+        if args:
+            return super().form(*args)
+        return "value"
+
+
 class Mapping(Form):
     @classmethod
     def form(cls, *args):  # pragma: no cover
@@ -455,6 +438,9 @@ class Pattern(Form):
         if isinstance(*x, str):
             x = (re.compile(*x),)
         return super().type(*x)
+
+    def py(cls):
+        return typing.Pattern
 
 
 class Format(Form):
@@ -608,71 +594,9 @@ class AtGraph(Plural):
     pass
 
 
-class Literals(metaclass=Generic):
-    pass
-
-
-class Strings(Literals):
-    lowercased = util.lowercased
-
-
-class Numbers(Literals):
-    pass
-
-
-class Lists(Literals):
-    def map(x, f):
-        cls = type(x)
-        if isinstance(f, type):
-            return cls[type](list(map(f, x)))
-        return cls(list(map(f, x)))
-
-    def filter(x, f):
-        return type(x)(list(filter(f, x)))
-
-    def groupby(x, f):
-        import itertools
-
-        from .types import Dict
-
-        v = {k: list(v) for k, v in itertools.groupby(x, f)}
-        t = Dict[(f, type(x)) if isinstance(f, type) else type(x)]
-        return t(v)
-
-
-class Dicts(Literals):
-    def _prepare_type(x, *args):
-        from .types import Dict
-
-        if len(args) == 1:
-            K, V = None, *args
-        elif len(args) == 2:
-            K, V = args
-        t = Generic.Dict
-        if K is None:
-            if isinstance(V, type):
-                t = t[V]
-            return t, K, V
-        else:
-            if isinstance(K, type):
-                t = t[(K,) if isinstance(V, type) else (K, V)]
-            elif isinstance(V, type):
-                t = t[V]
-
-        return t, K, V
-
-    def filter(x, *args):
-        t, K, V = x._prepare_type(*args)
-        if K is None:
-            return t({k: v for k, v in x.items() if V(v)})
-        if V is None:
-            return t({k: v for k, v in x.items() if K(k)})
-        return t({k: v for k, v in x.items() if K(k) and V(v)})
-
-    def map(x, *args):
-        t, K, V = x._prepare_type(*args)
-        if K is None:
-            return t({k: V(v) for k, v in x.items()})
-        if V is None:
-            return t({K(k): v for k, v in x.items()})
-        return t({K(k): V(v) for k, v in x.items()})
+class Literal:
+    @classmethod
+    def type(cls, *x):
+        if x:
+            return cls.default(*x)
+        return cls

@@ -1,63 +1,47 @@
 import functools
+import inspect
 import mimetypes
 import os
 import sys
 import typing
 
 from . import base, exceptions, util
+from .base import Default, Const, Generic
 
 
-# the Literal is the bridge between actual python types and base.Generic types, they emit concrete
-# implementations of python types like int, float, list, dict with they advantage that they may be described
-# in rdf notation.
-class Literal(base.Literals, base.Type):
-    def type(cls, *x):
-        if x:
-            return cls.default(*x)
-        return cls
-
-    @classmethod
-    def pytype(cls, *args):
-        if args:
-            m = {str: String, float: Number, int: Integer, list: List, dict: Dict}
-            t = type(*args)
-            if t in m:
-                return m[t]
-            return t
-        return super().pytype()
-
-
-class Null(Literal, base.Type["null"]):
+class Null(base.Literal, base.Type["null"]):
     pass
 
 
 Null.register(type(None))
 
 
-class Bool(Literal, base.Type["boolean"]):
+class Bool(base.Literal, base.Type["boolean"]):
     pass
 
 
 Bool.register(bool)
 
 
-class String(base.Strings, Literal, base.Type["string"]):
+class String(base.Literal, base.Type["string"], str):
+    lowercased = util.lowercased
+
     def loads(self):
         return self
 
 
-class Number(base.Numbers, Literal, base.Type["number"]):
+class Number(base.Literal, base.Type["number"], float):
     pass
 
 
 Float = Number
 
 
-class Integer(base.Numbers, Literal, base.Type["integer"]):
+class Integer(base.Literal, base.Type["integer"], int):
     pass
 
 
-class List(base.Lists, Literal, base.Type["array"]):
+class List(base.Literal, base.Type["array"], list):
     def object(cls, *args):
         if args:
             if isinstance(*args, (set, tuple)):
@@ -117,6 +101,33 @@ class List(base.Lists, Literal, base.Type["array"]):
     def __delitem__(self, x):
         return self.pop(x)
 
+    def map(x, f):
+        cls = type(x)
+        if isinstance(f, type):
+            return cls[type](list(map(f, x)))
+        return cls(list(map(f, x)))
+
+    def filter(x, f):
+        return type(x)(list(filter(f, x)))
+
+    def groupby(x, f):
+        import itertools
+
+        from .types import Dict
+
+        v = {k: list(v) for k, v in itertools.groupby(x, f)}
+        t = Dict[(f, type(x)) if isinstance(f, type) else type(x)]
+        return t(v)
+
+    def py(cls):
+        from . import apps
+        v = apps.get_py(base.Items.form(cls))
+        if v:
+            if isinstance(v, tuple):
+                return typing.Tuple[v]
+            return typing.List[v]
+        return typing.List
+
 
 class Tuple(List, base.Title["Tuple"]):
     pass
@@ -140,11 +151,17 @@ class Environ(base.Plural):
         return os.getenv(*cls.Environ.form(cls)[:1])
 
 
-class Py(base.Sys):
+class Py(base.Value):
     def validate(cls, *args):
-        if isinstance(*args, cls.pytype()):
+        if isinstance(*args, cls.Py.object.__func__(cls)):
             return args
         raise exceptions.ValidationError(f"{args} is not an object of {cls}")
+
+    def object(cls):
+        return util.forward_strings(*cls.Value.form(cls)[:1])[0]
+
+    def py(cls):
+        return Py.object.__func__(cls)
 
 
 class Instance(Py):
@@ -162,7 +179,7 @@ class Instance(Py):
 
 class Pipe(Instance):
     def object(cls, *args, **kwargs):
-        for f in cls.AtType.form(cls):
+        for f in cls.Value.form(cls):
             args, kwargs = (util.call(f, *args, **kwargs),), {}
         return args[0]
 
@@ -211,11 +228,22 @@ class Juxt(Instance):
         return Instance[object]
 
     def object(cls, *args, **kwargs):
-        t, *v = cls.AtType.form(cls)
+        t, *v = cls.Value.form(cls)
         return t(util.call(x, *args, **kwargs) for x in v)
 
 
-class Dict(base.Dicts, Literal, base.Type["object"]):
+class Dict(base.Type["object"], dict):
+    def py(cls):
+        from . import apps
+
+        k, v = map(
+            apps.get_py,(
+                base.Keys.form(cls) or str,
+                base.AdditionalProperties.form(cls) or typing.Any,
+            )
+        )
+        return typing.Dict[k, v]
+
     def __setitem__(self, k, v):
         self.update({k: v})
 
@@ -305,13 +333,52 @@ class Dict(base.Dicts, Literal, base.Type["object"]):
             return cls
         return cls.additionalProperties(x)
 
+    def _prepare_type(x, *args):
+        from .types import Dict
+
+        if len(args) == 1:
+            K, V = None, *args
+        elif len(args) == 2:
+            K, V = args
+        t = Generic.Dict
+        if K is None:
+            if isinstance(V, type):
+                t = t[V]
+            return t, K, V
+        else:
+            if isinstance(K, type):
+                t = t[(K,) if isinstance(V, type) else (K, V)]
+            elif isinstance(V, type):
+                t = t[V]
+
+        return t, K, V
+
+    def filter(x, *args):
+        t, K, V = x._prepare_type(*args)
+        if K is None:
+            return t({k: v for k, v in x.items() if V(v)})
+        if V is None:
+            return t({k: v for k, v in x.items() if K(k)})
+        return t({k: v for k, v in x.items() if K(k) and V(v)})
+
+    def map(x, *args):
+        t, K, V = x._prepare_type(*args)
+        if K is None:
+            return t({k: V(v) for k, v in x.items()})
+        if V is None:
+            return t({K(k): v for k, v in x.items()})
+        return t({K(k): V(v) for k, v in x.items()})
+
 
 class Uri(String, String.Format["uri"]):
     def get(self, *args, **kwargs):
         return __import__("requests").get(self, *args, **kwargs)
 
 
-class Dir(Literal, util.Path):
+class Dir(base.Literal, util.Path):
+    def py(cls):
+        return util.Path
+
     def object(cls, *args):
         return util.Path.__new__(util.Path(*args).is_file() and File or Dir, *args)
 
@@ -340,12 +407,12 @@ class File(Dir):
         return self.read_text()
 
 
-class Enum(base.Form.Plural, Literal):
+class Enum(base.Plural, base.Type):
     def object(cls, *args, **kwargs):
         # self.value = cls.validate(self)
         # cls._attach_parent(self)
         enum = Enum.form(cls)
-        self = cls.validate(Literal(args[0] if args else enum[0]))
+        self = cls.validate(base.Type(args[0] if args else enum[0]))
         if len(enum) is 1 and isinstance(*enum, dict):
             return enum[0].get(self)
         return self
@@ -373,9 +440,10 @@ class Cycler(Enum):
         return __import__("itertools").cycle(cls.choices())
 
 
-class Composite(base.Type):
+class Composite:
     """a schemaless form type mixin, the name of the class is used to derive others"""
 
+    @classmethod
     def validate(cls, object):
         # composites use the object creation for typing checking
         return cls.object(object)
@@ -388,7 +456,7 @@ class Composite(base.Type):
         return args
 
 
-class AnyOf(base.Form.Nested, Composite):
+class AnyOf(Composite, base.Form.Nested):
     def object(cls, *args):
         args = super().object(*args)
         ts = AnyOf.form(cls)
@@ -401,7 +469,7 @@ class AnyOf(base.Form.Nested, Composite):
                     raise exceptions.ValidationError()
 
 
-class AllOf(base.Form.Nested, Composite):
+class AllOf(Composite, base.Form.Nested):
     def object(cls, *args):
         args = super().object(*args)
         result = {}
@@ -413,7 +481,7 @@ class AllOf(base.Form.Nested, Composite):
         return cls._attach_parent(x)
 
 
-class OneOf(base.Form.Nested, Composite):
+class OneOf(Composite, base.Form.Nested):
     def object(cls, *args, **kwargs):
         args = super().object(*args)
         i, x = 0, None
@@ -436,7 +504,7 @@ class OneOf(base.Form.Nested, Composite):
         raise exceptions.ValidationError()
 
 
-class Not(Composite):
+class Not(Composite, base.Form):
     def object(cls, *args):
         try:
             cls.form(cls)(*args)
@@ -506,7 +574,13 @@ class Bunch(Dict):
 
 
 class Set(List, base.Form.Title["Set"], base.Form.UniqueItems[True]):
-    pass
+    def py(cls):
+        from . import apps
+
+        v = apps.get_py(base.Items.form(cls))
+        if v is None:
+            return typing.Set
+        return typing.Set[v]
 
 
 Set.register(set)

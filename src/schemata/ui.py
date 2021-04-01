@@ -44,18 +44,6 @@ class AutoFocus(Ui):
     pass
 
 
-class Rich(Ui):
-    pass
-
-
-class Interactive(Ui):
-    pass
-
-
-class Rjsf(Ui):
-    pass
-
-
 class Disabled(Ui):
     pass
 
@@ -112,9 +100,6 @@ class Title(Ui):
     pass
 
 
-class Tree(Widget):
-    pass
-
-
-class Table(Widget):
-    pass
+class Ansi(Ui):
+    def _ipython_display_(self):
+        __import__("rich").print(self)
