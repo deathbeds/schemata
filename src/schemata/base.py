@@ -9,6 +9,7 @@ import collections
 import functools
 import inspect
 import typing
+
 from . import exceptions, util
 
 
@@ -34,6 +35,14 @@ class Interface:
     def py(cls):  # pragma: no cover
         return typing.Any
 
+    @abc.abstractclassmethod
+    def form(cls):
+        pass
+
+    @abc.abstractclassmethod
+    def forms(cls, *args):
+        pass
+
 
 class Generic(Interface, abc.ABCMeta):
     # the generic base case is the metaclass for all of schemata's typess and protocols
@@ -55,7 +64,7 @@ class Generic(Interface, abc.ABCMeta):
             is_list = any(cls.List in x.__mro__ for x in bases)
             is_dict = any(cls.Dict in x.__mro__ for x in bases)
             if is_list or is_dict:
-                if not (cls.Properties.form(cls) or cls.Items.form(cls)):
+                if not (cls.Properties.forms(cls) or cls.Items.forms(cls)):
                     p.update(kwargs.pop(ANNOTATIONS, {}))
         except AttributeError:
             # early on in the module loading we don't have access to List or Dict
@@ -272,21 +281,23 @@ class Form(metaclass=Generic):
         )
 
     @classmethod
-    def form(cls, *args):  # pragma: no cover
+    def form(cls):
         n, *_ = cls.__name__.partition("_")
         if n.startswith("At"):
             n = "@" + util.lowercased(n[2:])
         if cls.__name__.endswith("_"):
             n = "$" + util.lowercased(n)
         n = util.lowercased(n)
-        if not args:
-            return n  #  lowercase x
+        return n  #  lowercase x
+
+    @classmethod
+    def forms(cls, *args):
         x, *_ = args
         if not isinstance(x, type):
             x = type(x)
         if x is not Generic:
             with util.suppress(AttributeError):
-                return x.schema().get(n)
+                return x.schema().get(cls.form())
 
     @classmethod
     def strategy(cls):
@@ -311,7 +322,7 @@ _python_mapping = {**_type_mapping, **_default_mapping}
 class Type(Form):
     @classmethod
     def concrete_type(cls):
-        return _python_mapping.get(cls.Type.form(cls))
+        return _python_mapping.get(cls.Type.forms(cls))
 
     def py(cls):  # pragma: no cover
         return cls.concrete_type()
@@ -323,7 +334,7 @@ class Type(Form):
 
     def object(cls, *args, **kwargs):
         if not (args or kwargs) and issubclass(cls, cls.Default):
-            f = cls.Default.form(cls)
+            f = cls.Default.forms(cls)
             if callable(f):
                 args, kwargs = (f(*args, **kwargs),), {}
 
@@ -354,12 +365,12 @@ class Type(Form):
 class Const(Form):
     # a constant
     def object(cls, *args, **kwargs):
-        return Const.form(cls)
+        return Const.forms(cls)
 
 
 class Default(Form):
     def object(cls, *args, **kwargs):
-        x = Default.form(cls)
+        x = Default.forms(cls)
         if callable(x):
             return util.call(x, *args, **kwargs)
         return x
@@ -379,8 +390,8 @@ class Plural(Form):
         return Form.type.__func__(cls, *args)
 
     @classmethod
-    def form(cls, *args):  # pragma: no cover
-        return super().form(*args) or ()
+    def forms(cls, *args):  # pragma: no cover
+        return super().forms(*args) or ()
 
 
 class AtType(Plural):
@@ -396,9 +407,9 @@ class Nested(Plural):
     def type(cls, object):
         x = super().type(object)
         v = ()
-        for y in cls.form(x):
+        for y in cls.forms(x):
             if issubclass(y, cls):
-                v += cls.form(y)
+                v += cls.forms(y)
             else:
                 v += (y,)
         x.__annotations__[cls.form()] = v
@@ -407,16 +418,14 @@ class Nested(Plural):
 
 class Value(Plural):
     @classmethod
-    def form(cls, *args):
-        if args:
-            return super().form(*args)
+    def form(cls):
         return "value"
 
 
 class Mapping(Form):
     @classmethod
-    def form(cls, *args):  # pragma: no cover
-        return super().form(*args) or {}
+    def forms(cls, *args):  # pragma: no cover
+        return super().forms(*args) or {}
 
 
 # json schema formes
@@ -498,7 +507,7 @@ class Properties(Mapping):
 class AdditionalProperties(Form):
     def __missing__(self, key):
         cls = type(self)
-        p = AdditionalProperties.form(cls)
+        p = AdditionalProperties.forms(cls)
         if p:
             self.update({key: util.call(p)})
         return self[key]
@@ -534,8 +543,8 @@ class Keys(Form):
 
 class ContentMediaType(Form):
     def __init_subclass__(cls):
-        t = cls.ContentMediaType.form(cls)
-        for e in cls.FileExtension.form(cls) if t else ():
+        t = cls.ContentMediaType.forms(cls)
+        for e in cls.FileExtension.forms(cls) if t else ():
             __import__("mimetypes").add_type(t, e)
 
 

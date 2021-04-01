@@ -79,7 +79,7 @@ class Fstring(types.String):
 class Parse(base.Pattern, types.String):
     @classmethod
     def object(cls, *args, **kwargs):
-        return super().object(cls.Pattern.form(cls)._format.format(*args, **kwargs))
+        return super().object(cls.Pattern.forms(cls)._format.format(*args, **kwargs))
 
     @classmethod
     def type(cls, *args):

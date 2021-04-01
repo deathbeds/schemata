@@ -17,9 +17,9 @@ __all__ = (
 )
 
 import functools
+import inspect
 import sys
 import typing
-import inspect
 from contextlib import suppress
 
 from .exceptions import ConsentException
@@ -119,55 +119,6 @@ del _root, ForwardRef
 
 def lowercased(x):
     return x[0].lower() + x[1:] if x else x
-
-
-def get_typer_parameter(p):
-    import functools
-    import typing
-
-    import typer
-
-    from .base import Generic
-
-    k = {}
-    if p.kind is inspect.Parameter.POSITIONAL_OR_KEYWORD:
-        f = typer.Argument
-
-    else:
-        f = typer.Option
-
-    k["default"] = ...
-    if p.default is not inspect._empty:
-        k["default"] = p.default
-
-    a = t = typing.Any
-    if p.annotation is not inspect._empty:
-        import enum
-
-        a = t = p.annotation
-        if isinstance(t, Generic):
-            a, *_ = get_non_schemata_types(t) + [typing.Any]
-            s = t.schema()
-            if a is enum.Enum:
-                c = t.choices()
-                if not isinstance(c, dict):
-                    c = dict(zip(c, c))
-                a = enum.Enum(t.__name__, c)
-            for e in ["", "Exclusive"]:
-                for m in ["maximum", "minimum"]:
-                    n = m + e
-                    if n in s:
-                        k[n[:3]] = s[n]
-
-                        if e == "Exclusive":
-                            k["clamp"] = True
-
-            if "description" in s:
-                k["help"] = s["description"]
-
-    return inspect.Parameter(
-        p.name, p.kind, annotation=a, default=f(k.pop("default"), **k)
-    )
 
 
 class Schema(dict):
@@ -374,26 +325,3 @@ def to_pydantic(cls):
             Config=type("Config", (), dict(schema_extra=cls.schema().ravel())),
         ),
     )
-
-
-def dispatch(f):
-
-    f = functools.singledispatch(f)
-    r = f.register
-
-    @functools.wraps(r)
-    def register(g):
-        nonlocal r
-        for i, p in enumerate(inspect.signature(g).parameters.values()):
-            if not i:
-                a = p.annotation
-                if isinstance(a, (list, tuple)):
-                    [r(x)(g) for x in a]
-                else:
-                    r(a)(g)
-
-        return g
-
-    f.register = register
-    return f
-

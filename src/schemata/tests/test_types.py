@@ -121,7 +121,7 @@ class LiteralTest(unittest.TestCase):
             Enum["a"]("b")
 
         C = Cycler["a", "b", "c"]
-        assert Cycler.form(C) == ("a", "b", "c")
+        assert Cycler.forms(C) == ("a", "b", "c")
         c = C()
 
         assert next(c) == "a" and next(c) == "b" and next(c) == "c" and next(c) == "a"
@@ -726,7 +726,7 @@ class ManualTests(unittest.TestCase):
         assert (Dict[dict(bar=Integer)] >> strings.Jinja["foo {{bar}}"])(
             bar=11
         ) == "foo 11"
-        assert len(OneOf.form(Json)) == 6
+        assert len(OneOf.forms(Json)) == 6
         v = dict(zip("abc", range(3)))
         assert Dict(v).map(str) == dict(zip(v.keys(), map(str, v.values())))
         assert Dict(v).map(Integer).__class__ == Dict[Integer]
@@ -768,7 +768,7 @@ class ManualTests(unittest.TestCase):
             (-String)("abc")
         assert (-String)(1) == 1
         assert (+String) is String
-        assert isinstance(Generic.Items.form(Tuple[[int, str]]), tuple)
+        assert isinstance(Generic.Items.forms(Tuple[[int, str]]), tuple)
         # this might not be right...
         assert issubclass(Dict.MinProperties[3], Dict.minProperties(3))
         assert Dict.type() is Dict
@@ -924,20 +924,6 @@ def test_load_dump():
     assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
     assert strings.JsonString.dumps(dict(a="b")) == '{"a": "b"}'
     assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
-
-
-def test_dispatch():
-    @util.dispatch
-    def func(x):
-        return str(x)
-
-    @func.register
-    def func_int(x: int):
-        return x
-
-    assert isinstance(func(10), int)
-
-    assert func({}) == str({})
 
 
 def test_ensure_mro_c3():

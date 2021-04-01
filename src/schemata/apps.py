@@ -1,6 +1,7 @@
+import functools
+import inspect
 import re
 import sys
-import inspect
 import typing
 
 from . import base, types, util
@@ -19,7 +20,7 @@ class App(types.Instance):
     def type(cls, *args):
         if not args:
             return cls
-        v = base.Value.form(cls)
+        v = base.Value.forms(cls)
         if isinstance(args[0], (tuple, list)):
             args = v + args[0]
         else:
@@ -86,13 +87,13 @@ class Typer(App["typer.Typer"]):
     def object(cls, *args, **kwargs):
         import typer
 
-        kwargs["name"] = kwargs.get("name", cls.Title.form(cls) or cls.__name__)
+        kwargs["name"] = kwargs.get("name", cls.Title.forms(cls) or cls.__name__)
         kwargs["add_completion"] = False
         default_context_settings = dict(help_option_names=["-h", "--help"])
         kwargs["context_settings"] = default_context_settings
 
         # split the application and things it is going to call.
-        app, *to = util.forward_strings(*cls.Value.form(cls))
+        app, *to = util.forward_strings(*cls.Value.forms(cls))
         app = app(**kwargs)
         for i, x in enumerate(to):
             n, help = x.__name__, None
@@ -104,15 +105,15 @@ class Typer(App["typer.Typer"]):
                 elif issubclass(x, cls.Py):
                     y = x
                     while issubclass(x, cls.Py):
-                        u = cls.Value.form(x)
+                        u = cls.Value.forms(x)
                         if u:
                             x = u[0]
                         else:
                             break
                         n = x.__name__
                 else:
-                    n = cls.Title.form(cls) or n
-                    help = cls.Description.form(cls) or help
+                    n = cls.Title.forms(cls) or n
+                    help = cls.Description.forms(cls) or help
 
             n = cls.String.lowercased(n)
             app.command(
@@ -129,90 +130,98 @@ class Chain(Typer):
         return super().object(*args, **kwargs, chain=True)
 
 
-@util.dispatch
+@functools.singledispatch
 def get_signature(x):
     return inspect.signature(x)
 
+
 @get_signature.register
-def _get_signature_from_schema(x:base.Generic):
+def _get_signature_from_schema(x: base.Generic):
     return get_signature(x.schema())
 
+
 @get_signature.register
-def _get_signature_from_schema(x:re.Pattern):
+def _get_signature_from_schema(x: re.Pattern):
     return inspect.Signature(
-            [
-                # inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
-                *(
-                    inspect.Parameter(x, inspect.Parameter.KEYWORD_ONLY)
-                    for x in sorted(x.groupindex)
-                ),
-                inspect.Parameter("kwargs", inspect.Parameter.VAR_KEYWORD),
-            ]
-        )
+        [
+            # inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
+            *(
+                inspect.Parameter(x, inspect.Parameter.KEYWORD_ONLY)
+                for x in sorted(x.groupindex)
+            ),
+            inspect.Parameter("kwargs", inspect.Parameter.VAR_KEYWORD),
+        ]
+    )
+
+
 @get_signature.register
-def _get_signature_from_schema(s:dict):
-        p = s.get("properties", {})
+def _get_signature_from_schema(s: dict):
+    p = s.get("properties", {})
 
-        a = []
-        required = s.get("required", [])
-        for k in required:
-            try:
-                a += (
-                    inspect.Parameter(
-                        k,
-                        inspect.Parameter.POSITIONAL_OR_KEYWORD,
-                        annotation=p.get(k, inspect._empty),
-                    ),
-                )
-            except (ValueError, TypeError):
-                return inspect.signature(cls)
+    a = []
+    required = s.get("required", [])
+    for k in required:
+        try:
+            a += (
+                inspect.Parameter(
+                    k,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    annotation=p.get(k, inspect._empty),
+                ),
+            )
+        except (ValueError, TypeError):
+            return inspect.signature(cls)
 
-        for k in p:
-            if k in required:
-                continue
+    for k in p:
+        if k in required:
+            continue
 
-            v = p[k]
-            if isinstance(v, type) and issubclass(v, base.Default):
-                d = base.Default.form(v)
-                if not callable(d):
-                    a += (
-                        inspect.Parameter(
-                            k,
-                            inspect.Parameter.KEYWORD_ONLY,
-                            annotation=p[k],
-                            default=d,
-                        ),
-                    )
-                continue
-
-            try:
+        v = p[k]
+        if isinstance(v, type) and issubclass(v, base.Default):
+            d = base.Default.forms(v)
+            if not callable(d):
                 a += (
                     inspect.Parameter(
                         k,
                         inspect.Parameter.KEYWORD_ONLY,
                         annotation=p[k],
+                        default=d,
                     ),
                 )
-            except ValueError:
-                pass
+            continue
 
-        additional = s.get("additionalProperties", True)
-        if not additional:
+        try:
             a += (
-                (
-                    inspect.Parameter(
-                        "kwargs",
-                        inspect.Parameter.VAR_KEYWORD,
-                        annotation=inspect._empty
-                        if isinstance(additional, bool)
-                        else additional,
-                    ),
+                inspect.Parameter(
+                    k,
+                    inspect.Parameter.KEYWORD_ONLY,
+                    annotation=p[k],
                 ),
             )
-        return inspect.Signature(a)
+        except ValueError:
+            pass
+
+    additional = s.get("additionalProperties", True)
+    if not additional:
+        a += (
+            (
+                inspect.Parameter(
+                    "kwargs",
+                    inspect.Parameter.VAR_KEYWORD,
+                    annotation=inspect._empty
+                    if isinstance(additional, bool)
+                    else additional,
+                ),
+            ),
+        )
+    return inspect.Signature(a)
+
 
 def get_typer(x):
-    return inspect.Signature(list(map(get_typer_parameter, get_signature(x).parameters.values())))
+    return inspect.Signature(
+        list(map(get_typer_parameter, get_signature(x).parameters.values()))
+    )
+
 
 def get_typer_parameter(p):
     import typer
@@ -256,4 +265,3 @@ def get_typer_parameter(p):
     return inspect.Parameter(
         p.name, p.kind, annotation=a, default=f(k.pop("default"), **k)
     )
-
