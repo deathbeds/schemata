@@ -1,3 +1,5 @@
+import datetime
+
 from . import base, types
 
 
@@ -5,13 +7,15 @@ from . import base, types
 class DateTime(types.String, types.String.Format["date-time"]):
     @classmethod
     def object(cls, *args):
-        import datetime
 
         import strict_rfc3339
 
         return datetime.datetime.utcfromtimestamp(
             strict_rfc3339.rfc3339_to_timestamp(*args)
         )
+
+    def py(cls):
+        return datetime.datetime
 
 
 class Date(DateTime, types.String.Format["date"]):

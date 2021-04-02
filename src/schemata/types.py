@@ -1,9 +1,11 @@
+import enum
 import functools
 import inspect
 import mimetypes
 import os
 import sys
 import typing
+import uuid
 
 from . import base, exceptions, util
 from .base import Const, Default, Generic
@@ -122,7 +124,7 @@ class List(base.Literal, base.Type["array"], list):
     def py(cls):
         from . import apps
 
-        v = apps.get_py(base.Items.forms(cls))
+        v = get_py(base.Items.forms(cls))
         if v:
             if isinstance(v, tuple):
                 return typing.Tuple[v]
@@ -238,7 +240,7 @@ class Dict(base.Type["object"], dict):
         from . import apps
 
         k, v = map(
-            apps.get_py,
+            get_py,
             (
                 base.Keys.forms(cls) or str,
                 base.AdditionalProperties.forms(cls) or typing.Any,
@@ -377,12 +379,18 @@ class Uri(String, String.Format["uri"]):
         return __import__("requests").get(self, *args, **kwargs)
 
 
-class Dir(base.Literal, util.Path):
+class Dir(base.Literal, base.Type, util.Path):
     def py(cls):
-        return util.Path
+        return __import__("pathlib").Path
 
     def object(cls, *args):
-        return util.Path.__new__(util.Path(*args).is_file() and File or Dir, *args)
+        if not args:
+            args = (Default.forms(cls),)
+        return util.Path.__new__(cls, *args)
+
+    def mimetype(self):
+        t, _ = mimetypes.guess_type("*" + self.suffix)
+        return t
 
 
 class Glob:
@@ -390,13 +398,6 @@ class Glob:
 
 
 class File(Dir):
-    def object(cls, *args):
-        return util.Path.__new__(File, *args)
-
-    def mimetype(self):
-        t, _ = mimetypes.guess_type("*" + self.suffix)
-        return t
-
     def read(self):
         if isinstance(self, str):
             self = File(self)
@@ -419,6 +420,12 @@ class Enum(base.Plural, base.Type):
             return enum[0].get(self)
         return self
 
+    def py(cls):
+        v = Enum.forms(cls)
+        if not isinstance(v, dict):
+            v = dict(zip(v, v))
+        return enum.Enum(cls.__name__, v, type=str)
+
     @classmethod
     def choices(cls):
         e = Enum.forms(cls)
@@ -428,7 +435,7 @@ class Enum(base.Plural, base.Type):
         return e
 
 
-Enum.register(__import__("enum").Enum)
+Enum.register(enum.Enum)
 
 
 class Cycler(Enum):
@@ -576,10 +583,38 @@ class Set(List, base.Form.Title["Set"], base.Form.UniqueItems[True]):
     def py(cls):
         from . import apps
 
-        v = apps.get_py(base.Items.forms(cls))
+        v = get_py(base.Items.forms(cls))
         if v is None:
             return typing.Set
         return typing.Set[v]
 
 
 Set.register(set)
+
+
+class Uuid(base.Literal, base.Type, uuid.UUID):
+    @classmethod
+    def object(cls, *args):
+        if not args:
+            args = (uuid.uuid4(),)
+        self = uuid.UUID.__new__(cls)
+        uuid.UUID.__init__(self, *map(str, args))
+        return self
+
+    def py(cls):
+        return uuid.UUID
+
+
+@functools.singledispatch
+def get_py(x):
+    return x
+
+
+@get_py.register
+def _get_py_generic(x: Generic):
+    return x.py()
+
+
+@get_py.register
+def _get_py_tuple(x: tuple):
+    return tuple(map(get_py, x))

@@ -36,11 +36,11 @@ class Interface:
         return typing.Any
 
     @abc.abstractclassmethod
-    def form(cls):
+    def form(cls):  # pragma: no cover
         pass
 
     @abc.abstractclassmethod
-    def forms(cls, *args):
+    def forms(cls, *args):  # pragma: no cover
         pass
 
 
@@ -285,8 +285,6 @@ class Form(metaclass=Generic):
         n, *_ = cls.__name__.partition("_")
         if n.startswith("At"):
             n = "@" + util.lowercased(n[2:])
-        if cls.__name__.endswith("_"):
-            n = "$" + util.lowercased(n)
         n = util.lowercased(n)
         return n  #  lowercase x
 
@@ -606,6 +604,4 @@ class AtGraph(Plural):
 class Literal:
     @classmethod
     def type(cls, *x):
-        if x:
-            return cls.default(*x)
-        return cls
+        return cls.default(*x)

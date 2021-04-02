@@ -838,7 +838,9 @@ def test_sig():
     def f(*, bar, foo, **kwargs):
         pass
 
-    assert apps.get_signature(
+    from schemata import compat
+
+    assert compat.get_signature(
         strings.Fstring["the {foo} is {bar}"].schema()["pattern"]
     ) == inspect.signature(f)
 
@@ -861,7 +863,7 @@ def test_sig():
     def f(w: Number, *, z: String["abc"] = "abc"):
         pass
 
-    assert apps.get_signature(T) == inspect.signature(f)
+    assert compat.get_signature(T) == inspect.signature(f)
 
 
 def _typer_doctest():
@@ -913,6 +915,8 @@ def test_parse():
         "pattern": "^this (.+?) is (?P<name>.+?)$",
     }
 
+    assert issubclass(p.py(), typing.Pattern)
+
     assert p(11, name=9) == "this 11 is 9"
 
 
@@ -931,3 +935,34 @@ def test_ensure_mro_c3():
         functools._c3_mro(x)
         for x in (Null, Bool, Integer, Number, String, List, Dict, Dict[List], Json)
     ]
+
+
+def test_typer():
+    nil = "00000000-0000-0000-0000-000000000000"
+
+    class CLI(Dict):
+        arg_number: Number
+        arg_number_min_max: Number.minimum(0).maximum(10)
+        arg_number_clamp_min_max: Number.exclusiveMinimum(0).exclusiveMaximum(10)
+        arg_bool: Bool
+        arg_uuid: Uuid
+        arg_datetime: strings.DateTime
+        arg_enum: Enum["a", "b"]
+        arg_file: File
+        arg_multiple_list: List[Integer]
+        arg_multiple_tuple: Tuple[String, File]
+
+        opt_number: Number[0]
+        opt_number_min_max: Number[0].minimum(0).maximum(10)
+        opt_number_clamp_min_max: Number[0].exclusiveMinimum(0).exclusiveMaximum(10)
+        opt_bool: Bool[True]
+        opt_uuid: Uuid[nil]
+        opt_datetime: strings.DateTime["2020-01-01"]
+        opt_enum: Enum["a", "b", "c"] = "a"
+        opt_file: File["readme.md"]
+        arg_multiple_list: List[Integer] + Default[[1]]
+
+        opt_multiple_tuple: Tuple[String, File] + Default["", "readme.md"]
+
+    with pytest.raises(SystemExit):
+        apps.Typer[CLI].help()
