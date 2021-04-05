@@ -1,5 +1,5 @@
 try:
-    import nox, os, subprocess, functools
+    import nox, os, subprocess, functools, io, pathlib
     CI = "GITHUB_ACTION" in os.environ
     @nox.session(python=False, reuse_venv=not CI)
     def build(session):
@@ -30,7 +30,7 @@ try:
             session.install(*"--ignore-installed --upgrade .[docs]".split())
         with open("conf.py", "w") as file:
             session.run(*"jb config sphinx --toc docs/_toc.yml --config docs/_config.yml .".split(), stdout=file)
-            
+
         session.run(*"jb build --toc docs/_toc.yml --config docs/_config.yml .".split())
 except ModuleNotFoundError:
     pass
