@@ -21,7 +21,7 @@ jobs:
       with:
         python-version: 3.9
     - run: python -m pip install nox
-    - run: nox -s build
+    - run: nox
     - uses: actions/upload-artifact@v2
       with:
         name: schemata dist ${{ github.run_number }}
@@ -44,8 +44,9 @@ jobs:
     - name: Deploy
       uses: JamesIves/github-pages-deploy-action@4.1.0
       with:
-        branch: gh-pages # The branch the action should deploy to.
-        folder: ./_build/html # The folder the action should deploy.  test:
+        branch: gh-pages
+        folder: ./_build/html
+  test:
     name: test ${{ matrix.os }} ${{ matrix.py }}
     needs: [build]
     runs-on: ${{ matrix.os }}-latest
