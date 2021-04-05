@@ -32,11 +32,13 @@ ci = ["codecov"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
+docs = ["jupyter-book"]
 test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
   "jinja2",
   "json-e",
+  "nbval",
   "parse",
   "pytest-cov",
   "pytest",
