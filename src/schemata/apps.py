@@ -55,7 +55,7 @@ class Test(App["unittest.main"]):
 
         try:
 
-            with suppress(SystemExit):
+            with util.suppress(SystemExit):
                 return super().object(**k)
         finally:
             del k["module"].load_tests

@@ -5,68 +5,17 @@
 [cov-badge]: https://img.shields.io/codecov/c/github/deathbeds/schemata?token=hob01Xmh6Z
 [cov]: https://app.codecov.io/gh/deathbeds/schemata
 
-A primary goal of schemata isa to provide a locale-aware trait system for python.
+`schemata` is trait system for Python and IPytohn applications that provide:
 
-    import schemata
+* validation
+* testing strategies
+* interactive user interfaces
+* observable pattern
 
-The trait system provides the following features:
+`schemata`'s type system is composable and expresses the type annotations in the form of json schema. attaching the schema to the types allows different interfaces to construct defaults in aspects like testing, visualization, and verification.
 
-- [x] Validation
-- [x] Defaults
-- [x] Examples
-- [x] Locales
-- [ ] Notification
-- [ ] GUI Generation
-  - [x] IPython
-  - [ ] Widgets
-- [ ] Predefined types
-  - [x] `jsonschema` types
-  - [ ] `jsonschema` formats
-  - [x] Container Types
-- [ ] API Compatability
-  - [ ] dataclasses (maybe attrs)
-  - [ ] traitlets
-  - [ ] pydantic
-  - [ ] param
 
-## from language agnostic to locale aware
-
-`schemata` implements a locale type system beginning with
-URIs and IRIs. It uses symbols as gestures to supplement language
-before building a concrete Python vocabulary.
-
-`schemata` tries to build from a language agnostic interface using symbols and urls.
-The symbols and urls can locale specific type systems.
-
-## supported schema
-
-### `jsonschema`
-
-- [x] jsonschema-core
-- [x] json hyper schema
-- [x] geojson
-- [ ] vega-lite
-- [ ] tableschema
-- [ ] schema.org
-- [ ] notebook format
-
-### python types
-
-- [ ] Instances
-- [ ] Types
-
-Schema must be implemented in two different conformations:
-
-1. A schema is a meta schema that establishes an abstract type. In this case, the schema defines jsonschema types
-that are not compatible with the base json schema.
-2. A schema derives for the a jsonschema object because it's schema conforms the standard json schema.
-
-## architecture
-
-Existing trait libraries use special objects, with custom logic, to acheive the features 
-of traitlet patterns. On the other hand, `schemata` provides concrete python types with traitlet features.
-
-`schemata` uses open source projects to extend the abilities of the library.
+Learn more from the documentation.
 
 ## comparison with other trait libraries
 

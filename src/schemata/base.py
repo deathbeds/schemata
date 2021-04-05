@@ -43,6 +43,12 @@ class Interface:
     def forms(cls, *args):  # pragma: no cover
         pass
 
+    @abc.abstractclassmethod
+    def widget(cls, *args):
+        import IPython
+
+        return IPython.display.DisplayHandle()
+
 
 class Generic(Interface, abc.ABCMeta):
     # the generic base case is the metaclass for all of schemata's typess and protocols
@@ -149,7 +155,7 @@ class Generic(Interface, abc.ABCMeta):
         return Generic.Pipe[cls, object]
 
     def __lshift__(cls, object):
-        return Generic.Pipe[cls, cls.Do[object]]
+        return cls >> cls.Do[object]
 
     def __hash__(cls):
         return hash(cls.schema().hashable())
@@ -223,7 +229,7 @@ class Generic(Interface, abc.ABCMeta):
 
             @functools.wraps(v)
             def call(*x):
-                return cls + v[x[0]]
+                return cls + v.type(*x)
 
             return call
         return object.__getattribute__(cls, k)
@@ -246,7 +252,7 @@ class Generic(Interface, abc.ABCMeta):
     def type(cls, **kwargs):
         if not isinstance(cls, tuple):
             cls = (cls,)
-        return type(cls[0].__name__, cls, kwargs)
+        return type(getattr(cls[0], "__name__", repr(cls[0])), cls, kwargs)
 
 
 class Form(metaclass=Generic):
@@ -545,6 +551,12 @@ class ContentMediaType(Form):
         for e in cls.FileExtension.forms(cls) if t else ():
             __import__("mimetypes").add_type(t, e)
 
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        return {
+            "text/plain": str(self),
+            ContentMediaType.forms(self): self,
+        }, {}
+
 
 class Examples(Plural):
     pass
@@ -605,3 +617,24 @@ class Literal:
     @classmethod
     def type(cls, *x):
         return cls.default(*x)
+
+
+class UpdateDisplay:
+    def _update_display(self):
+        if hasattr(self, "_display_handle"):
+            try:
+                d, md = self._repr_mimebundle_(None, None)
+                self._display_handle.update(d, metadata=md, raw=True)
+            except AttributeError:
+                self._display_handle.update({"text/plain": str(self)}, raw=True)
+
+    def _ipython_display_(self):
+        import IPython
+
+        if not hasattr(self, "_display_handle"):
+            self._display_handle = IPython.display.DisplayHandle()
+        try:
+            d, md = self._repr_mimebundle_(None, None)
+            self._display_handle.display(d, metadata=md, raw=True)
+        except AttributeError:
+            self._display_handle.display({"text/plain": str(self)}, raw=True)

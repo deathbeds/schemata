@@ -11,13 +11,5 @@ from .exceptions import ConsentException, ValidationError, ValidationErrors
 from . import apps, numbers, strings, ui  # isort:skip
 
 
-def load_ipython_extension(shell):  # pragma: no cover
-    from .ipython import load_ipython_extension
-
-    load_ipython_extension(shell)
-
-
-def unload_ipython_extension(shell):  # pragma: no cover
-    from .ipython import unload_ipython_extension
-
-    unload_ipython_extension(shell)
+if "IPython" in __import__("sys").modules:
+    from .compat.ipython import load_ipython_extension, unload_ipython_extension

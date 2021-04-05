@@ -1,8 +1,8 @@
-import schemata.app
-
-from schemata import *
-import rich.markdown
 import pandas
+import rich.markdown
+
+import schemata.app
+from schemata import *
 
 t = Dict[dict(name=S.String > 3)]
 t >>= Jinja[
@@ -20,4 +20,4 @@ t >>= rich.print
 if __name__ == "__main__":
     import schemata.app
 
-    schemata.app.Application[t].instance()
+    schemata.app.Application[t].object()

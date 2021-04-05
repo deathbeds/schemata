@@ -1,0 +1,8 @@
+file: readme
+sections:
+- file: docs/schemata-types
+  sections:
+  - file: docs/coverage/index
+    sections: []
+  - file: docs/extras/ipython-extension
+    sections: []

@@ -7,7 +7,7 @@ import sys
 import typing
 import uuid
 
-from . import base, exceptions, util
+from . import base, exceptions, mediatypes, util
 from .base import Const, Default, Generic
 
 
@@ -30,6 +30,10 @@ class String(base.Literal, base.Type["string"], str):
 
     def loads(self):
         return self
+
+    @classmethod
+    def title(cls, x):
+        return cls + cls.Title[x]
 
 
 class Number(base.Literal, base.Type["number"], float):
@@ -235,7 +239,7 @@ class Juxt(Instance):
         return t(util.call(x, *args, **kwargs) for x in v)
 
 
-class Dict(base.Type["object"], dict):
+class Dict(base.Type["object"], dict, base.UpdateDisplay):
     def py(cls):
         from . import apps
 
@@ -327,6 +331,9 @@ class Dict(base.Type["object"], dict):
         x, *_ = args
         if isinstance(x, dict):
             return cls.properties(x)
+
+        if issubclass(x, cls.ContentMediaType):
+            return cls + x
         if isinstance(x, tuple):
             if len(x) <= 2:
                 cls = cls + cls.Keys[x[0]]
@@ -415,10 +422,7 @@ class Enum(base.Plural, base.Type):
         # self.value = cls.validate(self)
         # cls._attach_parent(self)
         enum = Enum.forms(cls)
-        self = cls.validate(base.Type(args[0] if args else enum[0]))
-        if len(enum) is 1 and isinstance(*enum, dict):
-            return enum[0].get(self)
-        return self
+        return cls.validate(base.Type(args[0] if args else enum[0]))
 
     def py(cls):
         v = Enum.forms(cls)
@@ -554,7 +558,7 @@ class If(base.Form):
 
 class Json(
     List ^ Dict ^ String ^ Number ^ Bool ^ Null,
-    base.Form.ContentMediaType["application/json"],
+    mediatypes.Json,
 ):
     pass
 

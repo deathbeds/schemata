@@ -10,4 +10,5 @@ ValidationErrors = (
     ValidationError,
     __import__("jsonschema").ValidationError,
     ValueError,
+    ConsentException,
 )

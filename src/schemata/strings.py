@@ -1,6 +1,6 @@
 import datetime
 
-from . import base, types
+from . import base, mediatypes, types
 
 
 # set default datetimes to now
@@ -106,7 +106,7 @@ class Jinja(types.Instance["jinja2.Template"]):
 
 class Toml(
     types.String,
-    types.String.ContentMediaType["application/toml"],
+    mediatypes.Toml,
     types.String.FileExtension[".toml"],
 ):
     def loads(object):
@@ -119,7 +119,7 @@ class Toml(
 
 class Yaml(
     types.String,
-    types.String.ContentMediaType["text/x-yaml"],
+    mediatypes.Yaml,
     types.String.FileExtension[".yaml", ".yml"],
 ):
     def loads(object):
@@ -132,7 +132,7 @@ class Yaml(
 
 class JsonString(
     types.String,
-    types.String.ContentMediaType["application/json"],
+    mediatypes.Json,
     types.String.FileExtension[".json", ".ipynb"],
 ):
     def loads(object):
@@ -146,7 +146,7 @@ class JsonString(
 
 class Markdown(
     types.String,
-    types.String.ContentMediaType["text/markdown"],
+    mediatypes.Markdown,
     types.String.FileExtension[".md"],
 ):
     _repr_markdown_ = str
@@ -154,7 +154,11 @@ class Markdown(
 
 class Html(
     types.String,
-    types.String.ContentMediaType["text/html"],
+    mediatypes.Html,
     types.String.FileExtension[".html"],
 ):
     _repr_html_ = str
+
+
+class Svg(types.String, mediatypes.Svg, types.String.FileExtension[".svg"]):
+    _repr_svg_ = str
