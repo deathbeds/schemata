@@ -51,6 +51,12 @@ def filter_map(self, *args, **kwargs):
     return (args + (None,))[0]
 
 
+def is_empty_slice(x):
+    if isinstance(x):
+        return x.start is x.stop is x.step is None
+    return False
+
+
 def forward_strings(*args):
     return tuple(Forward(x)() if isinstance(x, str) else x for x in args)
 
@@ -221,8 +227,8 @@ class Schema(dict):
 
                 if k == "enum":
                     v = d[k]
-                    if len(v) is 1 and isinstance(*v, dict):
-                        d[k] = list(*v)
+                    if isinstance(v, dict):
+                        d[k] = list(v.values())
             return d
         if isinstance(self, (tuple, list)):
             return list(map(Schema.ravel, self))

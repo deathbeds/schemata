@@ -112,9 +112,6 @@ class LiteralTest(unittest.TestCase):
             E("c")
         assert E("b") == "b"
 
-        assert Enum[dict(a=1)].choices() == ("a",)
-        assert Enum[dict(a=1)]("a") == 1
-
         assert Enum["a"]("a") == "a"
 
         with raises:
@@ -306,8 +303,9 @@ class ExoticTest(unittest.TestCase):
     def draw_enum(
         draw, a=examples, i=hypothesis.strategies.sampled_from([0, 1, 5, 20])
     ):
+        kind = draw(a)
 
-        return Enum[tuple(draw(draw(a).strategy()) for _ in range(draw(i)))]
+        return kind + Enum[tuple(draw(kind.strategy()) for _ in range(draw(i)))]
 
     draw_enum = draw_enum()
 
@@ -324,7 +322,7 @@ class ExoticTest(unittest.TestCase):
     #     assert t() is t.choices()[0]
 
     @hypothesis.given(
-        (examples | draw_enum).flatmap(
+        (examples).flatmap(
             lambda x: globals().__setitem__("G", x)
             or Not[x].strategy().map(lambda y: (x, y))
         )
@@ -912,7 +910,7 @@ def test_parse():
 
     assert p(11, name=9).schema().ravel() == {
         "type": "string",
-        "pattern": "^this (.+?) is (?P<name>.+?)$",
+        "pattern": "\\Athis (.+?) is (?P<name>.+?)\\Z",
     }
 
     assert issubclass(p.py(), typing.Pattern)

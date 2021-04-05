@@ -243,14 +243,14 @@ class Dict(base.Type["object"], dict, base.UpdateDisplay):
     def py(cls):
         from . import apps
 
-        k, v = map(
-            get_py,
-            (
-                base.Keys.forms(cls) or str,
-                base.AdditionalProperties.forms(cls) or typing.Any,
-            ),
-        )
-        return typing.Dict[k, v]
+        return typing.Dict[
+            get_py(
+                (
+                    base.Keys.forms(cls) or str,
+                    base.AdditionalProperties.forms(cls) or typing.Any,
+                )
+            )
+        ]
 
     def __setitem__(self, k, v):
         self.update({k: v})
@@ -332,14 +332,15 @@ class Dict(base.Type["object"], dict, base.UpdateDisplay):
         if isinstance(x, dict):
             return cls.properties(x)
 
-        if issubclass(x, cls.ContentMediaType):
+        if isinstance(x, type) and issubclass(x, cls.ContentMediaType):
             return cls + x
         if isinstance(x, tuple):
             if len(x) <= 2:
                 cls = cls + cls.Keys[x[0]]
 
             if len(x) == 2:
-                cls = cls.additionalProperties(x)
+                if x[1] is not None:
+                    cls = cls.additionalProperties(x[1])
 
             return cls
         return cls.additionalProperties(x)
@@ -421,14 +422,11 @@ class Enum(base.Plural, base.Type):
     def object(cls, *args, **kwargs):
         # self.value = cls.validate(self)
         # cls._attach_parent(self)
-        enum = Enum.forms(cls)
-        return cls.validate(base.Type(args[0] if args else enum[0]))
+        return super().object(cls.validate(args[0] if args else Enum.forms(cls)[0]))
 
     def py(cls):
-        v = Enum.forms(cls)
-        if not isinstance(v, dict):
-            v = dict(zip(v, v))
-        return enum.Enum(cls.__name__, v, type=str)
+        forms = Enum.forms(cls)
+        return enum.Enum(cls.__name__, dict(zip(forms, forms)))
 
     @classmethod
     def choices(cls):
