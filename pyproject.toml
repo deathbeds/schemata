@@ -36,6 +36,7 @@ docs = ["jupyter-book"]
 test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
+  "ipywidgets",
   "jinja2",
   "json-e",
   "nbval",
