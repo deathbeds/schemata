@@ -11,9 +11,7 @@ try:
 
     @nox.session(python=False, reuse_venv=not CI)
     def build(session):
-        try:
-            import flit
-        except:
+        if CI:
             session.install(*"--upgrade pip wheel setuptools flit".split())
         "SOURCE_DATE_EPOCH=$(git log -1 --format=%ct)",
         env = dict(
@@ -23,11 +21,9 @@ try:
         )
         session.run(*"flit build".split(), env=env)
 
-    @nox.session(python=CI, reuse_venv=not CI)
+    @nox.session(python=False, reuse_venv=not CI)
     def test(session):
-        try:
-            import pytest
-        except:
+        if CI:
             session.install(*"--ignore-installed --upgrade .[test,ci]".split())
         session.run(
             *"pytest -vv --pyargs . --nbval -pno:importnb --durations=5 --cov=schemata --cov-report=term-missing:skip-covered --no-cov-on-fail".split()
