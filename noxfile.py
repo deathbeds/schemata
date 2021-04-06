@@ -43,6 +43,7 @@ try:
             )
 
         session.run(*"jb build --toc docs/_toc.yml --config docs/_config.yml .".split())
+        session.run("touch _build/html/.nojekyll")
 
 
 except ModuleNotFoundError:
