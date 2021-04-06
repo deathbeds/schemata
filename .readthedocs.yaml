@@ -1,5 +1,5 @@
 version: 2
-
+formats: all
 python:
   install:
     - method: pip
@@ -9,4 +9,4 @@ python:
         - tests
 
 sphinx:
-  configuration: conf.py        
+  configuration: conf.py
