@@ -55,5 +55,5 @@ def get_typer_parameter(p):
         )
     except ValueError:
         return inspect.Parameter(
-            p.name, p.kind, annotation=a, **k)
+            p.name, p.kind, annotation=a, **k
         )
