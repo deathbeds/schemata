@@ -6,7 +6,7 @@ import subprocess
 
 with __import__("contextlib").suppress(ModuleNotFoundError):
 
-    import nox # isort:skip
+    import nox  # isort:skip
 
     CI = "GITHUB_ACTION" in os.environ or "READTHEDOCS" in os.environ
 
@@ -60,7 +60,11 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
                 *"jb config sphinx --toc docs/_toc.yml --config docs/_config.yml .".split(),
                 stdout=file
             )
-            session.run(*"black conf.py".split())
+
+        with open("conf.py", "a") as file:
+            file.write("\nbibtex_bibfiles=[]\n")
+
+        session.run(*"black conf.py".split())
 
 
 def task_download_schema():

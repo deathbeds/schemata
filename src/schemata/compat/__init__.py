@@ -7,6 +7,7 @@ from .. import base
 
 Pattern = type(re.compile(""))
 
+
 @functools.singledispatch
 def get_signature(x):
     return inspect.signature(x)

@@ -252,7 +252,6 @@ exclude_patterns = [
     "docs/_build/html/_panels_static/panels-variables.06eb56fa6e07937060861dad626602ad.css",
     "docs/_config.yml",
     "docs/_toc.yml",
-    "docs/conf.py",
     "docs/coverage/coverage_html.js",
     "docs/coverage/favicon_32.png",
     "docs/coverage/jquery.ba-throttle-debounce.min.js",
@@ -292,6 +291,7 @@ exclude_patterns = [
     "docs/coverage/style.css",
     "docs/examples/small_program.py",
     "docs/extras/.ipynb_checkpoints/*",
+    "docs/requirements.txt",
     "docs/xxx.sqlite",
     "jupyter_execute/docs/extras/ipython-extension.ipynb",
     "jupyter_execute/docs/extras/ipython-extension.py",
@@ -465,3 +465,5 @@ nb_render_priority = {
 numfig = True
 panels_add_bootstrap_css = False
 pygments_style = "sphinx"
+
+bibtex_bibfiles = []
