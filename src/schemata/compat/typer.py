@@ -49,7 +49,11 @@ def get_typer_parameter(p):
 
             if "description" in s:
                 k["help"] = s["description"]
-
-    return inspect.Parameter(
-        p.name, p.kind, annotation=a, default=f(k.pop("default"), **k)
-    )
+    try:
+        return inspect.Parameter(
+            p.name, p.kind, annotation=a, default=f(k.pop("default"), **k)
+        )
+    except ValueError:
+        return inspect.Parameter(
+            p.name, p.kind, annotation=a, **k)
+        )
