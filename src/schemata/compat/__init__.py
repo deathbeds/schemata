@@ -5,7 +5,7 @@ import re
 
 from .. import base
 
-Pattern = getattr(re, "Pattern", re._pattern_type)
+Pattern = type(re.compile(""))
 
 @functools.singledispatch
 def get_signature(x):
