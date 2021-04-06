@@ -7,3 +7,6 @@ python:
       extra_requirements:
         - docs
         - tests
+
+sphinx:
+  configuration: conf.py        
