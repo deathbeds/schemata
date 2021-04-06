@@ -9,4 +9,4 @@ docs/coverage
 xxx.sqlite
 settings.json
 dist
-conf.py
+jupyter_execute

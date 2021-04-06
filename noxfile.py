@@ -1,13 +1,14 @@
-try:
-    import functools
-    import io
-    import os
-    import pathlib
-    import subprocess
+import functools
+import io
+import os
+import pathlib
+import subprocess
 
-    import nox
+with __import__("contextlib").suppress(ModuleNotFoundError):
 
-    CI = "GITHUB_ACTION" in os.environ
+    import nox # isort:skip
+
+    CI = "GITHUB_ACTION" in os.environ or "READTHEDOCS" in os.environ
 
     @nox.session(python=False, reuse_venv=not CI)
     def build(session):
@@ -35,19 +36,21 @@ try:
         try:
             import jupyter_book
         except:
-            session.install(*"--ignore-installed --upgrade .[docs]".split())
-        with open("conf.py", "w") as file:
-            session.run(
-                *"jb config sphinx --toc docs/_toc.yml --config docs/_config.yml .".split(),
-                stdout=file
-            )
-
+            if CI:
+                session.install(*"--ignore-installed --upgrade .[docs]".split())
+            else:
+                develop(session)
         session.run(*"jb build --toc docs/_toc.yml --config docs/_config.yml .".split())
         pathlib.Path("_build/html/.nojekyll").touch()
 
+    @nox.session(python=False)
+    def develop(session):
+        try:
+            import flit
+        except:
+            session.install("flit")
+        session.run(*"flit install -s".split())
 
-except ModuleNotFoundError:
-    pass
 
 
 def task_download_schema():
