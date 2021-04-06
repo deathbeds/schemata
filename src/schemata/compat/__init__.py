@@ -5,6 +5,7 @@ import re
 
 from .. import base
 
+Pattern = getattr(re, "Pattern", re._pattern_type)
 
 @functools.singledispatch
 def get_signature(x):
@@ -17,7 +18,7 @@ def _get_signature_from_schema(x: base.Generic):
 
 
 @get_signature.register
-def _get_signature_from_schema(x: re.Pattern):
+def _get_signature_from_schema(x: Pattern):
     return inspect.Signature(
         [
             # inspect.Parameter("string", inspect.Parameter.POSITIONAL_ONLY),
