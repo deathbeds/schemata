@@ -40,7 +40,9 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
                 session.install(*"--ignore-installed --upgrade .[docs]".split())
             else:
                 develop(session)
-        session.run(*"jb build --toc docs/_toc.yml --config docs/_config.yml .".split())
+        confpy(session)
+        # use sphinx for the build to ensure we can work on readthedocs
+        session.run(*"sphinx-build . _build/html".split())
         pathlib.Path("_build/html/.nojekyll").touch()
 
     @nox.session(python=False)
@@ -51,6 +53,14 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
             session.install("flit")
         session.run(*"flit install -s".split())
 
+    @nox.session(python=False)
+    def confpy(session):
+        with open("conf.py", "w") as file:
+            session.run(
+                *"jb config sphinx --toc docs/_toc.yml --config docs/_config.yml .".split(),
+                stdout=file
+            )
+            session.run(*"black conf.py".split())
 
 
 def task_download_schema():
