@@ -1,265 +1,16 @@
-"""the base types for schemata
+"""base metaclasses, forms, and types for schemata
 
-in this module we introduce the schemata type api
+this module defines the core type constructors for schemata. it does not export any
+actual type implementations, these are composed in the types module
 """
 
 import abc
 import collections
 import functools
 import inspect
-import sys
-import types
 import typing
-from contextlib import suppress
 
-try:
-    from typing import _ForwardRef as ForwardRef
-
-    _root = True  # pragma: no cover
-except ImportError:
-    from typing import ForwardRef
-
-    _root = False  # pragma: no cover
-
-Path = type(__import__("pathlib").Path())
-
-from .signatures import Signature
-
-
-def identity(*args, **kwargs):
-    return (args + (None,))[0]
-
-
-def filter_map(self, *args, **kwargs):
-    if self.start is not None:
-        args = (filter(self.start, *args),)
-
-    if self.stop is not None:
-        args = (map(self.stop, *args),)
-
-    if self.step is not None:
-        args = (self.step(*args),)
-    return (args + (None,))[0]
-
-
-class ConsentException(BaseException):
-    pass
-
-
-# a universal call (functor) method for calling schemata objects.
-def call(f, *args, **kwargs):
-
-    # lists and dicts dont init properly, mebbe they do now,
-    # this function exists because of each cases.
-    if callable(f):
-        if hasattr(f, "object"):
-            return f.object(*args, **kwargs)
-
-        return f(*args, **kwargs)
-
-    if isinstance(f, str):
-        return Forward(f)()(*args, **kwargs)
-    if isinstance(f, slice):
-        return filter_map(f, *args, **kwargs)
-
-    return f
-
-
-class Forward(ForwardRef, _root=_root):
-    # an overloaded forward reference method that allows both strings and literals.
-    def __new__(cls, object):
-        # only check string Forward References.
-        if isinstance(object, str):
-            self = super().__new__(cls)
-            self.__init__(object)
-            return self
-        return object
-
-    def consent(self):
-        # it would be dangerous too allow any forward reference anytime.
-        # consent means that the end user has imported the namespace in sys.modules
-        # this will indicate consent
-        if isinstance(self.__forward_arg__, str):
-            module = self.__forward_arg__.partition(".")[0]
-            if module not in sys.modules:
-                raise ConsentException(
-                    f"Import {module} to consent to making forward references to its attributes."
-                )
-
-    def _evaluate(self, force=False, globals=None, locals=None):
-        if self.__forward_evaluated__:
-            return self.__forward_value__
-        if not globals or locals:
-            # we've redirected our interests to explicit forward reference off of sys.modules.
-            # no errors, just False exceptions
-            globals = locals = sys.modules
-        self.consent()
-        self.__forward_value__ = eval(self.__forward_code__, globals, locals)
-        self.__forward_evaluated__ = True
-        return self.__forward_value__
-
-    def object(self):
-        return self._evaluate()
-
-    __call__ = object
-
-
-del _root, ForwardRef
-
-
-def lowercased(x):
-    return x[0].lower() + x[1:] if x else x
-
-
-class ValidationError(BaseException):
-    pass
-
-
-ValidationErrors = (
-    ValidationError,
-    __import__("jsonschema").ValidationError,
-    ValueError,
-)
-
-
-class Schema(dict):
-    def __init__(self, object=None):
-        if isinstance(object, type):
-            object = getattr(object, "__annotations__", {})
-
-        super().__init__(object)
-
-    def merge(*args):
-        next = {}
-
-        types = dict(
-            **{
-                x.form(): {}
-                for x in Generic.Mapping.__subclasses__()
-                if x is not Generic.Mapping
-            },
-            **{
-                x.form(): ()
-                for x in Generic.Plural.__subclasses__()
-                + Generic.Nested.__subclasses__()
-                if x is not (Generic.Plural, Generic.Nested)
-            },
-        )
-        for x in args:
-            for k, v in Schema(x).items():
-                if k in types:
-                    next.setdefault(k, types[k])
-                    if isinstance(types[k], dict):
-                        next[k].update(v)
-                    elif isinstance(next[k], tuple):
-                        next[k] += v
-                else:
-                    next[k] = v
-
-        for k in sorted(next):
-            if k in types:
-                v = next[k]
-                if isinstance(v, dict):
-                    o = sorted(v)
-                    v = dict(zip(o, map(v.get, o)))
-
-        return Schema(next)
-
-    def new(x, pointer=None):
-        if pointer is None:
-            pointer = ""
-        import jsonpointer
-
-        t = None
-        schema = jsonpointer.resolve_pointer(x, pointer)
-        types = {
-            y.form(): y
-            for x in (Generic.Form, Generic.Plural, Generic.Mapping, Generic.Nested)
-            for y in x.__subclasses__()
-        }
-        m = dict(
-            boolean=Generic.Bool,
-            null=Generic.Null,
-            integer=Generic.Integer,
-            number=Generic.Number,
-            array=Generic.List,
-            object=Generic.Dict,
-        )
-        for k, v in schema.items():
-            if k in types:
-                if k == "type":
-                    v = m.get(k, v)
-
-                if t is None:
-                    t = types[k][v]
-                else:
-                    t = t + types[k][v]
-        return t
-
-    def validate(self, x):
-        import jsonschema
-
-        jsonschema.Draft7Validator(
-            self.ravel(), format_checker=jsonschema.draft7_format_checker
-        ).validate(x)
-        return x
-
-    def ravel(self):
-        if isinstance(self, typing.Pattern):
-            return self.pattern
-        if isinstance(self, dict):
-            d = Schema(zip(self, map(Schema.ravel, self.values())))
-            for k in list(d):
-                if callable(d[k]):
-                    del d[k]
-
-                if k == "enum":
-                    v = d[k]
-                    if len(v) is 1 and isinstance(*v, dict):
-                        d[k] = list(*v)
-            return d
-        if isinstance(self, (tuple, list)):
-            return list(map(Schema.ravel, self))
-
-        if isinstance(self, Generic):
-            return Schema.ravel(self.schema())
-
-        return self
-
-    def __contains__(self, x):
-        if isinstance(x, dict):
-            for k, v in x.items():
-                if self.get(k, object()) != v:
-                    break
-            else:
-                return True
-            return False
-
-        return dict.__contains__(self, x)
-
-    def hashable(x, t=None):
-        if t is None:
-            t = ()
-        if isinstance(x, type):
-            if x not in t:
-                t += (x,)
-            return x
-        if isinstance(x, dict):
-            if not isinstance(x, Schema):
-                x = Schema(x)
-
-            return tuple((k, Schema.hashable(v, t)) for k, v in x.items())
-
-        if isinstance(x, slice):
-            return slice, x.start, x.stop, x.step
-
-        if isinstance(x, list):
-            x = tuple(x)
-
-        if isinstance(x, tuple):
-            return tuple(Schema.hashable(x, t) for x in x)
-
-        return x
+from . import exceptions, util
 
 
 # the Interface represents all of the bespoke type api features we provide through schemata.
@@ -281,10 +32,22 @@ class Interface:
         pass
 
     @abc.abstractclassmethod
-    def pytype(cls, *args):  # pragma: no cover
-        if args:
-            return type(*args)
+    def py(cls):  # pragma: no cover
         return typing.Any
+
+    @abc.abstractclassmethod
+    def form(cls):  # pragma: no cover
+        pass
+
+    @abc.abstractclassmethod
+    def forms(cls, *args):  # pragma: no cover
+        pass
+
+    @abc.abstractclassmethod
+    def widget(cls, *args):
+        import IPython
+
+        return IPython.display.DisplayHandle()
 
 
 class Generic(Interface, abc.ABCMeta):
@@ -307,7 +70,7 @@ class Generic(Interface, abc.ABCMeta):
             is_list = any(cls.List in x.__mro__ for x in bases)
             is_dict = any(cls.Dict in x.__mro__ for x in bases)
             if is_list or is_dict:
-                if not (cls.Properties.form(cls) or cls.Items.form(cls)):
+                if not (cls.Properties.forms(cls) or cls.Items.forms(cls)):
                     p.update(kwargs.pop(ANNOTATIONS, {}))
         except AttributeError:
             # early on in the module loading we don't have access to List or Dict
@@ -318,7 +81,7 @@ class Generic(Interface, abc.ABCMeta):
 
         # we always set a new annotation on the class to avoid and unexpected
         # inheritence confusion.
-        kwargs[ANNOTATIONS] = Schema(kwargs.get(ANNOTATIONS, {}))
+        kwargs[ANNOTATIONS] = util.Schema(kwargs.get(ANNOTATIONS, {}))
 
         for k in tuple(
             k
@@ -335,7 +98,7 @@ class Generic(Interface, abc.ABCMeta):
                 if k in kwargs:
                     f = kwargs[k]
                     p[k] = p[k] + cls.Default[f]
-                    if isinstance(f, types.FunctionType):
+                    if isinstance(f, __import__("types").FunctionType):
                         s = inspect.signature(f)
                         for a in s.parameters.values():
                             a = a.annotation
@@ -346,7 +109,7 @@ class Generic(Interface, abc.ABCMeta):
                                     d[k].add(a)
 
                 else:
-                    if not issubclass(p[k], Default):
+                    if not issubclass(p[k], cls.Default):
                         r += (k,)
 
             t = (cls.Properties[p],)
@@ -365,13 +128,13 @@ class Generic(Interface, abc.ABCMeta):
         # attach all new types to the Generic so they are easy to access
         setattr(Generic, cls.__name__, getattr(Generic, cls.__name__, cls))
 
-        with suppress(AttributeError):
-            cls.__annotations__ = Schema.merge(*cls.__mro__)
+        with util.suppress(AttributeError):
+            cls.__annotations__ = util.Schema.merge(*cls.__mro__)
 
         if is_list and t is not None:
             return cls[Generic.type((cls.Dict,) + t)]
 
-        with suppress(NameError):
+        with util.suppress(NameError):
             cls.__init_subclass__()
         return cls
 
@@ -382,20 +145,17 @@ class Generic(Interface, abc.ABCMeta):
                 return cls
         return cls.type(x)
 
-    # here we add symbolic methods to the type for easier composition
-    # we take advantage of the getitem method for this reason
     def __add__(cls, object):
         return Generic.type((cls, object))
 
     def __sub__(cls, object):
         return cls.AllOf[cls, cls.Not[object]]
 
-    # bit shift operators
     def __rshift__(cls, object):
         return Generic.Pipe[cls, object]
 
     def __lshift__(cls, object):
-        return Generic.Pipe[cls, cls.Do[object]]
+        return cls >> cls.Do[object]
 
     def __hash__(cls):
         return hash(cls.schema().hashable())
@@ -404,7 +164,7 @@ class Generic(Interface, abc.ABCMeta):
         t = type.__subclasscheck__(cls, x)
         if t:
             return True
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             a, b = x.schema(), cls.schema()
             if any(a) and any(b):
                 if a in b:
@@ -416,12 +176,17 @@ class Generic(Interface, abc.ABCMeta):
         try:
             cls.validate(object)
             return True
-        except ValidationErrors:
+        except exceptions.ValidationErrors:
             return False
 
     def __eq__(cls, object):
         if isinstance(object, Generic):
             return cls.schema() == object.schema()
+        with util.suppress(AttributeError):
+            if cls.Py in cls.__mro__:
+                with util.suppress(IndexError):
+                    return object == cls.Py.object.__func__(cls)
+
         return type.__eq__(cls, object)
 
     # conditional operations
@@ -464,7 +229,7 @@ class Generic(Interface, abc.ABCMeta):
 
             @functools.wraps(v)
             def call(*x):
-                return cls + v[x[0]]
+                return cls + v.type(*x)
 
             return call
         return object.__getattribute__(cls, k)
@@ -477,30 +242,17 @@ class Generic(Interface, abc.ABCMeta):
     def example(cls):
         return cls.strategy().example()
 
-    # generate all the children of a schemata type
-    def children(cls, deep=True):  # pragma: no cover
-
-        if not deep:
-            yield from cls.__subclasses__()
-            return
-        yield cls
-
-        for cls in cls.__subclasses__():
-            if hasattr(cls, "children"):
-                if callable(cls.children):
-                    yield from cls.children()
-
-    def attach_parent(cls, x):
+    def _attach_parent(cls, x):
         if isinstance(x, (type(None), bool)):
             return x
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             x.parent = cls
         return x
 
     def type(cls, **kwargs):
         if not isinstance(cls, tuple):
             cls = (cls,)
-        return type(cls[0].__name__, cls, kwargs)
+        return type(getattr(cls[0], "__name__", repr(cls[0])), cls, kwargs)
 
 
 class Form(metaclass=Generic):
@@ -516,37 +268,40 @@ class Form(metaclass=Generic):
 
     def __new__(cls, *args, **kwargs):
         # schemata types bubble up instances from the bottom rather than top down.
-        with suppress(NotImplementedError):
+        with util.suppress(NotImplementedError):
             return cls.object(*args, **kwargs)
         return cls.validate(*args)
 
     # the form makes it easy to create new types from class definitions,
     # the annotations take on the form of the cls which defaults to the lowercase name
-    def type(cls, object=None, **kwargs):
-        if isinstance(object, list):
-            object = tuple(object)
+    def type(cls, *args, **kwargs):
+        if not (args or kwargs):
+            return cls
+
+        if isinstance(*args, list):
+            args = (tuple(*args),)
         return Generic.type(
             cls,
-            __annotations__={cls.form(): object},
+            __annotations__={cls.form(): util.identity(*args)},
             **kwargs,
         )
 
     @classmethod
-    def form(cls, *args):  # pragma: no cover
+    def form(cls):
         n, *_ = cls.__name__.partition("_")
         if n.startswith("At"):
-            n = "@" + lowercased(n[2:])
-        if cls.__name__.endswith("_"):
-            n = "$" + lowercased(n)
-        n = lowercased(n)
-        if not args:
-            return n  #  lowercase x
+            n = "@" + util.lowercased(n[2:])
+        n = util.lowercased(n)
+        return n  #  lowercase x
+
+    @classmethod
+    def forms(cls, *args):
         x, *_ = args
         if not isinstance(x, type):
             x = type(x)
         if x is not Generic:
-            with suppress(AttributeError):
-                return x.schema().get(n)
+            with util.suppress(AttributeError):
+                return x.schema().get(cls.form())
 
     @classmethod
     def strategy(cls):
@@ -565,95 +320,63 @@ class Form(metaclass=Generic):
 
 _type_mapping = dict(number=float, integer=int, string=str, array=list, object=dict)
 _default_mapping = dict(null=type(None), boolean=bool)
+_python_mapping = {**_type_mapping, **_default_mapping}
 
 
 class Type(Form):
+    @classmethod
+    def concrete_type(cls):
+        return _python_mapping.get(cls.Type.forms(cls))
+
+    def py(cls):  # pragma: no cover
+        return cls.concrete_type()
+
     def __init__(self, *args, **kwargs):
         # short circuit initialization below this point and execute it ourselves
         # in the object methods
         pass
 
-    @classmethod
-    def type(cls, *args):
-        cls = super().type(*args)
-        e = _type_mapping.get(Type.form(cls)) or ()
-        if e:
-            return Generic.type((cls, e))
-        return cls
-
     def object(cls, *args, **kwargs):
         if not (args or kwargs) and issubclass(cls, cls.Default):
-            f = cls.Default.form(cls)
+            f = cls.Default.forms(cls)
             if callable(f):
                 args, kwargs = (f(*args, **kwargs),), {}
 
         if (args or kwargs) and not issubclass(cls, cls.Dict):
             args, kwargs = (cls.validate(*args, **kwargs),), {}
 
-        pytype = cls.pytype()
-        if pytype in {type(None), bool}:
+        t = cls.concrete_type()
+        if t in {type(None), bool}:
             if not args:
                 try:
                     args = (super().object(),)
                 except:
-                    args = (pytype(),)
+                    args = (t(),)
             return args[0]
-        with suppress(AttributeError):
+        with util.suppress(AttributeError):
             if not (args or kwargs):
                 args = (super().object(),)
-        if pytype is not None:
-            self = pytype.__new__(cls, *args, **kwargs)
+        if t is not None:
+            self = t.__new__(cls, *args, **kwargs)
             try:
-                pytype.__init__(self, *args, **kwargs)
+                t.__init__(self, *args, **kwargs)
             except TypeError:
-                pytype.__init__(self)
+                t.__init__(self)
             return self
         return args[0]
-
-    @classmethod
-    def pytype(cls):
-        return {**_type_mapping, **_default_mapping}.get(cls.Type.form(cls))
-
-
-class Sys(Type):
-    """ reference to python objects."""
-
-    def object(cls, *args, **kwargs):
-        return cls.pytype()
-
-    def validate(cls, *args):
-        return args
-
-    def type(cls, *args, **kwargs):
-        if not args:
-            return cls
-        x, *_ = args
-
-        cls = cls + cls.AtType[x]
-        with suppress(ConsentException, ValueError, TypeError):
-            t = cls.pytype()
-            cls.__signature__ = inspect.signature(t)
-
-        return cls
-
-    def pytype(cls):
-        x, *_ = cls.AtType.form(cls)
-        if isinstance(x, str):
-            x = Forward(x)()
-        return x
 
 
 class Const(Form):
     # a constant
     def object(cls, *args, **kwargs):
-        return Const.form(cls)
+        return Const.forms(cls)
 
 
 class Default(Form):
     def object(cls, *args, **kwargs):
-        x = Default.form(cls)
+        x = Default.forms(cls)
         if callable(x):
-            return call(x, *args, **kwargs)
+            return util.call(x, *args, **kwargs)
         return x
 
 
@@ -671,9 +394,247 @@ class Plural(Form):
         return Form.type.__func__(cls, *args)
 
     @classmethod
-    def form(cls, *args):  # pragma: no cover
-        return super().form(*args) or ()
+    def forms(cls, *args):  # pragma: no cover
+        return super().forms(*args) or ()
 
 
 class AtType(Plural):
     pass
+
+
+class Numeric(Form):
+    pass
+
+
+class Nested(Plural):
+    @classmethod
+    def type(cls, object):
+        x = super().type(object)
+        v = ()
+        for y in cls.forms(x):
+            if issubclass(y, cls):
+                v += cls.forms(y)
+            else:
+                v += (y,)
+        x.__annotations__[cls.form()] = v
+        return x
+
+
+class Value(Plural):
+    @classmethod
+    def form(cls):
+        return "value"
+
+
+class Mapping(Form):
+    @classmethod
+    def forms(cls, *args):  # pragma: no cover
+        return super().forms(*args) or {}
+
+
+# json schema formes
+
+
+class MinLength(Numeric):
+    pass
+
+
+class MaxLength(Numeric):
+    pass
+
+
+class Pattern(Form):
+    @classmethod
+    def type(cls, *x):
+        import re
+
+        if isinstance(*x, str):
+            x = (re.compile(*x),)
+        return super().type(*x)
+
+    def py(cls):
+        return typing.Pattern
+
+
+class Format(Form):
+    pass
+
+
+class MultipleOf(Numeric):
+    pass
+
+
+class Minimum(Numeric):
+    pass
+
+
+class Maximum(Numeric):
+    pass
+
+
+class ExclusiveMaximum(Numeric):
+    pass
+
+
+class ExclusiveMinimum(Numeric):
+    pass
+
+
+class Items(Form):
+    pass
+
+
+class Contains(Form):
+    pass
+
+
+class AdditionalItems(Form):
+    pass
+
+
+class MinItems(Numeric):
+    pass
+
+
+class MaxItems(Numeric):
+    pass
+
+
+class UniqueItems(Form):
+    pass
+
+
+class Properties(Mapping):
+    pass
+
+
+class AdditionalProperties(Form):
+    def __missing__(self, key):
+        cls = type(self)
+        p = AdditionalProperties.forms(cls)
+        if p:
+            self.update({key: util.call(p)})
+        return self[key]
+
+
+class Dependencies(Mapping):
+    pass
+
+
+class Required(Plural):
+    pass
+
+
+class PropertyNames(Mapping):
+    pass
+
+
+class MinProperties(Numeric):
+    pass
+
+
+class MaxProperties(Numeric):
+    pass
+
+
+class PatternProperties(Mapping):
+    pass
+
+
+class Keys(Form):
+    pass
+
+
+class ContentMediaType(Form):
+    def __init_subclass__(cls):
+        t = cls.ContentMediaType.forms(cls)
+        for e in cls.FileExtension.forms(cls) if t else ():
+            __import__("mimetypes").add_type(t, e)
+
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        return {
+            "text/plain": str(self),
+            ContentMediaType.forms(self): self,
+        }, {}
+
+
+class Examples(Plural):
+    pass
+
+
+class Title(Form):
+    pass
+
+
+class Description(Form):
+    pass
+
+
+# schemata specific formes
+
+
+class Optional(Form):
+    pass
+
+
+class FileExtension(Plural):
+    pass
+
+
+class Args(Plural):
+    pass
+
+
+class Kwargs(Mapping):
+    pass
+
+
+class AtContext(Mapping):
+    pass
+
+
+class AtVocab(Form):
+    pass
+
+
+class AtBase(Form):
+    pass
+
+
+class AtLanguage(Form):
+    pass
+
+
+class AtId(Form):
+    pass
+
+
+class AtGraph(Plural):
+    pass
+
+
+class Literal:
+    @classmethod
+    def type(cls, *x):
+        return cls.default(*x)
+
+
+class UpdateDisplay:
+    def _update_display(self):
+        if hasattr(self, "_display_handle"):
+            try:
+                d, md = self._repr_mimebundle_(None, None)
+                self._display_handle.update(d, metadata=md, raw=True)
+            except AttributeError:
+                self._display_handle.update({"text/plain": str(self)}, raw=True)
+
+    def _ipython_display_(self):
+        import IPython
+
+        if not hasattr(self, "_display_handle"):
+            self._display_handle = IPython.display.DisplayHandle()
+        try:
+            d, md = self._repr_mimebundle_(None, None)
+            self._display_handle.display(d, metadata=md, raw=True)
+        except AttributeError:
+            self._display_handle.display({"text/plain": str(self)}, raw=True)

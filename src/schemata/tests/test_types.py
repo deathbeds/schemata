@@ -8,6 +8,8 @@ import jsonpatch
 import pytest
 
 from schemata import *
+from schemata import base, util
+from schemata.util import *
 
 r = raises = pytest.raises(ValidationErrors)
 
@@ -37,8 +39,7 @@ class SchemaTest(unittest.TestCase):
         Generic.Required["a", "b"].schema().new("")
         Generic.Properties[dict(a=Integer)].schema().ravel().new()
         assert String[:] is String
-        assert Sys.type() is Sys
-        assert Plural.type() is Plural
+        assert base.Plural.type() is base.Plural
 
 
 class BaseTest(unittest.TestCase):
@@ -111,16 +112,13 @@ class LiteralTest(unittest.TestCase):
             E("c")
         assert E("b") == "b"
 
-        assert Enum[dict(a=1)].choices() == ("a",)
-        assert Enum[dict(a=1)]("a") == 1
-
         assert Enum["a"]("a") == "a"
 
         with raises:
             Enum["a"]("b")
 
         C = Cycler["a", "b", "c"]
-        assert Cycler.form(C) == ("a", "b", "c")
+        assert Cycler.forms(C) == ("a", "b", "c")
         c = C()
 
         assert next(c) == "a" and next(c) == "b" and next(c) == "c" and next(c) == "a"
@@ -305,8 +303,9 @@ class ExoticTest(unittest.TestCase):
     def draw_enum(
         draw, a=examples, i=hypothesis.strategies.sampled_from([0, 1, 5, 20])
     ):
+        kind = draw(a)
 
-        return Enum[tuple(draw(draw(a).strategy()) for _ in range(draw(i)))]
+        return kind + Enum[tuple(draw(kind.strategy()) for _ in range(draw(i)))]
 
     draw_enum = draw_enum()
 
@@ -323,7 +322,7 @@ class ExoticTest(unittest.TestCase):
     #     assert t() is t.choices()[0]
 
     @hypothesis.given(
-        (examples | draw_enum).flatmap(
+        (examples).flatmap(
             lambda x: globals().__setitem__("G", x)
             or Not[x].strategy().map(lambda y: (x, y))
         )
@@ -385,7 +384,6 @@ class ExoticTest(unittest.TestCase):
 
 class PyTests(unittest.TestCase):
     def test_py(x):
-        assert Sys["builtins.range"]() is range
         assert Py["builtins.range"]() is range
 
         with pytest.raises(TypeError):
@@ -450,8 +448,7 @@ class StringTest(unittest.TestCase):
         t = strings.UriTemplate(
             "https://api.github.com/search/issues?q={query}{&page,per_page,sort,order}"
         )
-        assert callable(t)
-        assert t(query="heart") == "https://api.github.com/search/issues?q=heart"
+        assert t.uri(query="heart") == "https://api.github.com/search/issues?q=heart"
 
     # def test_templates(x):
     #     assert Format["pos arg {}, kwarg {foo}"]("hi", foo=2) == "pos arg hi, kwarg 2"
@@ -469,16 +466,6 @@ class PyTypeTest(unittest.TestCase):
 
         import functools
 
-        assert Sys["functools"]() is Sys["functools"].object() is functools
-
-        assert (
-            Sys["functools.partial"]()
-            is Sys["functools.partial"].object()
-            is functools.partial
-        )
-
-        assert isinstance(int, Sys["functools.partial"])
-
         assert not isinstance(int, Py["functools.partial"])
 
         assert isinstance(functools.partial(f), Py["functools.partial"])
@@ -494,9 +481,9 @@ class PyTypeTest(unittest.TestCase):
         import inspect
         import urllib
 
-        assert Instance["urllib.request.Request"].__signature__ == inspect.signature(
-            urllib.request.Request
-        )
+        # assert Instance["urllib.request.Request"].__signature__ == inspect.signature(
+        #     urllib.request.Request
+        # )
         assert Instance[Integer](10) == 10
         assert Instance[list]([1]) == [1]
 
@@ -555,9 +542,9 @@ class ManualTests(unittest.TestCase):
         assert isinstance(Json(None), Null)
 
         with raises:
-            forms.Minimum[0](-1)
+            base.Minimum[0](-1)
 
-        assert forms.Minimum[0](1) is 1
+        assert base.Minimum[0](1) is 1
         with raises:
             Dict[dict(a=Integer)](a="abc")
 
@@ -604,10 +591,10 @@ class ManualTests(unittest.TestCase):
         with raises:
             String.maxLength(3)("abcd")
         with raises:
-            forms.Pattern["^foo"]("bar")
+            base.Pattern["^foo"]("bar")
         assert isinstance("this", String.pattern("^this"))
         assert not isinstance("his", String.pattern("^this"))
-        assert forms.Pattern["^foo"]("foo bar") == "foo bar"
+        assert base.Pattern["^foo"]("foo bar") == "foo bar"
         assert strings.DateTime("2018-11-13T20:20:39+00:00") == __import__(
             "datetime"
         ).datetime(2018, 11, 13, 20, 20, 39)
@@ -636,9 +623,6 @@ class ManualTests(unittest.TestCase):
         assert strings.Regex("^foo") == re.compile("^foo")
 
         assert strings.Pointer("a", "b") == "/a/b"
-
-        with raises:
-            strings.Pointer("{1}")
 
         assert strings.Yaml("a: b").loads() == dict(a="b")
 
@@ -734,13 +718,13 @@ class ManualTests(unittest.TestCase):
         assert Dict(a=1).map(str).map(String).__class__ == Dict[String]
 
         with raises:
-            forms.Required["a"](dict())
+            base.Required["a"](dict())
 
-        assert forms.Required["a"](dict(a=11)) == dict(a=11)
+        assert base.Required["a"](dict(a=11)) == dict(a=11)
         assert (Dict[dict(bar=Integer)] >> strings.Jinja["foo {{bar}}"])(
             bar=11
         ) == "foo 11"
-        assert len(OneOf.form(Json)) == 6
+        assert len(OneOf.forms(Json)) == 6
         v = dict(zip("abc", range(3)))
         assert Dict(v).map(str) == dict(zip(v.keys(), map(str, v.values())))
         assert Dict(v).map(Integer).__class__ == Dict[Integer]
@@ -754,24 +738,40 @@ class ManualTests(unittest.TestCase):
             zip(map(str.upper, v.keys()), map(str, v.values()))
         )
 
+        assert Dict(dict(zip(map(str, range(3)), range(3)))).filter(
+            "1".__eq__, (1).__eq__
+        ) == {"1": 1}
+        assert Dict(dict(zip(map(str, range(3)), range(3)))).filter(
+            "1".__eq__, None
+        ) == {"1": 1}
+        assert (
+            Dict(dict(zip(map(str, range(3)), range(3)))).filter("1".__eq__, (2).__eq__)
+            == {}
+        )
+
+        v = dict(zip([1, "a", 3], list("abc")))
+        assert Dict(v).map(String ^ Integer, String) == v and isinstance(
+            Dict(v).map(String ^ Integer, String), Dict[String ^ Integer, String]
+        )
+        assert Dict(v).map(String ^ Integer, None) == v and isinstance(
+            Dict(v).map(String ^ Integer, String), Dict[String ^ Integer, None]
+        )
+
     def test_abc(x):
-        assert Dict.type != List.type != Literal.type
+        assert Dict.type != List.type != base.Type.type
         assert not issubclass(Dict, Dict.Keys)
         assert not issubclass(Dict, Generic.Nested)
         assert issubclass(String["abc"], Default)
-        assert Generic.pytype() is typing.Any
         with raises:
             (-String)("abc")
         assert (-String)(1) == 1
         assert (+String) is String
-        assert isinstance(Generic.Items.form(Tuple[[int, str]]), tuple)
+        assert isinstance(Generic.Items.forms(Tuple[[int, str]]), tuple)
         # this might not be right...
         assert issubclass(Dict.MinProperties[3], Dict.minProperties(3))
         assert Dict.type() is Dict
-        assert Literal.type() is Literal
-        assert Literal.pytype("thing") is String
-        assert Literal.pytype(range) is type
-        assert Literal.type() is Literal
+        assert base.Type.type() is base.Type
+        assert base.Type.type() is base.Type
         with raises:
             (Integer ^ Number)(1)
 
@@ -793,8 +793,8 @@ class ManualTests(unittest.TestCase):
 
 class FileTest(unittest.TestCase):
     def test_file(x):
-        assert isinstance(Dir(""), Path) and isinstance(Dir(""), Literal)
-        assert isinstance(File(""), Path) and isinstance(File(""), Literal)
+        assert isinstance(Dir(""), Path) and isinstance(Dir(""), base.Type)
+        assert isinstance(File(""), Path) and isinstance(File(""), base.Type)
 
 
 def test_if():
@@ -836,8 +836,10 @@ def test_sig():
     def f(*, bar, foo, **kwargs):
         pass
 
-    assert Signature.from_re(
-        strings.Fstring["the {foo} is {bar}"].pattern()
+    from schemata import compat
+
+    assert compat.get_signature(
+        strings.Fstring["the {foo} is {bar}"].schema()["pattern"]
     ) == inspect.signature(f)
 
     class T(Dict):
@@ -859,5 +861,106 @@ def test_sig():
     def f(w: Number, *, z: String["abc"] = "abc"):
         pass
 
-    assert Signature.from_type(T) == inspect.signature(f)
-    Signature.from_type(T).to_typer()
+    assert compat.get_signature(T) == inspect.signature(f)
+
+
+def _typer_doctest():
+    """
+    >>> with suppress(SystemExit): apps.Typer[Dict[dict(a=Integer.minimum(0).maximum(10))]].help()
+    Usage: ... [OPTIONS]...
+    Options:
+      --a INTEGER RANGE  [required]
+      -h, --help         Show this message and exit.
+
+
+    >>> with suppress(SystemExit): apps.Typer[Dict[dict(a=Integer.minimum(0).maximum(10))]].run("--a 5")
+    {'a': 5}"""
+
+
+def test_uri():
+    from unittest import mock
+
+    import requests
+
+    t = strings.UriTemplate("https://{name}.com")
+    assert "https://test.com" == t.uri(name="test")
+
+    r = requests.Response()
+    r.url = t.uri(name="test")
+    with mock.patch("requests.get", return_value=r) as request:
+        assert Uri().get() == r
+
+
+def test_pointer():
+    v = dict(a=[None, dict(b=2)])
+    assert strings.Pointer("a") == "/a"
+
+    assert strings.Pointer("a", 1, "b") == "/a/1/b"
+
+    assert strings.Pointer() == ""
+    assert strings.Pointer().resolve(v) == v
+    assert strings.Pointer("a").resolve(v) == v["a"]
+    assert strings.Pointer("a", 1).resolve(v) == v["a"][1]
+    assert strings.Pointer("a", 1, "b").resolve(v) == v["a"][1]["b"]
+    assert (strings.Pointer("/a/1") / "b").resolve(v) == v["a"][1]["b"]
+
+
+def test_parse():
+    p = strings.Parse["this {} is {name}"]
+
+    assert p(11, name=9).schema().ravel() == {
+        "type": "string",
+        "pattern": "\\Athis (.+?) is (?P<name>.+?)\\Z",
+    }
+
+    assert issubclass(p.py(), typing.Pattern)
+
+    assert p(11, name=9) == "this 11 is 9"
+
+
+def test_load_dump():
+    assert strings.Toml.dumps(dict(a="b")) == 'a = "b"\n'
+    assert strings.Toml('''a = "b"''').loads() == dict(a="b")
+    assert strings.Yaml("""a: b""").loads() == dict(a="b")
+    assert strings.Yaml.dumps(dict(a="b")) == "a: b\n"
+    assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
+    assert strings.JsonString.dumps(dict(a="b")) == '{"a": "b"}'
+    assert strings.JsonString("""{"a": "b"}""").loads() == dict(a="b")
+
+
+def test_ensure_mro_c3():
+    [
+        functools._c3_mro(x)
+        for x in (Null, Bool, Integer, Number, String, List, Dict, Dict[List], Json)
+    ]
+
+
+def test_typer():
+    nil = "00000000-0000-0000-0000-000000000000"
+
+    class CLI(Dict):
+        arg_number: Number
+        arg_number_min_max: Number.minimum(0).maximum(10)
+        arg_number_clamp_min_max: Number.exclusiveMinimum(0).exclusiveMaximum(10)
+        arg_bool: Bool
+        arg_uuid: Uuid
+        arg_datetime: strings.DateTime
+        arg_enum: Enum["a", "b"]
+        arg_file: File
+        arg_multiple_list: List[Integer]
+        arg_multiple_tuple: Tuple[String, File]
+
+        opt_number: Number[0]
+        opt_number_min_max: Number[0].minimum(0).maximum(10)
+        opt_number_clamp_min_max: Number[0].exclusiveMinimum(0).exclusiveMaximum(10)
+        opt_bool: Bool[True]
+        opt_uuid: Uuid[nil]
+        opt_datetime: strings.DateTime["2020-01-01"]
+        opt_enum: Enum["a", "b", "c"] = "a"
+        opt_file: File["readme.md"]
+        arg_multiple_list: List[Integer] + Default[[1]]
+
+        opt_multiple_tuple: Tuple[String, File] + Default["", "readme.md"]
+
+    with pytest.raises(SystemExit):
+        apps.Typer[CLI].help()

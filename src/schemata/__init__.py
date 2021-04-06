@@ -3,21 +3,13 @@ __version__ = "0.0.1"
 
 # from .abc import Schema
 
-from .base import *  # isort:skip
-from . import apps, forms, numbers, strings
+from . import base  # isort:skip
 
 from .types import *  # isort:skip
+from .exceptions import ConsentException, ValidationError, ValidationErrors
 
-# from .strings import *
-
-
-def load_ipython_extension(shell):  # pragma: no cover
-    from .ipython import load_ipython_extension
-
-    load_ipython_extension(shell)
+from . import apps, numbers, strings, ui  # isort:skip
 
 
-def unload_ipython_extension(shell):  # pragma: no cover
-    from .ipython import unload_ipython_extension
-
-    unload_ipython_extension(shell)
+if "IPython" in __import__("sys").modules:
+    from .compat.ipython import load_ipython_extension, unload_ipython_extension

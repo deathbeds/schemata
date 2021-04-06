@@ -32,15 +32,19 @@ ci = ["codecov"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
+docs = ["jupyter-book"]
 test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
+  "ipywidgets",
   "jinja2",
   "json-e",
+  "nbval",
   "parse",
   "pytest-cov",
   "pytest",
   "pyyaml",
+  "requests",
   "toml",
   "typer"
 ]
@@ -60,3 +64,6 @@ omit = [
 
 [tool.coverage.html]
 directory = "docs/coverage"
+
+[tool.pytest.ini_options]
+doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]

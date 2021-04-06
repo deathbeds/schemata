@@ -4,3 +4,9 @@ __pycache__
 .hypothesis
 *.pyc
 *checkpoint*
+_build
+docs/coverage
+xxx.sqlite
+settings.json
+dist
+jupyter_execute

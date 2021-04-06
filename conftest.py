@@ -1,3 +1,8 @@
+import os
+
+collect_ignore_glob = ["_build"]
+pytest_plugins = ["pytester"]
+
 # Derived from
 # https://github.com/utgwkk/pytest-github-actions-annotate-failures
 # MIT License
