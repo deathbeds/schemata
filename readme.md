@@ -1,7 +1,14 @@
 # schemata
 
+[![rtd-badge]][rtd]
+[![gh-badge]][gh-actions]
 [![cov-badge]][cov]
 
+
+[gh-badge]: https://github.com/deathbeds/schemata/actions/workflows/python-package.yml/badge.svg
+[gh-actions]: https://github.com/deathbeds/schemata/actions/workflows/python-package.yml
+[rtd-badge]: https://readthedocs.org/projects/schemata/badge/
+[rtd]: https://schemata.readthedocs.io/en/edits/readme.html
 [cov-badge]: https://img.shields.io/codecov/c/github/deathbeds/schemata?token=hob01Xmh6Z
 [cov]: https://app.codecov.io/gh/deathbeds/schemata
 
