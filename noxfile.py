@@ -26,9 +26,7 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
     def test(session):
         if CI:
             session.install(*"--ignore-installed --upgrade .[test,ci]".split())
-        session.run(
-            *"pytest -vv --pyargs . --nbval -pno:importnb --durations=5 --cov=schemata --cov-report=term-missing:skip-covered --no-cov-on-fail".split()
-        )
+        session.run("pytest")
         session.run(*"coverage html".split())
 
     @nox.session(python=False)

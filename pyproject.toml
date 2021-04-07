@@ -29,10 +29,10 @@ requires-python = ">=3.6"
 [tool.flit.metadata.requires-extra]
 app = ["typer", "jinja2"]
 ci = ["codecov"]
+docs = ["jupyter-book"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
-docs = ["jupyter-book"]
 test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
@@ -46,7 +46,7 @@ test = [
   "pyyaml",
   "requests",
   "toml",
-  "typer"
+  "typer",
 ]
 web = ["fastapi", "jinja2"]
 
@@ -66,4 +66,6 @@ omit = [
 directory = "docs/coverage"
 
 [tool.pytest.ini_options]
+addopts = "-vv --nbval -pno:importnb --durations=5 --cov=src/schemata --cov-report=term-missing:skip-covered --no-cov-on-fail"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+testpaths = ["docs", "src/schemata"]
