@@ -1,5 +1,5 @@
 author = "tonyfast"
-comments_config = {"hypothesis": False, "utterances": False}
+comments_config = {"hypothesis": True, "utterances": False}
 copyright = "2020"
 exclude_patterns = [
     "**.ipynb_checkpoints",
@@ -439,17 +439,17 @@ html_theme_options = {
         "colab_url": "",
     },
     "path_to_docs": "",
-    "repository_url": "https://github.com/executablebooks/jupyter-book",
+    "repository_url": "https://github.com/deathbeds/schemata",
     "repository_branch": "master",
     "google_analytics_id": "",
     "extra_navbar": "",
     "extra_footer": "",
     "home_page_in_toc": True,
-    "use_repository_button": False,
-    "use_edit_page_button": False,
-    "use_issues_button": False,
+    "use_repository_button": True,
+    "use_edit_page_button": True,
+    "use_issues_button": True,
 }
-html_title = "resourceful"
+html_title = "schemata"
 jupyter_cache = ""
 jupyter_execute_notebooks = "auto"
 language = None

@@ -1,9 +1,10 @@
-title: resourceful
+title: schemata
 author: tonyfast
 copyright: '2020'
 logo: ''
 only_build_toc_files: true
-repository: {}
+repository: 
+  url: https://github.com/deathbeds/schemata
 execute:
   execute_notebooks: auto
 exclude_patterns:
@@ -27,16 +28,16 @@ exclude_patterns:
 - docs/_build/*
 html:
   favico: ''
-  use_edit_page_button: false
-  use_repository_button: false
-  use_issues_button: false
+  use_edit_page_button: true
+  use_repository_button: true
+  use_issues_button: true
   extra_navbar: ''
   extra_footer: ''
   google_analytics_id: ''
   home_page_in_navbar: true
   baseurl: ''
   comments:
-    hypothesis: false
+    hypothesis: true
     utterances: false
 sphinx:
   extra_extensions: []
