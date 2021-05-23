@@ -1,622 +1,453 @@
+import abc
+import builtins
 import enum
-import functools
 import inspect
-import mimetypes
-import os
-import sys
 import typing
-import uuid
 
-from . import base, exceptions, mediatypes, util
-from .base import Const, Default, Generic
+from .exceptions import ValidationError
+from .utils import (
+    ANNO,
+    EMPTY,
+    enforce_tuple,
+    get_default,
+    get_hash,
+    get_schema_dict,
+    get_schemata_object,
+    get_verified_object,
+    testing,
+    uppercase,
+)
+
+__all__ = (
+    "Any",
+    "Bool",
+    "Cast",
+    "Comment_",
+    "Const",
+    "ContentEncoding",
+    "ContentMediaType",
+    "Default",
+    "Deprecated",
+    "Description",
+    "Definitions",
+    "Enum",
+    "Examples",
+    "Any",
+    "MetaType",
+    "Null",
+    "ReadOnly",
+    "Ref_",
+    "Title",
+    "Type",
+    "Value",
+    "ValidationError",
+    "Verified",
+    "WriteOnly",
+)
 
 
-class Null(base.Literal, base.Type["null"]):
-    pass
+class MetaType(abc.ABCMeta):
+    def __new__(cls, name, bases, dict, value=EMPTY, id=EMPTY, rank=None):
+        from .utils import DOC, merge, py_to_json
 
-
-Null.register(type(None))
-
-
-class Bool(base.Literal, base.Type["boolean"]):
-    pass
-
-
-Bool.register(bool)
-
-
-class String(base.Literal, base.Type["string"], str):
-    lowercased = util.lowercased
-
-    def loads(self):
-        return self
-
-    @classmethod
-    def title(cls, x):
-        return cls + cls.Title[x]
-
-
-class Number(base.Literal, base.Type["number"], float):
-    pass
-
-
-Float = Number
-
-
-class Integer(base.Literal, base.Type["integer"], int):
-    pass
-
-
-class List(base.Literal, base.Type["array"], list):
-    def object(cls, *args):
-        if args:
-            if isinstance(*args, (set, tuple)):
-                args = (list(*args),)
-        return cls.validate(super().object(*args))
-
-    def type(cls, x):
-        return cls + cls.Items[x]
-
-    # fluent list api
-    def append(self, object):
-        return self.extend((object,))
-
-    def extend(self, args=None):
-        self + (args or [])
-        list.extend(self, args or [])
-        return self
-
-    def insert(self, id, value):
-        if id < 0:
-            id += len(self)
-
-        self.validate(self[:id] + [value] + self[id:])
-        list.insert(self, id, value)
-
-        return self
-
-    def pop(self, id=-1):
-        if id == -1:
-            id = len(self) - 1
-        self.validate(self[:id] + self[id + 1 :])
-        return list.pop(self, id)
-
-    def remove(self, value):
-        self.pop(self.index(value))
-        return self
-
-    def __setitem__(self, key, value):
-        if isinstance(key, int):
-            if key < 0:
-                key += len(self)
-        if isinstance(key, slice):
-            x = list(self)
-            x[key] = value
-            self.validate(x)
+        # resolve docstrings
+        doc = dict.pop(DOC, None)
+        if isinstance(doc, (str, type(None))):
+            if doc is not None:
+                bases += (Description[doc],)
         else:
-            self.validate(self[: key - 1] + [value] + self[key + 1 :])
-        return list.__setitem__(self, key, value)
-
-    __iadd__ = extend
-
-    def __add__(self, object):
-        if isinstance(object, tuple):
-            object = list(object)
-        return type(self)(list.__add__(self, object))
-
-    def __delitem__(self, x):
-        return self.pop(x)
-
-    def map(x, f):
-        cls = type(x)
-        if isinstance(f, type):
-            return cls[type](list(map(f, x)))
-        return cls(list(map(f, x)))
-
-    def filter(x, f):
-        return type(x)(list(filter(f, x)))
-
-    def groupby(x, f):
-        import itertools
-
-        from .types import Dict
-
-        v = {k: list(v) for k, v in itertools.groupby(x, f)}
-        t = Dict[(f, type(x)) if isinstance(f, type) else type(x)]
-        return t(v)
-
-    def py(cls):
-        from . import apps
-
-        v = get_py(base.Items.forms(cls))
-        if v:
-            if isinstance(v, tuple):
-                return typing.Tuple[v]
-            return typing.List[v]
-        return typing.List
-
-
-class Tuple(List, base.Title["Tuple"]):
-    pass
-
-
-Tuple.register(tuple)
-
-
-class Environ(base.Plural):
-    def type(cls, *args):
-        if not args:
-            return cls
-        x, *_ = args
-        if isinstance(x, tuple):
-            if len(x) == 2:
-                if not x[0] in os.environ:
-                    os.environ[x[0]] = x[1]
-        return super().type(*args)
-
-    def object(cls):
-        return os.getenv(*cls.Environ.forms(cls)[:1])
-
-
-class Py(base.Value):
-    def validate(cls, *args):
-        if isinstance(*args, cls.Py.object.__func__(cls)):
-            return args
-        raise exceptions.ValidationError(f"{args} is not an object of {cls}")
-
-    def object(cls):
-        return util.forward_strings(*cls.Value.forms(cls)[:1])[0]
-
-    def py(cls):
-        return Py.object.__func__(cls)
-
-
-class Instance(Py):
-    @classmethod
-    def object(cls, *args, **kwargs):
-        """kind of like a functor."""
-        # call callables, basically making this a functor
-        return util.call(
-            super().object(),
-            *(cls.Args.forms(cls) or ()),
-            *args,
-            **{**(cls.Kwargs.forms(cls) or {}), **kwargs},
-        )
-
-
-class Pipe(Instance):
-    def object(cls, *args, **kwargs):
-        for f in cls.Value.forms(cls):
-            args, kwargs = (util.call(f, *args, **kwargs),), {}
-        return args[0]
-
-
-class Star(Pipe):
-    def object(cls, *args, **kwargs):
-        return super().object(**dict(*args, **kwargs))
-
-
-class Do(Pipe):
-    # so many schema have a thing, this is ours
-    def object(cls, *args, **kwargs):
-        super().object(*args, **kwargs)
-        return (args + (None,))[0]
-
-
-class Juxt(Instance):
-    def type(cls, object):
-        if isinstance(object, slice):
-            object = slice(
-                object.start and Juxt[object.start],
-                object.stop and Juxt[object.stop],
-                object.step and Juxt[object.step],
-            )
-
-        if callable(object):
-            return object
-        elif isinstance(object, str):
-            pass
-        elif not isinstance(object, str) and isinstance(
-            object, (typing.Sequence, typing.Set)
-        ):
-            return super().type((type(object), *map(Juxt.type, object)))
-
-        elif isinstance(object, typing.Container):
-            # convert dictionary containers to key, value pairs
-            return super().type(
-                (
-                    type(object),
-                    *tuple(
-                        Juxt.type((isinstance(k, str) and k.format or k, v))
-                        for k, v in object.items()
-                    ),
-                )
-            )
-        return Instance[object]
-
-    def object(cls, *args, **kwargs):
-        t, *v = cls.Value.forms(cls)
-        return t(util.call(x, *args, **kwargs) for x in v)
-
-
-class Dict(base.Type["object"], dict, base.UpdateDisplay):
-    def py(cls):
-        from . import apps
-
-        return typing.Dict[
-            get_py(
-                (
-                    base.Keys.forms(cls) or str,
-                    base.AdditionalProperties.forms(cls) or typing.Any,
-                )
-            )
-        ]
-
-    def __setitem__(self, k, v):
-        self.update({k: v})
-
-    def update(self, *args, **kwargs):
-        kwargs = dict(*args, **kwargs)
-        r = type(self).Required.forms(self) or ()
-        x = self.force_update(type(self).object(**{**self, **kwargs}))
-        with util.suppress(AttributeError):
-            x._update_display()
-
-        return x
-
-    def force_update(self, *args, **kwargs):
-        dict.update(self, dict(*args, **kwargs))
-        return self
-
-    def pop(self, key, default=None):
-        try:
-            v = self[key]
-        except KeyError:
-            return default
-        self.validate({k: v for k, v in self.items() if k != key})
-        try:
-            return dict.pop(self, key, default)
-        finally:
-            with util.suppress(AttributeError):
-                self._update_display()
-
-    @classmethod
-    def object(cls, *args, **kwargs):
-        if not args or kwargs:
-            if issubclass(cls, cls.Default):
-                return super().object()
-        if not all(isinstance(x, dict) for x in args):
-            raise exceptions.ValidationError
-        kwargs = super().object(dict(*args, **kwargs))
-        p, d, r = (
-            cls.Properties.forms(cls),
-            dict(cls.Dependencies.forms(cls)),
-            cls.Required.forms(cls),
-        )
-        for k, v in p.items():
-            if k in d:
-                continue
-
-            if k not in kwargs and issubclass(v, cls.Default):
-                kwargs.force_update({k: cls.Default.forms(v)})
-
-        while d:
-            for x in list(d):
-                if all(x in kwargs for x in d[x]):
-                    v = cls.Default.forms(cls.Properties.forms(cls)[x])
-
-                    kwargs.force_update({x: v(kwargs)})
-                    d.pop(x)
-                    break
-            else:
-                break
-
-        return cls.validate(kwargs)
-
-    @classmethod
-    def validate(cls, *args):
-        if args:
-            args = (base.Type.validate.__func__(cls, *args),)
-        k = cls.Keys.forms(cls)
-        if args and k:
-            for x in list(*args):
-                if not isinstance(x, k):
-                    raise exceptions.ValidationError(f"not all keys are objects of {k}")
-        return args[0] if args else dict()
-
-    @classmethod
-    def type(cls, *args):
-        if not args:
-            return cls
-        x, *_ = args
-        if isinstance(x, dict):
-            return cls.properties(x)
-
-        if isinstance(x, type) and issubclass(x, cls.ContentMediaType):
-            return cls + x
-        if isinstance(x, tuple):
-            if len(x) <= 2:
-                cls = cls + cls.Keys[x[0]]
-
-            if len(x) == 2:
-                if x[1] is not None:
-                    cls = cls.additionalProperties(x[1])
-
-            return cls
-        return cls.additionalProperties(x)
-
-    def _prepare_type(x, *args):
-        from .types import Dict
-
-        if len(args) == 1:
-            K, V = None, *args
-        elif len(args) == 2:
-            K, V = args
-        t = Generic.Dict
-        if K is None:
-            if isinstance(V, type):
-                t = t[V]
-            return t, K, V
-        else:
-            if isinstance(K, type):
-                t = t[(K,) if isinstance(V, type) else (K, V)]
-            elif isinstance(V, type):
-                t = t[V]
-
-        return t, K, V
-
-    def filter(x, *args):
-        t, K, V = x._prepare_type(*args)
-        if K is None:
-            return t({k: v for k, v in x.items() if V(v)})
-        if V is None:
-            return t({k: v for k, v in x.items() if K(k)})
-        return t({k: v for k, v in x.items() if K(k) and V(v)})
-
-    def map(x, *args):
-        t, K, V = x._prepare_type(*args)
-        if K is None:
-            return t({k: V(v) for k, v in x.items()})
-        if V is None:
-            return t({K(k): v for k, v in x.items()})
-        return t({K(k): V(v) for k, v in x.items()})
-
-
-class Uri(String, String.Format["uri"]):
-    def get(self, *args, **kwargs):
-        return __import__("requests").get(self, *args, **kwargs)
-
-
-class Dir(base.Literal, base.Type, util.Path):
-    def py(cls):
-        return __import__("pathlib").Path
-
-    def object(cls, *args):
-        if not args:
-            args = (Default.forms(cls),)
-        return util.Path.__new__(cls, *args)
-
-    def mimetype(self):
-        t, _ = mimetypes.guess_type("*" + self.suffix)
-        return t
-
-
-class Glob:
-    pass
-
-
-class File(Dir):
-    def read(self):
-        if isinstance(self, str):
-            self = File(self)
-        t = self.mimetype()
-        if t:
-            for cls in base.Generic.String.__subclasses__():
-                if base.Generic.ContentMediaType.forms(cls) == t:
-                    return cls(self.read_text())
-
-        return self.read_text()
-
-
-class Enum(base.Plural, base.Type):
-    def object(cls, *args, **kwargs):
-        # self.value = cls.validate(self)
-        # cls._attach_parent(self)
-        return super().object(cls.validate(args[0] if args else Enum.forms(cls)[0]))
-
-    def py(cls):
-        forms = Enum.forms(cls)
-        return enum.Enum(cls.__name__, dict(zip(forms, forms)))
-
-    @classmethod
-    def choices(cls):
-        e = Enum.forms(cls)
-        if len(e) is 1 and isinstance(e[0], dict):
-            # Enum is defined as a plural form
-            return tuple(*e)
-        return e
-
-
-Enum.register(enum.Enum)
-
-
-class Cycler(Enum):
-    def form(cls):
-        return "enum"
-
-    def object(cls):
-        return __import__("itertools").cycle(cls.choices())
-
-
-class Composite:
-    """a schemaless form type mixin, the name of the class is used to derive others"""
-
-    @classmethod
-    def validate(cls, object):
-        # composites use the object creation for typing checking
-        return cls.object(object)
-
-    @classmethod
-    def object(cls, *args):
-        if not args:
-            with util.suppress(AttributeError):
-                args = (super().object(),)
-        return args
-
-
-class AnyOf(Composite, base.Form.Nested):
-    def object(cls, *args):
-        args = super().object(*args)
-        ts = AnyOf.forms(cls)
-        for t in ts:
-            try:
-                x = util.call(t, *args)
-                return cls._attach_parent(x)
-            except exceptions.ValidationErrors + (ValueError,):
-                if t is ts[-1]:
-                    raise exceptions.ValidationError()
-
-
-class AllOf(Composite, base.Form.Nested):
-    def object(cls, *args):
-        args = super().object(*args)
-        result = {}
-        for t in AllOf.forms(cls):
-            result.setdefault("x", util.call(t, *args))
-
-        x = result.get("x", args[0])
-
-        return cls._attach_parent(x)
-
-
-class OneOf(Composite, base.Form.Nested):
-    def object(cls, *args, **kwargs):
-        args = super().object(*args)
-        i, x = 0, None
-        for t in OneOf.forms(cls):
-            try:
-                if i:
-                    util.call(t, *args, **kwargs)
-                else:
-                    x = util.call(t, *args, **kwargs)
-
-                i += 1
-            except exceptions.ValidationErrors as e:
-                continue
-            if i > 1:
-                break
-
-        if i == 1:
-            return cls._attach_parent(x)
-
-        raise exceptions.ValidationError()
-
-
-class Not(Composite, base.Form):
-    def object(cls, *args):
-        try:
-            cls.forms(cls)(*args)
-        except exceptions.ValidationErrors:
-            x, *_ = args
-
-            return cls._attach_parent(x)
-        raise exceptions.ValidationError
-
-
-class Else(base.Form):
-    pass
-
-
-class Then(base.Form):
-    pass
-
-
-class If(base.Form):
-    def object(cls, *args):
-        try:
-            args = (If.forms(cls)(*args),)
-            t = Then.forms(cls)
-            if t:
-                return t(*args)
-            return args[0]
-        except exceptions.ValidationErrors as exc:
-            e = Else.forms(cls)
-            if e:
-                return e(*args)
-
-    def type(cls, object):
-        if isinstance(object, slice):
-            cls = super().type(object.start)
-            if object.stop is not None:
-                cls = cls + Then[object.stop]
-            if object.step is not None:
-                cls = cls + Else[object.step]
+            dict[DOC] = doc
+
+        # resolve annotations
+        if dict.get(ANNO):
+            from .mappings import Dict
+            from .sequences import Sequence
+
+            property = Dict.Properties[dict[ANNO]]
+            if any(issubclass(x, Sequence) for x in bases):
+                property = Sequence.Items[property]
+            bases += (property,)
+
+        # resolve Meta definitions in the class
+        defs = {
+            k: v
+            for k, v in dict.items()
+            if isinstance(v, MetaType) and getattr(v, ANNO, None)
+        }
+        if defs:
+            bases += (Definitions[defs],)
+
+        # update the class dict payload
+        key = py_to_json(name)
+        if id is not EMPTY:
+            dict.setdefault("id", id)
+        elif value is not EMPTY:
+            dict.setdefault(ANNO, {})
+            dict[ANNO].update({key: value})
+
+        dict.setdefault("rank", rank)
+
+        # build
+        cls = super().__new__(cls, name, bases, dict)
+        cls.__annotations__ = merge(cls)
         return cls
 
+    def key(cls):
+        from .utils import py_to_json
 
-class Json(
-    List ^ Dict ^ String ^ Number ^ Bool ^ Null,
-    mediatypes.Json,
-):
+        return py_to_json(cls.__name__)
+
+    def value(cls, *key, default=EMPTY):
+        """get the corresponding value to the class key"""
+        if not hasattr(cls, ANNO):
+            return
+
+        for k in key or (cls.key(),):
+            if isinstance(k, type):
+                k = k.key()
+
+            if k in cls.__annotations__:
+                return cls.__annotations__[k]
+        if default is EMPTY:
+            return EMPTY
+        return default
+
+    def __add__(cls, *object):
+        return type(cls.__name__, (cls,) + object, {})
+
+    def __pos__(cls):
+        return cls
+
+    def __neg__(cls):
+        from . import Not
+
+        return Not[cls]
+
+    def __and__(cls, *object):
+        from . import AllOf
+
+        return AllOf[(cls,) + object]
+
+    def __or__(cls, *object):
+        from . import AnyOf
+
+        return AnyOf[(cls,) + object]
+
+    def __xor__(cls, *object):
+        from . import OneOf
+
+        return OneOf[(cls,) + object]
+
+    def __eq__(cls, object):
+        if isinstance(object, MetaType):
+            return cls.schema() == object.schema()
+        return super().__eq__(object)
+
+    def __hash__(cls):
+        return get_hash(cls)
+
+    def __getattr__(cls, str):
+        try:
+            return object.__getattribute__(cls, str)
+        except AttributeError as e:
+            error = e
+        if str[0].islower():
+            name = uppercase(str)
+            if hasattr(cls, name):
+
+                def caller(*args):
+                    object = getattr(cls, name)
+                    if not args:
+                        return cls + object
+                    if len(args) is 1:
+                        return cls + object[args[0]]
+                    return cls + object[args]
+
+                return caller
+        raise error
+
+    @property
+    def __doc__(cls):
+        """generate docstrings from schema"""
+        from .utils import get_docstring
+
+        return get_docstring(cls)
+
+    def __dir__(cls):
+        object = super().__dir__()
+        return object + [
+            k[0].lower() + k[1:]
+            for k in object
+            if k[0].isupper() and isinstance(getattr(cls, k), type)
+        ]
+
+
+class Any(metaclass=MetaType):
+    def __new__(cls, object=EMPTY):
+        if not isinstance(object, MetaType):
+            object = get_default(cls, object)
+            return get_schemata_object(object)
+        return object
+
+    @classmethod
+    def py(cls):
+        return cls
+
+    def __class_getitem__(cls, object):
+        return type(cls.__name__, (cls,), {}, value=object)
+
+    @classmethod
+    def validate(cls, object: typing.Any) -> None:
+        exception = ValidationError()
+        for t in inspect.getmro(cls):
+            if getattr(t, ANNO, {}):
+                with exception:
+                    t.is_valid(object)
+        exception.raises()
+
+    @classmethod
+    def schema(cls, ravel=None):
+        from .utils import get_schema
+
+        return get_schema(cls, ravel=ravel)
+
+    @classmethod
+    def is_valid(cls, object):
+        pass
+
+    def pipe(self, callable, *args, **kwargs):
+        return callable(self, *args, **kwargs)
+
+    @classmethod
+    def py(cls):
+        return object
+
+    @classmethod
+    def cast(cls, object=True):
+        return cls + Cast[object]
+
+    @classmethod
+    def verified(cls, object=EMPTY):
+        if object is EMPTY:
+            return cls()
+        return cls(Verified[object])
+
+
+class Cast(Any):
     pass
 
 
-class Bunch(Dict):
-    def __getattribute__(self, k):
-        if not k.startswith("_"):
-            if base.Form.Properties.forms(type(self)):
-                try:
-                    return dict.__getitem__(self, k)
-                except KeyError:
-                    pass
-
-        return object.__getattribute__(self, k)
-
-    def __setattr__(self, k, v):
-        if not k.startswith("_"):
-            if base.Generic.Properties.forms(type(self)):
-                self[k] = v
-                return
-
-        return object.__setattr__(self, k, v)
+class Verified(Any):
+    pass
 
 
-class Set(List, base.Form.Title["Set"], base.Form.UniqueItems[True]):
-    def py(cls):
-        from . import apps
+class Type(Any, id="validation:/properties/type"):
+    def __new__(cls, object=EMPTY):
+        object = get_default(cls, object)
 
-        v = get_py(base.Items.forms(cls))
-        if v is None:
-            return typing.Set
-        return typing.Set[v]
+        if object is EMPTY:
+            return super().__new__(cls)
 
-
-Set.register(set)
-
-
-class Uuid(base.Literal, base.Type, uuid.UUID):
-    @classmethod
-    def object(cls, *args):
-        if not args:
-            args = (uuid.uuid4(),)
-        self = uuid.UUID.__new__(cls)
-        uuid.UUID.__init__(self, *map(str, args))
+        cast = cls.value(Cast)
+        cast or cls.validate(object)
+        t = Type.py.__func__(cls)
+        self = t.__new__(cls, object)
+        cast and cls.validate(self)
         return self
 
+    @classmethod
+    def is_valid(cls, object):
+        from .utils import enforce_tuple, testing
+
+        with ValidationError() as exceptions:
+            for value in enforce_tuple(cls.value(Type)):
+                if value is EMPTY:
+                    continue
+                if isinstance(value, str):
+                    if value in JSONSCHEMA_SCHEMATA_MAPPING:
+                        JSONSCHEMA_SCHEMATA_MAPPING[value].is_valid(object)
+                    else:
+                        "we'll consider these forward references"
+
+                elif isinstance(value, type):
+                    testing.assertIsInstance(object, value)
+                else:
+                    assert False, f"don't know how to enfore type: {value}"
+
+        exceptions.raises()
+
+    @classmethod
+    def py(cls, expand=True):
+        type = cls.value(Type)
+        if type:
+            return JSONSCHEMA_PY_MAPPING[type]
+        return object
+
+    @classmethod
+    def strategy(cls):
+        import hypothesis_jsonschema
+
+        return hypothesis_jsonschema.from_schema(cls.schema(True))
+
+    def print(self):
+        import pprint
+
+        if isinstance(self, str):
+            print(self)
+        else:
+            pprint.pprint(self)
+
+
+class Null(Type["null"]):
+    def __new__(cls, object=EMPTY):
+        object = get_default(cls, object, None)
+
+        if object is EMPTY:
+            return
+
+        cls.validate(object)
+
+    @classmethod
+    def is_valid(cls, object):
+        testing.assertIs(object, None)
+
+
+class Title(Any, id="metadata:/properties/title"):
+    pass
+
+
+class Description(Any, id="metadata:/properties/description"):
+    pass
+
+
+class Examples(Any, id="metadata:/properties/examples"):
+    pass
+
+
+class Default(Any, id="metadata:/properties/default"):
+    pass
+
+
+class Deprecated(Any, id="metadata:/properties/default"):
+    pass
+
+
+class ReadOnly(Any, id="metadata:/properties/default"):
+    pass
+
+
+class WriteOnly(Any, id="metadata:/properties/default"):
+    pass
+
+
+class Value(Any):
+    @classmethod
+    def key(cls):
+        return "value"
+
+
+class ContentMediaType(Any, id="content:/properties/contentMediaType"):
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        cls = type(self)
+        return dict({cls.value(ContentMediaType, "text/plain"): self})
+
+
+class ContentEncoding(Any, id="content:/properties/contentEncoding"):
+    pass
+
+
+class Const(Type, id="validation:/properties/const"):
+    @classmethod
+    def is_valid(cls, object):
+        testing.assertEqual(object, cls.value(Const))
+
+
+class Ref_(Any, id="core:/properties/$ref"):
+    pass
+
+
+class Comment_(Any, id="core:/properties/$comment"):
+    pass
+
+
+class Definitions(Any, id="core:/properties/$defs"):
+    pass
+
+
+class Ui(Any):
+    pass
+
+
+class UiWidget(Ui):
+    pass
+
+class UiOptions(Ui):
+    pass
+
+class Bool(Type["boolean"]):
+    def __new__(cls, object=EMPTY):
+        object = get_default(cls, object, bool())
+        cls.validate(object)
+        return object
+
+    @classmethod
+    def is_valid(cls, object):
+        testing.assertIsInstance(object, bool)
+
+
+class Enum(Type, id="validation:/properties/enum"):
+    def __class_getitem__(cls, object):
+        if isinstance(object, str):
+            object = tuple(object.split())
+        return super().__class_getitem__(object)
+
+    @classmethod
+    def is_valid(cls, object):
+        testing.assertIn(object, cls.value(Enum))
+
+    @classmethod
     def py(cls):
-        return uuid.UUID
+        data = cls.value(Enum)
+        if not isinstance(data, dict):
+            data = dict(zip(*map(enforce_tuple, (data, data))))
+        return EnumeratedType
+
+    class Radio(UiWidget["updown"]):
+        pass
 
 
-@functools.singledispatch
-def get_py(x):
-    return x
+Any.Cast = Cast
+Any.Comment_ = Comment_
+Any.Const = Const
+Any.ContentEncoding = ContentEncoding
+Any.ContentMediaType = ContentMediaType
+Any.Default = Default
+Any.Definitions = Definitions
+Any.Deprecated = Deprecated
+Any.Description = Description
+Any.Enum = Enum
+Any.Examples = Examples
+Any.ReadOnly = ReadOnly
+Any.Ref_ = Ref_
+Any.Title = Title
+Any.UiWidget = UiWidget
+Any.WriteOnly = WriteOnly
+
+JSONSCHEMA_SCHEMATA_MAPPING = dict(
+    null=Null,
+    boolean=Bool,
+)
 
 
-@get_py.register
-def _get_py_generic(x: Generic):
-    return x.py()
+JSONSCHEMA_PY_MAPPING = dict(
+    null=type(None),
+    boolean=bool,
+    string=str,
+    integer=int,
+    number=float,
+    array=list,
+    object=dict,
+)
 
 
-@get_py.register
-def _get_py_tuple(x: tuple):
-    return tuple(map(get_py, x))
+JSONSCHEMA_STR_MAPPING = dict(map(reversed, JSONSCHEMA_PY_MAPPING.items()))

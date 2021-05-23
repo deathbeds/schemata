@@ -1,164 +1,127 @@
-import datetime
+from .apis import StringCase
+from .types import (
+    JSONSCHEMA_SCHEMATA_MAPPING,
+    Any,
+    ContentEncoding,
+    ContentMediaType,
+    Type,
+    UiWidget,
+)
+from .utils import EMPTY, partialmethod, testing, validates
 
-from . import base, mediatypes, types
+__all__ = "String", "Bytes", "Uri", "Uuid"
 
 
-# set default datetimes to now
-class DateTime(types.String, types.String.Format["date-time"]):
+class Bytes(ContentEncoding["base64"], bytes):
     @classmethod
-    def object(cls, *args):
+    def is_valid(cls, object):
+        testing.assertIsInstance(object, bytes)
 
-        import strict_rfc3339
 
-        return datetime.datetime.utcfromtimestamp(
-            strict_rfc3339.rfc3339_to_timestamp(*args)
+class String(Type["string"], StringCase, str):
+    @classmethod
+    def is_valid(cls, object):
+
+        testing.assertIsInstance(object, str)
+
+    class Pattern(Any, id="validation:/properties/pattern"):
+        @validates(str)
+        def is_valid(cls, object):
+            testing.assertRegex(object, cls.value(String.Pattern))
+
+    def __class_getitem__(cls, object):
+        if isinstance(object, str):
+            return cls + cls.Pattern[object]
+        return super().__class_getitem__(object)
+
+    class Format(Any):
+        pass
+
+    class MinLength(Any, id="validation:/properties/minLength"):
+        @validates(list, tuple, set)
+        def is_valid(cls, object):
+            testing.assertGreaterEqual(len(object), cls.value(String.MinLength))
+
+    class MaxLength(Any, id="validation:/properties/maxLength"):
+        @validates(list, tuple, set)
+        def is_valid(cls, object):
+            testing.assertLessEqual(len(object), cls.value(String.MaxLength))
+
+    class Text(UiWidget["text"]):
+        pass
+
+    class Textarea(UiWidget["textarea"]):
+        pass
+
+
+class Email(String.Format["email"]):
+    pass
+
+
+class DataUrl(String.Format["data-url"]):
+    pass
+
+
+class Date(String.Format["date"]):
+    pass
+
+
+class DateTime(String.Format["date-time"]):
+    pass
+
+
+class Time(String.Format["time"]):
+    pass
+
+
+class Uri(String, String.Format["uri"]):
+    @validates(str)
+    def is_valid(cls, object):
+
+        import rfc3986
+
+        from .utils import not_format
+
+        assert rfc3986.uri_reference(object).is_valid(require_scheme=True), not_format(
+            cls, object
         )
 
-    def py(cls):
-        return datetime.datetime
+    def __class_getitem__(cls, object):
+        from .templates import UriTemplate
+
+        return cls + UriTemplate[object]
 
 
-class Date(DateTime, types.String.Format["date"]):
-    @classmethod
-    def object(cls, *args):
-        return super().object(str.__add__(*args, "T00:00:00+00:00"))
+class Uuid(String, String.Format["uuid"]):
+    def __new__(cls, object=EMPTY, *args, **kwargs):
+        import uuid
+
+        if not object:
+            version = cls.value(Uuid.Version)
+            if version:
+                object = getattr(uuid, f"uuid{version}")(*args, **kwargs)
+            else:
+                object = "00000000-0000-0000-0000-000000000000"
+        else:
+            object = uuid.UUID(object, *args, **kwargs)
+        return super().__new__(cls, str(object))
+
+    @validates(str)
+    def is_valid(cls, object):
+
+        import uuid
+
+        uuid.UUID(object)
+
+    def __class_getitem__(cls, object):
+        return cls + Uuid.Version[object]
+
+    class Version(Any):
+        pass
 
 
-class Time(DateTime, types.String.Format["time"]):
-    @classmethod
-    def object(cls, *args):
-        return super().object("1970-01-01T".__add__(*args))
-
-
-class Email(types.String, types.String.Format["email"]):
+class UriReference(String.Format["uri-reference"], Uri):
     pass
 
 
-class HostName(types.String, types.String.Format["hostname"]):
-    pass
-
-
-class IPv4(types.String, types.String.Format["ipyv4"]):
-    pass
-
-
-class IPv6(types.String, types.String.Format["ipyv6"]):
-    pass
-
-
-class Pointer(types.String, types.String.Format["json-pointer"]):
-    def object(cls, *args):
-        if len(args) > 1 or args and not args[0].startswith("/"):
-            args = (__import__("jsonpointer").JsonPointer.from_parts(args).path,)
-        return super().object(*args)
-
-    def resolve(self, object):
-        return __import__("jsonpointer").resolve_pointer(object, self)
-
-    def __truediv__(self, object):
-        return Pointer(self + "/" + object)
-
-
-class UriTemplate(types.String, types.String.Format["uri-template"]):
-    def uri(self, **kwargs):
-        return types.Uri(__import__("uritemplate").URITemplate(self).expand(**kwargs))
-
-
-class Regex(types.String, types.String.Format["regex"]):
-    @classmethod
-    def object(cls, *args):
-        import re
-
-        return re.compile(super().object(*args))
-
-
-class Fstring(types.String):
-    def type(cls, object):
-        import parse
-
-        _parse = parse.compile(object)
-        return cls + cls.Pattern[_parse._match_re]
-
-
-class Parse(base.Pattern, types.String):
-    @classmethod
-    def object(cls, *args, **kwargs):
-        return super().object(cls.Pattern.forms(cls)._format.format(*args, **kwargs))
-
-    @classmethod
-    def type(cls, *args):
-        import parse
-
-        return cls + cls.Pattern[parse.compile(*args)]
-
-
-class Jinja(types.Instance["jinja2.Template"]):
-    @classmethod
-    def object(cls, *args, **kwargs):
-        import jinja2
-
-        return super().object().render(*args, **kwargs)
-
-    @classmethod
-    def type(cls, *args):
-        return cls + cls.Args[args]
-
-
-class Toml(
-    types.String,
-    mediatypes.Toml,
-    types.String.FileExtension[".toml"],
-):
-    def loads(object):
-        return types.Json(__import__("toml").loads(object))
-
-    @classmethod
-    def dumps(cls, object):
-        return cls(__import__("toml").dumps(object))
-
-
-class Yaml(
-    types.String,
-    mediatypes.Yaml,
-    types.String.FileExtension[".yaml", ".yml"],
-):
-    def loads(object):
-        return types.Json(__import__("yaml").safe_load(object))
-
-    @classmethod
-    def dumps(cls, object):
-        return types.Json(__import__("yaml").safe_dump(object))
-
-
-class JsonString(
-    types.String,
-    mediatypes.Json,
-    types.String.FileExtension[".json", ".ipynb"],
-):
-    def loads(object):
-
-        return types.Json(__import__("json").loads(object))
-
-    @classmethod
-    def dumps(cls, object):
-        return cls(__import__("json").dumps(object))
-
-
-class Markdown(
-    types.String,
-    mediatypes.Markdown,
-    types.String.FileExtension[".md"],
-):
-    _repr_markdown_ = str
-
-
-class Html(
-    types.String,
-    mediatypes.Html,
-    types.String.FileExtension[".html"],
-):
-    _repr_html_ = str
-
-
-class Svg(types.String, mediatypes.Svg, types.String.FileExtension[".svg"]):
-    _repr_svg_ = str
+JSONSCHEMA_SCHEMATA_MAPPING["string"] = String

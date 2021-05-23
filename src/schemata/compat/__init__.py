@@ -3,7 +3,7 @@ import functools
 import inspect
 import re
 
-from .. import base
+from .. import types
 
 Pattern = type(re.compile(""))
 
@@ -14,7 +14,7 @@ def get_signature(x):
 
 
 @get_signature.register
-def _get_signature_from_schema(x: base.Generic):
+def _get_signature_from_schema(x: types.Generic):
     return get_signature(x.schema())
 
 
@@ -55,8 +55,8 @@ def _get_signature_from_schema(s: dict):
             continue
 
         v = p[k]
-        if isinstance(v, type) and issubclass(v, base.Default):
-            d = base.Default.forms(v)
+        if isinstance(v, type) and issubclass(v, types.Default):
+            d = types.Default.forms(v)
             if not callable(d):
                 a += (
                     inspect.Parameter(

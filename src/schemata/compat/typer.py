@@ -1,7 +1,7 @@
 import inspect
 import typing
 
-from .. import base
+from .. import types
 from . import get_signature
 
 
@@ -30,7 +30,7 @@ def get_typer_parameter(p):
         import enum
 
         a = t = p.annotation
-        if isinstance(t, base.Generic):
+        if isinstance(t, types.Generic):
             a = t.py()
             s = t.schema()
             if a is enum.Enum:

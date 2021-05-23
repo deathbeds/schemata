@@ -2,18 +2,19 @@ import enum
 import functools
 import types
 
-from schemata import base, ui, util
+import ipywidgets
+import traitlets
 
-from .ipython import get_names_in_main
+from schemata import types, ui, util
 
 mapping = dict(
-    min=base.Minimum,
-    max=base.Maximum,
-    step=base.MultipleOf,
-    description=base.Title,
+    min=types.Minimum,
+    max=types.Maximum,
+    step=types.MultipleOf,
+    description=types.Title,
     disabled=ui.Disabled,
     placeholder=ui.Placeholder,
-    options=base.Generic.Enum,
+    options=types.Generic.Enum,
 )
 
 
@@ -27,38 +28,66 @@ def get_kwargs_from_schema(s, **kwargs):
     return kwargs
 
 
-def get_widget_schema(s):
-    if s.get("enum"):
-        return get_widget_from_enum(s)
-    if s.get("type") in {"number", "integer"}:
-        return get_widget_from_number(s)
+def make_object_widget(layout, **kwargs):
+    pass
 
-    if s.get("type") in {"string"}:
+
+def get_widget_from_object(s):
+    import ipywidgets
+
+    widgets = {}
+
+    def widget(**kwargs):
+        children = []
+        if s.has("properties"):
+            for key, value in s["properties"].items():
+                S = s["properties"][key].schema()
+                widget = get_widget_from_schema(S)
+
+                k = get_kwargs_from_schema(S)
+                k["description"] = key
+                if key in kwargs.get("value", {}):
+                    k["value"] = kwargs["value"][key]
+                children.append(widget(**k))
+        return ValueContainer(
+            container=ipywidgets.HBox(children=children), value=kwargs["value"]
+        )
+
+    return widget
+
+
+def get_widget_from_schema(s):
+    if s.has("enum"):
+        return get_widget_from_enum(s)
+    if s.has("type", "integer", "number"):
+        return get_widget_from_number(s)
+    if s.has("type", "string"):
         return get_widget_from_string(s)
+    if s.has("type", "object"):
+        return get_widget_from_object(s)
 
 
 def get_widget_from_number(s):
     import ipywidgets
 
-    if s.get("ui:widget") == "range":
+    if s.has("ui:widget", "range"):
         attr = "{}Slider"
     else:
         if any(
-            x in s
-            for x in ("maximum", "minimum", "exclusiveMinimum", "exclusiveMaximum")
+            map(s.has, ("maximum", "minimum", "exclusiveMinimum", "exclusiveMaximum"))
         ):
             attr = "Bounded{}Text"
         else:
             attr = "{}Text"
     return getattr(
-        ipywidgets, attr.format(dict(integer="Int", number="Float")[s["type"]])
+        ipywidgets, attr.format(dict(integer="Int", number="Float")[s["type"][0]])
     )
 
 
 def get_widget_from_bool(s):
     import ipywidgets
 
-    if s.get("ui:widget") == "checkbox":
+    if s.has("ui:widget", "checkbox"):
         return ipywidgets.Checkbox
     return ipywidgets.ToggleButton
 
@@ -66,18 +95,18 @@ def get_widget_from_bool(s):
 def get_widget_from_string(s):
     import ipywidgets
 
-    if s.get("ui:widget") == "textarea":
+    if s.has("ui:widget", "textarea"):
         return ipywidgets.Textarea
-    elif s.get("ui:widget") == "password":
+    elif s.has("ui:widget", "password"):
         return ipywidgets.Password
-    elif s.get("contentMediaType") == "text/html":
+    elif s.has("contentMediaType", "text/html"):
         return ipywidgets.HTML
-    elif s.get("contentMediaType") == "imgae":
+    elif s.has("contentMediaType", "image"):
         return ipywidgets.Image
-    elif s.get("format") == "date":
+    elif s.has("format", "date"):
         return ipywidgets.DatePicker
-    elif s.get("ui:widget") == "color":
-        return ipywidget.ColorPicker
+    elif s.has("ui:widget", "color"):
+        return ipywidgets.ColorPicker
 
     return ipywidgets.Text
 
@@ -85,37 +114,51 @@ def get_widget_from_string(s):
 def get_widget_from_enum(s):
     import ipywidgets
 
-    if s.get("ui:widget") == "select":
+    if s.has("ui:widget", "select"):
         return ipywidgets.Select
-    elif s.get("ui:widget") == "radio":
+    elif s.has("ui:widget", "radio"):
         return ipywidgets.RadioButtons
-    elif s.get("ui:widget") == "range":
+    elif s.has("ui:widget", "range"):
         return ipywidgets.SelectionSlider
-    elif s.get("ui:widget") == "toggle":
+    elif s.has("ui:widget", "toggle"):
         return ipywidgets.ToggleButtons
-    elif s.get("ui:widget") == "dropdown":
+    elif s.has("ui:widget", "dropdown"):
         return ipywidgets.Dropdown
 
     return ipywidgets.Select
 
 
-def get_widget_from_value(*args, schema=None):
-    if schema is None:
-        schema = x.schema()
+def get_widget_from_value(*args, schema=None, **kwargs):
+    """create widgets from an object conforming to a schema.
 
-    widget = get_widget_schema(schema)
-    kwargs = get_kwargs_from_schema(schema)
+    Args:
+        schema ([type], optional): [description]. Defaults to None.
+
+    Returns:
+        [type]: [description]
+    """
     if args:
         kwargs["value"] = util.identity(*args)
-    w = widget(**kwargs)
-    if args:
-        names, annotations = get_names_in_main(*args)
 
-        def handler(delta):
-            nonlocal names
-            m = __import__("__main__")
-            for name in names:
-                setattr(m, name, delta["new"])
+    if schema is None:
+        schema = kwargs["value"].schema()
 
-        w.observe(handler, "value")
-    return w
+    widget = get_widget_from_schema(schema)
+    kwargs.update(get_kwargs_from_schema(schema))
+    return widget(**kwargs)
+
+
+class ValueContainer(traitlets.HasTraits):
+    container = traitlets.Any()
+    value = traitlets.Any()
+
+    def _ipython_display_(self):
+        import IPython
+
+        IPython.display.display(self.container)
+
+    @traitlets.observe("value")
+    def _change_value(self, delta):
+        for child in self.container.children:
+            if child.description in delta["new"]:
+                child.value = delta["new"][child.description]
