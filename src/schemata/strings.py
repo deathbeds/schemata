@@ -1,8 +1,6 @@
 import datetime
 import operator
 
-from requests_cache.core import CachedSession
-
 from . import exceptions, formats, mediatypes, templates, times, utils
 from .apis import FluentString
 from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Type
