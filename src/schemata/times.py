@@ -82,8 +82,7 @@ class Date(DateTime, formats.Date):
 
 
 class Time(DateTime, formats.Time):
-    @classmethod
-    def object(cls, object=EMPTY):
+    def __new__(cls, object=EMPTY):
         object = get_default(cls, object)
         if isinstance(object, str):
             if not cls.value(Cast):

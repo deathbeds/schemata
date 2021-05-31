@@ -108,13 +108,12 @@ class Uri(String, formats.Uri):
             cls += formats.UriTemplate
         return cls
 
-    @classmethod
-    def object(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         template = cls.value(String.Pattern)
         if template:
-            return Type.object.__func__(cls, cls.render(*args, **kwargs))
+            return Type.__new__(cls, cls.render(*args, **kwargs))
 
-        return super().object(*args, **kwargs)
+        return super().__new__(cls, *args, **kwargs)
 
     def get(self, **kwargs):
         cache = type(self).value(Uri.Cache)
@@ -209,9 +208,8 @@ class Template:
     def __class_getitem__(cls, object):
         return Any.__class_getitem__.__func__(cls, object)
 
-    @classmethod
-    def object(cls, *args, **kwargs):
-        return super().object(cls.render(*args, **kwargs))
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, cls.render(*args, **kwargs))
 
 
 class StringTemplate(Template, String):
@@ -228,7 +226,6 @@ class Jinja(StringTemplate):
     @classmethod
     def render(cls, *args, **kwargs):
         import jinja2
-
         return jinja2.Template(cls.value(Jinja)).render(*args, **kwargs)
 
     @classmethod

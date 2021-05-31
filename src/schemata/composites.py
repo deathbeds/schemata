@@ -7,8 +7,7 @@ __all__ = "AllOf", "AnyOf", "Else", "If", "Not", "OneOf", "Then"
 
 
 class Composite:
-    @classmethod
-    def object(cls, object=EMPTY):
+    def __new__(cls, object=EMPTY):
         return cls.validate(object)
 
 

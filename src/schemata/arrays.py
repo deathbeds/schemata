@@ -7,26 +7,8 @@ from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Type
 __all__ = "List", "Tuple", "Set", "Arrays"
 
 
-class Arrays(apis.FluentArrays):
-
-    def __new__(cls, *args):
-        from . import callables
-        type = cls.mro()[-2]
-        if not args:
-            args = utils.enforce_tuple(utils.get_default(cls, list()))
-
-        cast = cls.value(callables.Cast)
-        if cast:
-            args, kwargs = utils.enforce_tuple((list if cast is True else cast)(*args)), {}
-
-        else:
-            cls.validate(*args)
-        self = type.__new__(cls, *args)
-        self.__init__(*args)
-        if cast:
-            cls.validate(self)
-        return self
-            
+class Arrays(apis.FluentArrays):        
+        
     def __class_getitem__(cls, object):
         from .builders import build_list
 
@@ -89,22 +71,26 @@ class Arrays(apis.FluentArrays):
 
 
 class List(Arrays, Type["array"], list):
-    
-
     def __init__(self, *args):
-        args and list.__init__(self, *args)
-    #     cls = type(self)
+        from . import callables
+        cls = type(self)
+        if not args:
+            args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
 
-    #     sorted = cls.value(Arrays.Sorted)
-    #     if sorted is not EMPTY:
-    #         reversed = cls.value(Arrays.Reversed)
-    #         kw = {}
-    #         if reversed is not EMPTY:
-    #             kw.update(reverse=reversed)
+        cast = cls.value(callables.Cast)
+        if cast:
+            args = cls.preprocess(*args),
+        
+        sort = cls.value(Arrays.Sorted)
 
-    #         if not isinstance(sorted, bool):
-    #             kw.update(key=sorted)
-    #         list.sort(self, **kw)
+        if sort:
+            args = sorted(list(*args), key=callable(sort) and sort or None, reverse=cls.value(Arrays.Reversed, default=False)),
+
+        if not cast:
+            cls.validate(*args)
+
+        list.__init__(self, *args)
+
 
     @classmethod
     def validator(cls, object):
@@ -138,8 +124,21 @@ class Tuple(Arrays, Type["array"], tuple):
 
 
 class Set(Arrays, Type["array"], set):
+
     def __init__(self, *args):
-        args and set.__init__(self, *args)
+        from . import callables
+        cls = type(self)
+        if not args:
+            args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
+
+        cast = cls.value(callables.Cast)
+        if cast:
+            args = cls.preprocess(*args),
+        
+        if not cast:
+            cls.validate(*args)
+
+        super().__init__(*args)
 
     @classmethod
     def validator(cls, object):

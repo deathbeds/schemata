@@ -8,7 +8,7 @@ __all__ = "Cast", "Do", "Juxt", "Callable"
 
 class Cast(Any):
     @classmethod
-    def call(cls, *args, **kwargs):
+    def preprocess(cls, *args, **kwargs):
         args = utils.enforce_tuple(cls.value(Callable.Args, default=())) + args
         kwargs = {**cls.value(Callable.Kwargs, default={}), **kwargs}
 
@@ -17,7 +17,7 @@ class Cast(Any):
             if cast is not True:
                 for callable in utils.enforce_tuple(cast):
                     args, kwargs = (callable(*args, **kwargs),), {}
-        return Any.object(*args, **kwargs)
+        return args[0]
 
     class Return(Any):
         ...
@@ -45,8 +45,7 @@ class Callable(Cast):
 
 
 class Do(Cast):
-    @classmethod
-    def object(cls, *args, **kwargs):
+    def __new__(cls, *args, **kwargs):
         super().__new__(cls, *args, **kwargs)
         if args:
             return args[0]
@@ -54,7 +53,7 @@ class Do(Cast):
 
 class Juxt(Type):
     @classmethod
-    def object(cls, *args, **kwargs):
+    def call(cls, *args, **kwargs):
         from .utils import enforce_tuple
 
         args = (cls.value(Callable.Args) or ()) + args

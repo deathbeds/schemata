@@ -97,9 +97,9 @@ instantiate a new schemata type.
 
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
-    def __new__(cls, *args):
+    def __new__(cls, object =EMPTY):
         # fill in the default values if they exist
-        object = args or utils.get_default(cls, object)
+        object = utils.get_default(cls, default=object)
         if not isinstance(object, Any):
             return utils.get_schemata(object)
         return object
@@ -120,8 +120,8 @@ class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaTyp
         from . import callables
 
         if args:
-            return cls + callables.Cast[(object,) + args]
-        return cls + callables.Cast[object]
+            return callables.Cast[(object,) + args] + cls
+        return callables.Cast[object] + cls
 
 
 class Type(Any):
@@ -148,16 +148,11 @@ class Type(Any):
         if object is not EMPTY:
             args = (object,) + args
 
-        if cast:
-            if cast is not True:
-                args, kw = (cls.call(*args, **kw),), kw
-        else:
+        if not cast:
             args = args or (super(Any, cls).__new__(cls),)
             cls.validate(*args)
 
         self = super(Any, cls).__new__(cls, *args, **kw)
-
-        cast and cls.validate(self)
 
         return self
 
