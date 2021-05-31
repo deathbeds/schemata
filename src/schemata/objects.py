@@ -1,7 +1,5 @@
 import typing
 
-from schemata import callables
-
 from . import apis, utils
 from .types import (
     ANNO,
