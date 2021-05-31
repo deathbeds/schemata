@@ -7,15 +7,13 @@ from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Type
 __all__ = "List", "Tuple", "Set", "Arrays"
 
 
-class Arrays(apis.FluentArrays):        
-        
+class Arrays(apis.FluentArrays):
     def __class_getitem__(cls, object):
         from .builders import build_list
 
         if isinstance(object, tuple):
             return Tuple.items(object)
         return cls.add(*utils.enforce_tuple(build_list(object)))
-
 
     class Items(Any, id="applicator:/properties/items"):
         @utils.validates(list, tuple, set)
@@ -73,24 +71,30 @@ class Arrays(apis.FluentArrays):
 class List(Arrays, Type["array"], list):
     def __init__(self, *args):
         from . import callables
+
         cls = type(self)
         if not args:
             args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
 
         cast = cls.value(callables.Cast)
         if cast:
-            args = cls.preprocess(*args),
-        
+            args = (cls.preprocess(*args),)
+
         sort = cls.value(Arrays.Sorted)
 
         if sort:
-            args = sorted(list(*args), key=callable(sort) and sort or None, reverse=cls.value(Arrays.Reversed, default=False)),
+            args = (
+                sorted(
+                    list(*args),
+                    key=callable(sort) and sort or None,
+                    reverse=cls.value(Arrays.Reversed, default=False),
+                ),
+            )
 
         if not cast:
             cls.validate(*args)
 
         list.__init__(self, *args)
-
 
     @classmethod
     def validator(cls, object):
@@ -124,17 +128,17 @@ class Tuple(Arrays, Type["array"], tuple):
 
 
 class Set(Arrays, Type["array"], set):
-
     def __init__(self, *args):
         from . import callables
+
         cls = type(self)
         if not args:
             args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
 
         cast = cls.value(callables.Cast)
         if cast:
-            args = cls.preprocess(*args),
-        
+            args = (cls.preprocess(*args),)
+
         if not cast:
             cls.validate(*args)
 

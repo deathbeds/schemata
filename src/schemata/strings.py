@@ -224,6 +224,7 @@ class Jinja(StringTemplate):
     @classmethod
     def render(cls, *args, **kwargs):
         import jinja2
+
         return jinja2.Template(cls.value(Jinja)).render(*args, **kwargs)
 
     @classmethod

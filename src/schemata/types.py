@@ -97,7 +97,7 @@ instantiate a new schemata type.
 
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
-    def __new__(cls, object =EMPTY):
+    def __new__(cls, object=EMPTY):
         # fill in the default values if they exist
         object = utils.get_default(cls, default=object)
         if not isinstance(object, Any):
