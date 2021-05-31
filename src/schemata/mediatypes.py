@@ -1,10 +1,20 @@
-from . import ContentMediaType
-from .strings import String, Type
+from . import strings
+from .types import Any, Type
+
+__all__ = ("ContentEncoding", "ContentMediaType", "Plain", "Json", "Toml", "Yaml")
+
+
+class ContentMediaType(Any, id="content:/properties/contentMediaType"):
+    def _repr_mimebundle_(self, include=None, exclude=None):
+        return dict({type(self).value(ContentMediaType, "text/plain"): self})
+
+
+class ContentEncoding(Any, id="content:/properties/contentEncoding"):
+    pass
 
 
 class Plain(ContentMediaType["application"]):
-    @classmethod
-    def loads(cls, self):
+    def loads(self):
         return self
 
     @classmethod
@@ -13,8 +23,7 @@ class Plain(ContentMediaType["application"]):
 
 
 class Json(ContentMediaType["application/json"]):
-    @classmethod
-    def loads(cls, self):
+    def loads(self):
         import json
 
         return json.loads(self)
@@ -23,12 +32,11 @@ class Json(ContentMediaType["application/json"]):
     def dumps(cls, self):
         import json
 
-        return (String + Json)(json.dumps(self))
+        return (strings.String + Json)(json.dumps(self))
 
 
 class Yaml(ContentMediaType["application/yaml"]):
-    @classmethod
-    def loads(cls, self):
+    def loads(self):
         import yaml
 
         return yaml.safe_load(self)
@@ -37,12 +45,11 @@ class Yaml(ContentMediaType["application/yaml"]):
     def dumps(cls, self, **kwargs):
         import yaml
 
-        return (String + Yaml)(yaml.safe_dump(self, **kwargs))
+        return (strings.String + Yaml)(yaml.safe_dump(self, **kwargs))
 
 
 class Toml(ContentMediaType["text/toml"]):
-    @classmethod
-    def loads(cls, self):
+    def loads(self):
         import toml
 
         return toml.loads(self)
@@ -51,7 +58,7 @@ class Toml(ContentMediaType["text/toml"]):
     def dumps(cls, self):
         import toml
 
-        return (String + Toml)(toml.dumps(self))
+        return (strings.String + Toml)(toml.dumps(self))
 
 
 class Markdown(ContentMediaType["text/markdown"]):
@@ -59,6 +66,18 @@ class Markdown(ContentMediaType["text/markdown"]):
 
 
 class Html(ContentMediaType["text/html"]):
+    pass
+
+
+class LD(Json, ContentMediaType["application/ld+json"]):
+    pass
+
+
+class Turtle(ContentMediaType["text/turtle"]):
+    pass
+
+
+class Rdf(ContentMediaType["application/rdf+xml"]):
     pass
 
 

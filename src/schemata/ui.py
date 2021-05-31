@@ -1,4 +1,16 @@
-from .types import UiOptions, UiWidget
+from .types import Any
+
+
+class Ui(Any):
+    pass
+
+
+class UiWidget(Ui):
+    pass
+
+
+class UiOptions(Ui):
+    pass
 
 
 class Checkbox(UiWidget["checkbox"]):
@@ -12,8 +24,10 @@ class Select(UiWidget["select"]):
 class Radio(UiWidget["radio"]):
     pass
 
+
 class Range(UiWidget["range"]):
     pass
+
 
 class Slider(UiWidget["slider"]):
     pass
@@ -34,19 +48,24 @@ class Textarea(UiWidget["text"]):
 class Password(UiWidget["password"]):
     pass
 
+
 class Updown(UiWidget["updown"]):
     pass
+
 
 class Color(UiWidget["color"]):
     pass
 
+
 class Picker(UiOptions):
     pass
+
 
 class Multiple(UiOptions):
     pass
 
-from .arrays import Sequence
+
+from .arrays import Arrays
 from .numbers import Numeric
 from .objects import Dict
 from .strings import String
@@ -56,7 +75,7 @@ SCHEMATA_TO_UI_TYPES = {
     Bool: [Checkbox, Select, Radio],
     Numeric: [Text, Updown, Range, Slider],
     String: [Text, Textarea, Password, Color],
-    Sequence: [Dropdown, Range, Select],
+    Arrays: [Dropdown, Range, Select],
     Dict: [],
     Enum: [Range, Select, Dropdown, Radio],
 }

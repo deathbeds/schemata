@@ -1,7 +1,7 @@
 version: 2
 formats: all
 python:
-  install:
+m  install:
     - method: pip
       path: .
       extra_requirements:

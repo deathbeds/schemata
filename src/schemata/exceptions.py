@@ -1,5 +1,12 @@
 from contextlib import suppress
 
+from .utils import partial, testing
+
+globals().update(
+    {x: getattr(testing, x) for x in dir(testing) if x.startswith("assert")}
+)
+__all__ = ("ValidationError",)
+
 
 class ValidationError(AssertionError, suppress):
     def __init__(self, *args, **kw):
@@ -32,3 +39,7 @@ class ValidationError(AssertionError, suppress):
         if self.exceptions:
             raise self
         return self
+
+
+def raises(*args):
+    assertRaises(BaseException, partial(*args))

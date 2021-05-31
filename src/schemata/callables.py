@@ -1,34 +1,26 @@
-from schemata.utils import enforce_tuple, get_default
+from schemata.utils import EMPTY, enforce_tuple, get_default
 
+from . import utils
 from .types import Any, Type
 
-__all__ = "Callable", "Compose", "Juxt"
+__all__ = "Cast", "Do", "Juxt", "Callable"
 
 
-class Callable(Type):
-    def __class_getitem__(cls, object):
-        if isinstance(object, tuple):
-            return cls + Callable.Funcs[object[0]] + Callable.Args[object[1:]]
-        elif isinstance(object, dict):
-            return cls + Callable.Kwargs[object]
-        return cls + Callable.Funcs[object]
-
+class Cast(Any):
     @classmethod
-    def is_valid(cls, object):
-        assert callable(object), "{object} is not callable"
-
-    def __new__(cls, *args, **kwargs):
-        from .utils import enforce_tuple
-
-        args = enforce_tuple(cls.value(Callable.Args, default=())) + args
+    def call(cls, *args, **kwargs):
+        args = utils.enforce_tuple(cls.value(Callable.Args, default=())) + args
         kwargs = {**cls.value(Callable.Kwargs, default={}), **kwargs}
 
-        for callable in enforce_tuple(cls.value(Callable.Funcs)):
-            args, kwargs = (callable(*args, **kwargs),), {}
-        return args[0]
+        cast = cls.value(Cast)
+        if cast:
+            if cast is not True:
+                for callable in utils.enforce_tuple(cast):
+                    args, kwargs = (callable(*args, **kwargs),), {}
+        return Any.object(*args, **kwargs)
 
-    class Funcs(Any):
-        pass
+    class Return(Any):
+        ...
 
     class Args(Any):
         pass
@@ -37,18 +29,37 @@ class Callable(Type):
         pass
 
 
-class Compose(Callable):
+class Callable(Cast):
+    @classmethod
+    def validator(cls, object):
+        assert callable(object), f"{object} is not callable"
+
     def __class_getitem__(cls, object):
-        return cls + Callable.Funcs[enforce_tuple(object)]
+        if isinstance(object, tuple):
+            if len(object) is 1:
+                cls += Cast[object[0]]
+            if len(object) is 2:
+                cls += Callable.Return[object[1]]
+
+        return super().__class_getitem__(enforce_tuple(object))
+
+
+class Do(Cast):
+    @classmethod
+    def object(cls, *args, **kwargs):
+        super().__new__(cls, *args, **kwargs)
+        if args:
+            return args[0]
 
 
 class Juxt(Type):
-    def __new__(cls, *args, **kwargs):
+    @classmethod
+    def object(cls, *args, **kwargs):
         from .utils import enforce_tuple
 
         args = (cls.value(Callable.Args) or ()) + args
         kwargs = {**(cls.value(Callable.Kwargs) or {}), **kwargs}
 
-        for callable in enforce_tuple(cls.value(Callable.Funcs)):
+        for callable in enforce_tuple(cls.value(Cast)):
             args, kwargs = (callable(*args, **kwargs),), {}
         return args[0]

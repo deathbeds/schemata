@@ -302,7 +302,7 @@ class Type(metaclass=Definition):
         return get_schema(cls, ravel=ravel)
 
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         types = cls.py()
         if types:
             testing.assertIsInstance(object, types)
@@ -313,7 +313,7 @@ class Type(metaclass=Definition):
         for t in inspect.getmro(cls):
             if getattr(t, "created", None):
                 with exception:
-                    t.is_valid(object)
+                    t.validator(object)
         exception.raises()
 
     def __class_getitem__(cls, object):
@@ -337,7 +337,7 @@ class Default(Type, rank=-1):
 
 class Const(Default):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         value = cls.value(Const)
         if value is not None:
             testing.assertEqual(object, value)
@@ -351,12 +351,12 @@ class Combined(Type):
 
 class Composite(Type):
     def __new__(cls, object=inspect._empty):
-        return cls.is_valid(object)
+        return cls.validator(object)
 
 
 class Not(Composite, rank=-10000):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         value = cls.value(Not)
         try:
             value.validate(object)
@@ -367,7 +367,7 @@ class Not(Composite, rank=-10000):
 
 class AllOf(Composite, kind=Kind.tuple):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         exception = ValidationError()
         for type in cls.value(AllOf) or []:
             with exception:
@@ -378,7 +378,7 @@ class AllOf(Composite, kind=Kind.tuple):
 
 class AnyOf(Composite, kind=Kind.tuple):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         exceptions = ValidationError()
         for type in cls.value(AnyOf) or []:
             with exceptions:
@@ -389,11 +389,11 @@ class AnyOf(Composite, kind=Kind.tuple):
 
 class OneOf(Composite, kind=Kind.tuple):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         found = False
         for type in cls.value(OneOf) or []:
             try:
-                type.is_valid(object)
+                type.validator(object)
                 if found:
                     raise ValidationError(
                         "object is more than one type", parent=cls, exceptions=[]
@@ -438,9 +438,9 @@ Bool.register(bool)
 
 class Integer(Type["integer"], int, Mixin.Literal):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         testing.assertNotIsInstance(object, bool)
-        super().is_valid(object)
+        super().validator(object)
 
 
 class Float(Type["number"], float, Mixin.Literal):
@@ -453,7 +453,7 @@ class String(Type["string"], str, Mixin.Literal):
 
 class Items(Type):
     @classmethod
-    def is_valid(cls, object):
+    def validator(cls, object):
         value = cls.value(Items)
         if value:
             if isinstance(value, (tuple, list)):
@@ -526,7 +526,7 @@ class Examples(Type, kind=Kind.tuple):
 
 class Dependencies(Type, kind=Kind.dict):
     @validates(dict)
-    def is_valid(cls, object):
+    def validator(cls, object):
         for k, v in (cls.value(Dependencies) or {}).items():
             if k in object:
                 missing = list(v)
@@ -539,7 +539,7 @@ class Dependencies(Type, kind=Kind.dict):
 
 class Properties(Type, kind=Kind.dict):
     @validates(dict)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, dict):
             for k, v in (cls.value(Properties) or {}).items():
                 if k in object:
@@ -608,7 +608,7 @@ class Pattern(String):
         return Type.__class_getitem__.__func__(cls, re.compile(object))
 
     @validates(str)
-    def is_valid(cls, object):
+    def validator(cls, object):
         value = cls.value(Pattern)
         if isinstance(value, typing.Pattern):
             testing.assertRegex(object, value)
@@ -625,10 +625,10 @@ class Format(Type):
 
 class Uri(Format["uri"], String):
     @validates(str)
-    def is_valid(cls, object):
+    def validator(cls, object):
         import rfc3986
 
-        assert rfc3986.uri_reference(object).is_valid(require_scheme=True), not_format(
+        assert rfc3986.uri_reference(object).validator(require_scheme=True), not_format(
             cls, object
         )
 
@@ -651,21 +651,21 @@ class Email(Format["email"]):
 
 class MinLength(Type, kind=Kind.int):
     @validates(list, tuple)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, str):
             testing.assertGreaterEqual(len(object), cls.value(MinLength))
 
 
 class MaxLength(Type, kind=Kind.int):
     @validates(list, tuple)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, str):
             testing.assertLessEqual(len(object), cls.value(MaxLength))
 
 
 class Regex(Format["regex"], String):
     @validates(str)
-    def is_valid(cls, object):
+    def validator(cls, object):
         import re
 
         re.compile(object)
@@ -673,7 +673,7 @@ class Regex(Format["regex"], String):
 
 class MultipleOf(Type, kind=Kind.float):
     @validates(int, float)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (int, float)):
             value = cls.value(MultipleOf)
             assert not object % value, f"{object} is not a multiple of {value}"
@@ -681,28 +681,28 @@ class MultipleOf(Type, kind=Kind.float):
 
 class Minimum(Type, kind=Kind.float):
     @validates(int, float)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (int, float)):
             testing.assertGreaterEqual(object, cls.value(Minimum))
 
 
 class Maximum(Type, kind=Kind.float):
     @validates(int, float)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (int, float)):
             testing.assertLessEqual(object, cls.value(Maximum))
 
 
 class ExclusiveMinimum(Type, kind=Kind.float):
     @validates(int, float)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (int, float)):
             testing.assertGreater(object, cls.value(ExclusiveMinimum))
 
 
 class ExclusiveMaximum(Type, kind=Kind.float):
     @validates(int, float)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (int, float)):
             testing.assertLess(object, cls.value(ExclusiveMaximum))
 
@@ -717,14 +717,14 @@ class AdditionalItems(Type):
 
 class MinItems(Type, kind=Kind.int):
     @validates(list)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (tuple, list)):
             testing.assertGreaterEqual(len(object), cls.value(MinItems))
 
 
 class MaxItems(Type, kind=Kind.int):
     @validates(list)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, (tuple, list)):
             testing.assertLessEqual(len(object), cls.value(MaxItems))
 
@@ -743,14 +743,14 @@ class PropertyNames(Type):
 
 class MinProperties(Type, kind=Kind.int):
     @validates(dict)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, str):
             testing.assertGreaterEqual(len(object), cls.value(MinProperties))
 
 
 class MaxProperties(Type, kind=Kind.int):
     @validates(dict)
-    def is_valid(cls, object):
+    def validator(cls, object):
         if isinstance(object, str):
             testing.assertLessEqual(len(object), cls.value(MaxProperties))
 

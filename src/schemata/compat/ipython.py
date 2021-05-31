@@ -157,4 +157,3 @@ def unload_ipython_extension(shell):
     global display_extension
     if display_extension is not None:
         display_extension.unload()
-    

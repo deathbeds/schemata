@@ -1,14 +1,14 @@
-from .types import EMPTY, ContentMediaType, Default, Examples, Type
-from .utils import Path
+from . import mediatypes, strings, utils
+from .types import EMPTY, Default, Examples, Type
 
 
-class Dir(Type, Path):
+class Dir(Type, utils.Path):
     def __class_getitem__(cls, object):
         return cls + Default[object]
 
     @classmethod
     def py(cls):
-        return Path
+        return utils.Path
 
 
 class File(Dir):
@@ -26,7 +26,7 @@ class File(Dir):
         with self.open("w") as file:
             if hasattr(self, "dumps"):
                 file.write(self.dumps(object))
-            mt = type(self).value(ContentMediaType)
+            mt = type(self).value(mediatypes.ContentMediaType)
             if mt is EMPTY:
-                return String
-            return String + mt
+                return strings.String
+            return strings.String + mt

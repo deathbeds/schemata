@@ -38,3 +38,10 @@ def test_api(type, contains):
     keys = dir(type)
     assert all(map(keys.__contains__, contains))
     assert not any(map(keys.__contains__, not_keys))
+
+
+# def test_infer():
+#     self = Integer.minimum(1).maximum(10)
+
+#     assert Any.infer(self.schema()) is not self
+#     assert Any.infer(self.schema()) == self
