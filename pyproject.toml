@@ -30,7 +30,7 @@ requires-python = ">=3.6"
 [tool.flit.metadata.requires-extra]
 app = ["typer", "jinja2"]
 ci = ["codecov"]
-docs = ["jupyter-book"]
+docs = ["jupyter-book", "sphinx_sitemap"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
