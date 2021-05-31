@@ -3,7 +3,7 @@ import operator
 import typing
 from functools import partialmethod
 
-from schemata.utils import EMPTY
+from .utils import EMPTY
 
 from . import exceptions, utils
 

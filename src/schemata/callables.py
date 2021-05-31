@@ -1,4 +1,4 @@
-from schemata.utils import EMPTY, enforce_tuple, get_default
+from .utils import EMPTY, enforce_tuple, get_default
 
 from . import utils
 from .types import Any, Type
