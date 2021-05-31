@@ -6,7 +6,7 @@ python:
       path: .
       extra_requirements:
         - docs
-        - tests
+        - test
 
 sphinx:
   configuration: conf.py

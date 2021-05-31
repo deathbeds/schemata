@@ -34,7 +34,7 @@ docs = ["jupyter-book", "sphinx_sitemap"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
-tests = [
+test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
   "ipywidgets",
