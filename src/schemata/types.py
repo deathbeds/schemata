@@ -203,6 +203,17 @@ class Const(Any):
     def validator(cls, object):
         exceptions.assertEqual(object, cls.value(Const))
 
+    def map(x, f):
+        cls = type(x)
+        if isinstance(f, type):
+            return cls[type](list(map(f, x)))
+        return cls(list(map(f, x)))
+
+    def filter(x, f):
+        return type(x)(list(filter(f, x)))
+
+    def groupby(x, f):
+        import itertools
 
 class Comment_(Any):
     id = "core:/properties/$comment"
