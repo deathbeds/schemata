@@ -34,7 +34,7 @@ docs = ["jupyter-book"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
-test = [
+tests = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
   "ipywidgets",
@@ -46,7 +46,7 @@ test = [
   "pytest",
   "pyyaml",
   "requests",
-  "requests-cache",
+  "requests_cache",
   "toml",
   "typer",
 ]
