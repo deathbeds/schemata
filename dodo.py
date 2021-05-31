@@ -10,7 +10,7 @@ def task_uml():
 
 
 def task_format():
-    return dict(actions=["isort .", "black ."])
+    return dict(actions=["isort .", "black ."], task_dep=["confpy"])
 
 
 def task_docs():
@@ -25,7 +25,7 @@ def task_confpy():
     return dict(
         actions=[
             "jb config sphinx --toc docs/toc.yml --config docs/config.yml  . > conf.py",
-            append,
+            """echo "\nbibtex_bibfiles = []" >> conf.py """,
         ]
     )
 
