@@ -3,9 +3,8 @@ import operator
 import typing
 from functools import partialmethod
 
-from .utils import EMPTY
-
 from . import exceptions, utils
+from .utils import EMPTY
 
 
 class TypeConversion:

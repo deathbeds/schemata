@@ -1,3 +1,5 @@
+"""composable types and traits in python"""
+__version__ = "0.0.1"
 from . import tests, ui
 from .arrays import *
 from .callables import *

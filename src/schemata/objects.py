@@ -25,7 +25,9 @@ class Dict(Type["object"], apis.FluentDict, dict):
             args = (dict(*args, **kwargs),)
         cast = cls.value(callables.Cast)
         if cast:
-            args = utils.enforce_tuple((dict if cast is True else cast)(*args, **kwargs))
+            args = utils.enforce_tuple(
+                (dict if cast is True else cast)(*args, **kwargs)
+            )
         else:
             cls.validate(*args)
 
