@@ -71,4 +71,4 @@ directory = "docs/coverage"
 [tool.pytest.ini_options]
 addopts = "-vv --nbval -pno:importnb --durations=5 --cov=src/schemata --cov-report=term-missing:skip-covered --no-cov-on-fail"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
-testpaths = ["docs", "src/schemata"]
+testpaths = ["docs", "src", "src/schemata"]
