@@ -8,7 +8,7 @@ from contextlib import suppress
 
 
 from . import apis, exceptions, utils
-from .utils import ANNO, DOC, EMPTY, PYVER
+from .utils import ANNO, DOC, EMPTY
 
 __all__ = (
     "Any",
