@@ -42,6 +42,9 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
         # use sphinx for the build to ensure we can work on readthedocs
         session.run(*"sphinx-build . _build/html".split())
         pathlib.Path("_build/html/.nojekyll").touch()
+        pathlib.Path("_build/html.index.html").write_text(
+            """<meta http-equiv="Refresh" content="0; url='readme.html'" />"""
+        )
 
     @nox.session(python=False)
     def develop(session):
@@ -55,7 +58,7 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
     def confpy(session):
         with open("conf.py", "w") as file:
             session.run(
-                *"jb config sphinx --toc docs/_toc.yml --config docs/_config.yml .".split(),
+                *"jb config sphinx --toc docs/toc.yml --config docs/config.yml .".split(),
                 stdout=file
             )
 
