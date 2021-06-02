@@ -10,6 +10,8 @@ from typing import Type
 from unittest import TestCase
 from unittest.runner import TextTestResult
 
+Pattern = type(re.compile(""))
+
 testing = TestCase()
 import abc
 import functools
@@ -147,7 +149,7 @@ def get_schema_iter(x, *, ravel=True):
 
 
 @get_schema.register
-def get_schema_re(x: re.Pattern, *, ravel=True):
+def get_schema_re(x: Pattern, *, ravel=True):
     return x.pattern
 
 
