@@ -40,6 +40,12 @@ class ValidationError(AssertionError, suppress):
             raise self
         return self
 
+    def push(self, key):
+        return self
+
+    def pop(self):
+        pass
+
 
 def raises(*args):
     assertRaises(BaseException, partial(*args))

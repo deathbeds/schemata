@@ -81,6 +81,22 @@ class Rdf(ContentMediaType["application/rdf+xml"]):
     pass
 
 
+class Image:
+    pass
+
+
+class Png(ContentMediaType["image/png"]):
+    pass
+
+
+class Bmp(ContentMediaType["image/bmp"]):
+    pass
+
+
+class Jpeg(ContentMediaType["image/jpeg"]):
+    pass
+
+
 Type.Plain = Plain
 Type.Json = Json
 Type.Yaml = Yaml

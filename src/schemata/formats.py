@@ -46,6 +46,7 @@ class UriTemplate(Format["uri-template"]):
         import uritemplate
 
         from .strings import String
+        from .types import Type
 
         template = uritemplate.URITemplate(cls.value(String.Pattern))
         return template.expand(dict(zip(template.variable_names, args)), **kw)

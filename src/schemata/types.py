@@ -26,6 +26,7 @@ __all__ = (
     "Optional",
     "ReadOnly",
     "Ref_",
+    "Schema_",
     "Title",
     "Type",
     "Value",
@@ -94,6 +95,9 @@ instantiate a new schemata type.
     def __doc__(cls):
         """generate docstrings from schema"""
         return utils.get_docstring(cls)
+
+    def __str__(cls):
+        return cls.key() or super().__str__()
 
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
@@ -214,6 +218,11 @@ class Const(Any):
 
     def groupby(x, f):
         import itertools
+
+
+class Schema_(Any):
+    pass
+
 
 class Comment_(Any):
     id = "core:/properties/$comment"

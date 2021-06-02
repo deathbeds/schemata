@@ -264,6 +264,16 @@ class FluentArrays:
         cls = type(self)
         return cls.cast()((x for x in self if callable(x, *args, **kwargs)))
 
+    def dataframe(self, *args, **kwargs):
+        import pandas
+
+        return pandas.DataFrame(self, *args, **kwargs)
+
+    def series(self, *args, **kwargs):
+        import pandas
+
+        return pandas.Series(self, *args, **kwargs)
+
     def append(self, *args):
         list.append(self, *args)
         return self
@@ -285,12 +295,14 @@ class FluentArrays:
         return self
 
     def sum(self, start=0):
+        from .arrays import List
+
         if isinstance(start, str):
             from .strings import String
 
             # usually strings fail to sum on strings.
             return String(start.join(self))
-        return sum(self, start)
+        return List(sum(self, start))
 
     def sort(self, inplace=True, key=EMPTY, reverse=EMPTY):
         if inplace:
@@ -332,7 +344,7 @@ class FluentDict:
         from .objects import Dict
 
         if not cls:
-            return dict.values(self)
+            return dict.keys(self)
         if cls is True:
             from .arrays import List as cls
 
@@ -447,3 +459,7 @@ class Gather:
 
             nest_asyncio.apply()
             return asyncio.run(self._gather())
+
+
+class Meaning:
+    pass

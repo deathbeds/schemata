@@ -1,5 +1,7 @@
 import typing
 
+from schemata.callables import Cast
+
 from . import apis, utils
 from .types import (
     ANNO,
@@ -16,38 +18,31 @@ from .utils import get_py, testing, validates
 __all__ = ("Dict",)
 
 
-class Dict(Type["object"], apis.FluentDict, dict):
-    def __new__(cls, *args, **kwargs):
-        if not (args or kwargs):
-            args = (utils.get_default(cls, {}),)
+class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        cls = type(self)
 
-        if kwargs:
-            args = (dict(*args, **kwargs),)
-        cast = cls.value(callables.Cast)
-        if cast:
-            args = utils.enforce_tuple(
-                (dict if cast is True else cast)(*args, **kwargs)
+        from . import callables
+
+        if not self:
+            self.update(
+                utils.get_default(cls, default=self),
             )
-        else:
-            cls.validate(*args)
 
-        self = dict.__new__(cls)
-        dict.__init__(self, *args)
-        if cast:
-            cls.validate(self)
-        return self
+        self.initialize()
 
-    def __init__(self, object=EMPTY, **kwargs):
-        if object is EMPTY:
-            object = type(self).value(Default, Const)
+    def initialize(self):
+        cls = type(self)
+        for key, value in cls.value(Dict.Properties, default={}).items():
+            if key not in self:
+                default = utils.get_default(value)
+                if default is not EMPTY:
+                    self[key] = default
 
-        if object is EMPTY:
-            object = {}
-
-        if object is EMPTY:
-            super().__init__()
-        else:
-            super().__init__(object, **kwargs)
+            if key in self:
+                if value in type(self[key]).__mro__:
+                    key[self] = value(self[key])
 
     @classmethod
     def default(cls, object=EMPTY, **kwargs):
@@ -92,6 +87,9 @@ class Dict(Type["object"], apis.FluentDict, dict):
         return cls + Dict.Properties[dict(*args, **kwargs)]
 
     class Properties(Any, id="applicator:/properties/properties"):
+        def __class_getitem__(cls, object):
+            return super().__class_getitem__(object)
+
         @validates(dict)
         def validator(cls, object):
             for k, v in (cls.value(Dict.Properties) or {}).items():
@@ -160,6 +158,11 @@ class Dict(Type["object"], apis.FluentDict, dict):
                 if k in keys:
                     for required in v:
                         testing.assertIn(required, keys)
+
+    def remove(self, *args):
+        for x in args:
+            self.pop(x)
+        return self
 
 
 JSONSCHEMA_SCHEMATA_MAPPING["object"] = Dict

@@ -17,7 +17,13 @@ import json
 from pathlib import Path
 
 Path = type(Path())
-ANNO, NAME, SCHEMA, DOC = "__annotations__", "__name__", "__schema__", "__doc__"
+ANNO, NAME, SCHEMA, DOC, TYPE = (
+    "__annotations__",
+    "__name__",
+    "__schema__",
+    "__doc__",
+    "@type",
+)
 
 
 class Ø(abc.ABCMeta):
@@ -111,7 +117,7 @@ def get_schema_str(x: str, *, ravel=True):
 
 @get_schema.register
 def get_schema_enum(x: enum.EnumMeta, *, ravel=True):
-    return tuple(x.__members__)
+    return (ravel and list or tuple)(x.__members__)
 
 
 @get_schema.register
@@ -268,12 +274,13 @@ def get_schema_type_cache(x=EMPTY):
 
 @get_schemata.register
 def get_schemata_dict(schema: dict, cache=None):
+    from .composites import AllOf, AnyOf, Not, OneOf
     from .types import Any, MetaType
 
     cache = cache or get_schema_type_cache()
 
-    if "type" in schema:
-        id = (("type", schema["type"]),)
+    id = (("type", schema["type"]),)
+    if "type" in schema and id in cache["prototypes"]:
         cls = cache["prototypes"][hash(id)]
     else:
         cls = Any

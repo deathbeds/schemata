@@ -100,17 +100,12 @@ class Uuid(String, formats.Format["uuid"]):
 
 
 class Uri(String, formats.Uri):
-    def __class_getitem__(cls, object):
-        cls = super().__class_getitem__(object)
-        if isinstance(object, str):
-            cls += formats.UriTemplate
-        return cls
-
     def __new__(cls, *args, **kwargs):
         template = cls.value(String.Pattern)
         if template:
-            return Type.__new__(cls, cls.render(*args, **kwargs))
-
+            args, kwargs = (
+                formats.UriTemplate.render.__func__(cls, *args, **kwargs),
+            ), {}
         return super().__new__(cls, *args, **kwargs)
 
     def get(self, **kwargs):
@@ -135,8 +130,21 @@ class Uri(String, formats.Uri):
     class Cache(Any):
         pass
 
+    def __add__(self, object):
+        return str.__new__(type(self), super().__add__(object))
+
     def __truediv__(self, object):
-        return self + "/" + object
+        return str.__new__(type(self), self + "/" + object)
+
+    def __getattr__(self, object):
+        if object.startswith("__"):
+            return super().__getattr__(object)
+        return str.__new__(type(self), super().__add__(object))
+
+    def iframe(self, width="100%", height=600):
+        import IPython
+
+        return IPython.display.IFrame(self, width=width, height=height)
 
 
 class UriReference(Uri, formats.Format["uri-reference"]):
@@ -248,4 +256,4 @@ class UriTemplate(String, formats.UriTemplate):
         import uritemplate
 
         template = uritemplate.URITemplate(self)
-        return template.expand(dict(zip(template.variable_names, args)), **kw)
+        return Uri(template.expand(dict(zip(template.variable_names, args)), **kw))

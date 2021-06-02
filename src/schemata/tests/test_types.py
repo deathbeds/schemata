@@ -6,8 +6,7 @@ import hypothesis
 import pytest
 
 from schemata import *
-from schemata import base, util
-from schemata.util import *
+from schemata.utils import *
 
 
 class ANull(Null, Examples[None]):

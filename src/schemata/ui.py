@@ -1,12 +1,12 @@
-from .types import Any
-
 from . import base, util
+from .types import Any
 
 
 class Ui(base.Form):
     @classmethod
     def form(cls):
         return f"ui:{util.lowercased(cls.__name__)}"
+
 
 class Ui(Any):
     pass

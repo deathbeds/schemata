@@ -68,7 +68,7 @@ class Arrays(apis.FluentArrays):
         return cls
 
 
-class List(Arrays, Type["array"], list):
+class List(Arrays, apis.Meaning, Type["array"], list):
     def __init__(self, *args):
         from . import callables
 
