@@ -28,9 +28,7 @@ extensions = [
     "sphinx_panels",
     "sphinx_book_theme",
     "sphinx_sitemap",
-    "sphinx.ext.napoleon",
     "sphinx.ext.todo",
-    "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
 ]
 globaltoc_path = "docs/toc.yml"
