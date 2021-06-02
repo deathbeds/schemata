@@ -21,6 +21,7 @@ requires = [
   "uritemplate",
   "typing >=3.7.4 ; python_version < '3.7'",
   "strict_rfc3339",
+  "rfc3986",
   "email_validator",
 ]
 requires-python = ">=3.6"
