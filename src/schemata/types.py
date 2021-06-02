@@ -99,6 +99,8 @@ instantiate a new schemata type.
     def __str__(cls):
         return cls.key() or super().__str__()
 
+    def __getitem__(cls, object):
+        return cls.__class_getitem__(object)
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
     def __new__(cls, object=EMPTY):
