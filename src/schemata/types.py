@@ -6,8 +6,9 @@ import inspect
 import typing
 from contextlib import suppress
 
+
 from . import apis, exceptions, utils
-from .utils import ANNO, DOC, EMPTY
+from .utils import ANNO, DOC, EMPTY, PYVER
 
 __all__ = (
     "Any",
@@ -98,9 +99,6 @@ instantiate a new schemata type.
 
     def __str__(cls):
         return cls.key() or super().__str__()
-
-    def __getitem__(cls, object):
-        return cls.__class_getitem__(cls, object)
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
     def __new__(cls, object=EMPTY):
