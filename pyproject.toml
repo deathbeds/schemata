@@ -63,6 +63,9 @@ include = []
 [tool.coverage.run]
 omit = [
   "*/tests/*",
+  "src/schemata/compat/*",
+  "src/schemata/ui.py",
+  "src/schemata/_schema.py"
 ]
 
 [tool.coverage.html]
