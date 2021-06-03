@@ -6,6 +6,7 @@ from schemata.tests import strategies
 
 
 @hypothesis.given(strategies.draw_type_value(strategies.draw_schemata()))
+@hypothesis.settings(suppress_health_check=[hypothesis.HealthCheck.too_slow])
 def test_types(pair):
     global cls, value
     cls, value = pair
