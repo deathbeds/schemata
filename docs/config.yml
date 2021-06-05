@@ -26,9 +26,9 @@ html:
 sphinx:
   extra_extensions: 
   - sphinx_sitemap
-  # - sphinx.ext.napoleon
+  - sphinx.ext.napoleon
   - sphinx.ext.todo
-  # - sphinx.ext.autodoc
+  - sphinx.ext.autodoc
   - sphinx.ext.viewcode
   local_extensions: {}
   config: 

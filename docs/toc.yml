@@ -1,5 +1,7 @@
-- file: readme
-  sections:
-  - file: src/readme
-  - file: src/schemata/readme
-  - file: src/schemata/tests/readme
+format: jb-article
+root: readme
+sections:
+- file: src/readme
+- file: src/schemata/readme
+- file: src/schemata/tests/readme
+

@@ -21,17 +21,21 @@ extensions = [
     "sphinx_copybutton",
     "myst_nb",
     "jupyter_book",
-    "sphinxcontrib.bibtex",
     "sphinx_thebe",
     "sphinx_comments",
+    "sphinx_external_toc",
     "sphinx.ext.intersphinx",
     "sphinx_panels",
     "sphinx_book_theme",
     "sphinx_sitemap",
+    "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "jupyterbook_latex",
 ]
-globaltoc_path = "docs/toc.yml"
+external_toc_exclude_missing = False
+external_toc_path = "docs/toc.yml"
 html_add_permalinks = "¶"
 html_baseurl = "https://schemata.readthedocs.io/en/latest/"
 html_favicon = ""
@@ -63,6 +67,7 @@ jupyter_cache = ""
 jupyter_execute_notebooks = "off"
 language = None
 latex_engine = "pdflatex"
+myst_enable_extensions = ["colon_fence", "dollarmath", "linkify", "substitution"]
 myst_url_schemes = ["mailto", "http", "https"]
 napoleon_numpy_docstring = True
 nb_output_stderr = "show"
@@ -82,5 +87,7 @@ nb_render_priority = {
 numfig = True
 panels_add_bootstrap_css = False
 pygments_style = "sphinx"
+suppress_warnings = ["myst.domains"]
+use_jupyterbook_latex = True
 
 bibtex_bibfiles = []
