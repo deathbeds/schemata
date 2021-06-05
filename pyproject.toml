@@ -62,16 +62,15 @@ include = []
 
 [tool.coverage.run]
 omit = [
-  "*/tests/*",
-  "src/schemata/compat/*",
-  "src/schemata/ui.py",
-  "src/schemata/_schema.py"
+  "*/tests/*.py",
+  "*/compat/*.py",
+  "*/src/*.ipynb",
 ]
 
 [tool.coverage.html]
 directory = "docs/coverage"
 
 [tool.pytest.ini_options]
-addopts = "-vv --nbval -pno:importnb --durations=5 --cov=src/schemata --cov-report=term-missing:skip-covered --no-cov-on-fail"
+addopts = "-v --nbval -pno:importnb --durations=5 --cov=src --cov-report=term-missing:skip-covered --no-cov-on-fail"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
 testpaths = ["docs", "src", "src/schemata"]
