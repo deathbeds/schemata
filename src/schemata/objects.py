@@ -3,16 +3,7 @@ import typing
 from schemata.callables import Cast
 
 from . import apis, utils
-from .types import (
-    ANNO,
-    EMPTY,
-    JSONSCHEMA_SCHEMATA_MAPPING,
-    Any,
-    Const,
-    Default,
-    MetaType,
-    Type,
-)
+from .types import ANNO, EMPTY, Any, Const, Default, MetaType, Type
 from .utils import get_py, testing, validates
 
 __all__ = ("Dict",)
@@ -165,4 +156,4 @@ class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
         return self
 
 
-JSONSCHEMA_SCHEMATA_MAPPING["object"] = Dict
+utils.JSONSCHEMA_SCHEMATA_MAPPING["object"] = Dict

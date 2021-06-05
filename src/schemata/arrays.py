@@ -2,7 +2,7 @@ import typing
 
 from . import apis, exceptions, utils
 from .strings import Uri
-from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Type
+from .types import EMPTY, Any, Type
 
 __all__ = "List", "Tuple", "Set", "Arrays"
 
@@ -157,4 +157,4 @@ class Set(Arrays, Type["array"], set):
         return set
 
 
-JSONSCHEMA_SCHEMATA_MAPPING["array"] = List
+utils.JSONSCHEMA_SCHEMATA_MAPPING["array"] = List

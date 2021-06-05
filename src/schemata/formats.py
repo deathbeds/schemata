@@ -69,3 +69,23 @@ class Uri(Format["uri"]):
         import rfc3986
 
         assert rfc3986.uri_reference(object).is_valid(require_scheme=True)
+
+
+class Uuid(Format["uuid"]):
+    @utils.validates(str)
+    def validator(cls, object, *args, **kwargs):
+        import uuid
+
+        return uuid.UUID(object, *args, **kwargs)
+
+
+class JsonPointer(Format["json-pointer"]):
+    @utils.validates(str)
+    def validator(cls, object):
+        import jsonpointer
+
+        return jsonpointer.JsonPointer(object)
+
+
+class UriReference(Format["uri-reference"]):
+    pass

@@ -1,5 +1,5 @@
 from . import apis, exceptions, utils
-from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Default, Type
+from .types import EMPTY, Any, Default, Type
 
 __all__ = "Integer", "Float", "Numeric"
 
@@ -63,4 +63,4 @@ class Float(Numeric, Type["number"], float):
         exceptions.assertIsInstance(object, float)
 
 
-JSONSCHEMA_SCHEMATA_MAPPING.update(dict(integer=Integer, number=Float))
+utils.JSONSCHEMA_SCHEMATA_MAPPING.update(dict(integer=Integer, number=Float))

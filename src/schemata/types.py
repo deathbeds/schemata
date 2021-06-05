@@ -6,7 +6,6 @@ import inspect
 import typing
 from contextlib import suppress
 
-
 from . import apis, exceptions, utils
 from .utils import ANNO, DOC, EMPTY
 
@@ -47,10 +46,10 @@ instantiate a new schemata type.
         
         """
         # resolve docstrings
-        if DOC in dict and isinstance(dict[DOC], (str, type(None))):
-            doc = dict.pop(DOC)
-            if doc and isinstance(doc, str):
-                bases += (Description[doc],)
+        # if DOC in dict and isinstance(dict[DOC], (str, type(None))):
+        #     doc = dict.pop(DOC)
+        #     if doc and isinstance(doc, str):
+        #         bases += (Description[doc],)
 
         if ANNO in dict:
             anno = dict.pop(ANNO)
@@ -81,9 +80,6 @@ instantiate a new schemata type.
 
     def value(cls, *key, default=EMPTY):
         """get the corresponding value to the class key"""
-        if not hasattr(cls, ANNO):
-            return
-
         for k in key or (cls.key(),):
             if isinstance(k, type):
                 k = k.key()
@@ -92,13 +88,9 @@ instantiate a new schemata type.
                 return cls.__annotations__[k]
         return default
 
-    @property
-    def __doc__(cls):
-        """generate docstrings from schema"""
-        return utils.get_docstring(cls)
-
     def __str__(cls):
         return cls.key() or super().__str__()
+
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
     def __new__(cls, object=EMPTY):
@@ -156,7 +148,10 @@ class Type(Any):
             args = args or (super(Any, cls).__new__(cls),)
             cls.validate(*args)
 
-        self = super(Any, cls).__new__(cls, *args, **kw)
+        if type:
+            self = super(Any, cls).__new__(cls, *args, **kw)
+        else:
+            return super().__new__(cls, *args, **kw)
 
         return self
 
@@ -168,9 +163,9 @@ class Type(Any):
             if value is EMPTY:
                 continue
             if isinstance(value, str):
-                if value in JSONSCHEMA_SCHEMATA_MAPPING:
+                if value in utils.JSONSCHEMA_SCHEMATA_MAPPING:
                     with exception:
-                        JSONSCHEMA_SCHEMATA_MAPPING[value].validator(object)
+                        utils.JSONSCHEMA_SCHEMATA_MAPPING[value].validator(object)
                 else:
                     "we'll consider these forward references"
 
@@ -188,15 +183,15 @@ class Type(Any):
         if isinstance(type, tuple):
             return typing.Union[tuple(Type[x].py() for x in type)]
         if type:
-            return JSONSCHEMA_PY_MAPPING[type]
+            return utils.JSONSCHEMA_PY_MAPPING[type]
         return object
 
     def __class_getitem__(cls, object):
-        with suppress(NameError):
-            if object in JSONSCHEMA_STR_MAPPING:
-                object = JSONSCHEMA_STR_MAPPING[object]
-            if object in JSONSCHEMA_SCHEMATA_MAPPING:
-                return JSONSCHEMA_SCHEMATA_MAPPING[object]
+        if object in utils.JSONSCHEMA_STR_MAPPING:
+            object = utils.JSONSCHEMA_STR_MAPPING[object]
+        if object in utils.JSONSCHEMA_SCHEMATA_MAPPING:
+            return utils.JSONSCHEMA_SCHEMATA_MAPPING[object]
+
         return Any.__class_getitem__.__func__(cls, object)
 
 
@@ -355,22 +350,10 @@ Any.Ref_ = Ref_
 Any.Title = Title
 Any.WriteOnly = WriteOnly
 
-JSONSCHEMA_SCHEMATA_MAPPING = dict(
+
+# map a jsonschema to the schemata type
+utils.JSONSCHEMA_SCHEMATA_MAPPING.update(
     null=Null,
     boolean=Bool,
     enum=Enum,
 )
-
-
-JSONSCHEMA_PY_MAPPING = dict(
-    null=type(None),
-    boolean=bool,
-    string=str,
-    integer=int,
-    number=float,
-    array=list,
-    object=dict,
-)
-
-
-JSONSCHEMA_STR_MAPPING = dict(map(reversed, JSONSCHEMA_PY_MAPPING.items()))

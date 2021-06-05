@@ -45,10 +45,7 @@ def validates(*types):
     def decorator(callable):
         @functools.wraps(callable)
         def main(cls, object):
-            if types:
-                if isinstance(object, types):
-                    return callable(cls, object)
-            else:
+            if isinstance(object, types):
                 return callable(cls, object)
 
         return classmethod(main)
@@ -66,32 +63,59 @@ def enforce_tuple(x):
     return x
 
 
-def merge(cls, **schema):
-    for type in cls.__mro__:
-        for k, v in dict.items(getattr(type, ANNO, {}) or {}):
-            if k in ("type", "enum", "cast", "anyOf", "allOf", "oneOf"):
-                if k in schema:
-                    for y in enforce_tuple(v):
-                        if y == schema[k]:
-                            continue
-                        if y in schema[k]:
-                            continue
-                        v = enforce_tuple(schema[k]) + (y,)
+@register
+def merge(object, **schema):
+    return schema
 
-                schema[k] = v
-            else:
-                schema[k] = v
+
+@merge.register
+def merge_type(object: type, **schema):
+    """merge multiple schema together"""
+    for type in object.__mro__:
+        schema = merge_dict(getattr(type, ANNO, {}) or {}, **schema)
+    return schema
+
+
+@merge.register
+def merge_dict(object: dict, **schema):
+    """merge multiple schema together"""
+    for k, v in object.items():
+        if k in ("type", "enum", "cast", "anyOf", "allOf", "oneOf"):
+            if k in schema:
+                for y in enforce_tuple(v):
+                    if y == schema[k]:
+                        continue
+                    if y in schema[k]:
+                        continue
+                    v = enforce_tuple(schema[k]) + (y,)
+
+        schema[k] = v
+    return schema
+
+
+@merge.register(tuple)
+@merge.register(list)
+def merge_iter(object, **schema):
+    """merge multiple schema together"""
+    for object in object:
+        schema = merge(object, **schema)
     return schema
 
 
 def lowercase(s):
+    """return a lower string"""
     if s:
         return s[0].lower() + s[1:]
     return ""
 
 
 def normalize_json_key(s):
-    """convert to a string a proper json key based on conventions"""
+    """convert to a string a proper json key based on conventions
+
+    * one trailing `_` refers to a `$` key
+    * two trailing `__` refers to a `@` key
+    * names leading with Ui are given spinal case
+    """
     if s.startswith("Ui"):
         return "ui:" + lowercase(s[2:])
     if s.endswith("_" * 2):
@@ -108,12 +132,7 @@ def uppercase(s):
 
 @register
 def get_schema(x, *, ravel=True):
-    """get teh schema from an object"""
-    return x
-
-
-@get_schema.register
-def get_schema_str(x: str, *, ravel=True):
+    """get the schema from an object"""
     return x
 
 
@@ -125,11 +144,26 @@ def get_schema_enum(x: enum.EnumMeta, *, ravel=True):
 @get_schema.register
 def get_schema_type(x: type, *, ravel=True):
     from .objects import Dict
+    from .types import MetaType
+
+    data = getattr(x, ANNO, {})
+
+    if ravel:
+        if hasattr(x, "__raw_doc__"):
+            data["description"] = x.__raw_doc__
+        else:
+            if x.__doc__:
+                data["description"] = x.__doc__
+
+        comments = inspect.getcomments(x)
+
+        if comments:
+            data["$comment"] = get_santized_comments(comments)
 
     if ravel is None:
-        return get_schema(getattr(x, ANNO, {}), ravel=True)
+        return get_schema(data, ravel=True)
     if ravel:
-        return get_schema(getattr(x, ANNO, {}), ravel=ravel)
+        return get_schema(data, ravel=ravel)
     return x
 
 
@@ -153,10 +187,12 @@ def get_schema_re(x: Pattern, *, ravel=True):
     return x.pattern
 
 
-def get_docstring(cls):
+def get_docstring(cls, docstring=""):
     """build a docstring for a schemata type"""
+    if not hasattr(cls, "__raw_doc__"):
+        cls.__raw_doc__ = cls.__doc__
     schema = cls.schema(True)
-    docstring = get_santized_comments(inspect.getcomments(cls) or "")
+    docstring = """"""
     if "title" in schema:
         docstring += schema["title"] + "\n" * 2
     if "description" in schema:
@@ -166,7 +202,7 @@ def get_docstring(cls):
 
         docstring += f"""\
 Notes
---------
+-----
 {schema["$comment"]}
 
 """
@@ -180,8 +216,8 @@ Examples
 """
             + "\n".join(
                 f"""\
- >>> {cls.__name__}({F'"{x}"' if isinstance(x, str) else x})
- """
+>>> {cls.__name__}({F'"{x}"' if isinstance(x, str) else x})
+"""
                 + ("" if x is None else f"'{x}'" if isinstance(x, str) else str(x))
                 for x in schema["examples"] or []
             )
@@ -199,10 +235,10 @@ def get_santized_comments(x):
 
 @register
 def get_schemata(x, cls=None):
-    from .types import JSONSCHEMA_SCHEMATA_MAPPING, JSONSCHEMA_STR_MAPPING, Any, Type
+    from .types import Any, Type
 
-    if cls and x is EMPTY:
-        return cls()
+    if cls and x in (EMPTY, None):
+        return None
 
     if isinstance(x, Any):
         return x
@@ -215,12 +251,7 @@ def get_schemata(x, cls=None):
 
 @get_schemata.register
 def get_schemata_type(x: type, cls=None):
-    from .types import (
-        JSONSCHEMA_SCHEMATA_MAPPING,
-        JSONSCHEMA_STR_MAPPING,
-        Any,
-        MetaType,
-    )
+    from .types import Any, MetaType
 
     if isinstance(x, MetaType):
         return x
@@ -231,17 +262,17 @@ def get_schemata_type(x: type, cls=None):
 @get_schemata.register
 def get_schemata_str(x: str, cls=None):
     from .strings import String
-    from .types import JSONSCHEMA_SCHEMATA_MAPPING
 
     if x in JSONSCHEMA_SCHEMATA_MAPPING:
         return JSONSCHEMA_SCHEMATA_MAPPING[x]
-    return String
+    return String(x)
 
 
 INFER_DICT_TYPES = "properties dependencies".split()
 
 
 def get_prototypes(x):
+    """the prototypes are individual class definitions that can be verified."""
     for cls in get_subclasses(x):
         if cls is x:
             continue
@@ -252,55 +283,10 @@ def get_prototypes(x):
 
 
 def get_subclasses(x):
+    """iterate through all the subclasses of an object"""
     for cls in x.__subclasses__():
         yield cls
         yield from get_subclasses(cls)
-
-
-def get_schema_type_cache(x=EMPTY):
-    from .types import Any
-
-    return dict(
-        prototypes={
-            hash(x): x
-            for x in get_prototypes(x or Any)
-            if len(getattr(x, ANNO, {})) is 1
-        },
-        keys={
-            x.key(): x
-            for x in get_prototypes(x or Any)
-            if len(getattr(x, ANNO, {})) is 0
-        },
-    )
-
-
-@get_schemata.register
-def get_schemata_dict(schema: dict, cache=None):
-    from .composites import AllOf, AnyOf, Not, OneOf
-    from .types import Any, MetaType
-
-    cache = cache or get_schema_type_cache()
-
-    id = (("type", schema["type"]),)
-    if "type" in schema and id in cache["prototypes"]:
-        cls = cache["prototypes"][hash(id)]
-    else:
-        cls = Any
-    for k, v in schema.items():
-        if k == "type":
-            continue
-
-        if isinstance(v, MetaType):
-            cls += v
-            continue
-
-        id = hash(((k, v),))
-
-        if id in cache["prototypes"]:
-            cls = cls + cache["prototypes"][id]
-        elif k in cache["keys"]:
-            cls = cls + cache["keys"][k][v]
-    return cls
 
 
 @register
@@ -319,14 +305,6 @@ def get_py_dict(x: dict):
 @get_py.register(list)
 def get_py_iter(x):
     return type(x)(map(get_py, x))
-
-
-def get_verified_object(x):
-    from .types import Verified
-
-    if isinstance(x, type) and issubclass(x, Verified):
-        return True, x.value(Verified)
-    return False, x
 
 
 @register
@@ -385,24 +363,6 @@ def make_enum(cls, members):
     )
 
 
-def is_metadata(x):
-    from . import types
-
-    return issubclass(
-        x,
-        (
-            types.Description,
-            types.Comment_,
-            types.Title,
-            types.Optional,
-            types.Examples,
-            types.Optional,
-            types.ReadOnly,
-            types.WriteOnly,
-        ),
-    )
-
-
 @register
 def get_default(object, default=EMPTY):
     return object
@@ -434,18 +394,6 @@ def get_default_type(cls: type, default=EMPTY):
                     next[k] = v
             return next
     return get_default(object, default=default)
-
-
-def get_cast(cls, *args, **kwargs):
-    from .callables import Cast
-
-    cast = cls.value(Cast)
-    if cast:
-        if cast is True:
-            return cls(*args, **kwargs)
-        if callable(cast):
-            return cast(*args, **kwargs)
-    raise TypeError("cant cast")
 
 
 """
@@ -483,3 +431,19 @@ Warns
 Yield (alias of Yields)
 Yields
 """
+
+# map a jsonschema to the python type
+JSONSCHEMA_PY_MAPPING = dict(
+    null=type(None),
+    boolean=bool,
+    string=str,
+    integer=int,
+    number=float,
+    array=list,
+    object=dict,
+)
+
+# map a python type to its jsonschema key
+JSONSCHEMA_STR_MAPPING = dict(map(reversed, JSONSCHEMA_PY_MAPPING.items()))
+
+JSONSCHEMA_SCHEMATA_MAPPING = {}

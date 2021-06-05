@@ -3,7 +3,7 @@ import operator
 
 from . import exceptions, formats, mediatypes, templates, times, utils
 from .apis import FluentString
-from .types import EMPTY, JSONSCHEMA_SCHEMATA_MAPPING, Any, Type
+from .types import EMPTY, Any, Type
 
 __all__ = (
     "String",
@@ -18,12 +18,6 @@ __all__ = (
 )
 
 
-class Bytes(mediatypes.ContentEncoding["base64"], bytes):
-    @classmethod
-    def validator(cls, object):
-        exceptions.assertIsInstance(object, bytes)
-
-
 # a string type
 class String(Type["string"], FluentString, str):
     @classmethod
@@ -33,15 +27,7 @@ class String(Type["string"], FluentString, str):
     def __class_getitem__(cls, object):
         if isinstance(object, str):
             return cls + cls.Pattern[object]
-        if isinstance(object, slice):
-            if object.step is not None:
-                cls = cls[object.step]
-            if object.start is not None:
-                cls += String.MinLength[object.start]
-            if object.stop is not None:
-                cls += String.MaxLength[object.stop]
-            return cls
-        return super().__class_getitem__(object)
+        return cls + object
 
     class Pattern(Any, id="validation:/properties/pattern"):
         @utils.validates(str)
@@ -61,12 +47,18 @@ class String(Type["string"], FluentString, str):
             exceptions.assertLessEqual(len(object), cls.value(String.MaxLength))
 
 
+class Bytes(mediatypes.ContentEncoding["base64"], bytes):
+    @classmethod
+    def validator(cls, object):
+        exceptions.assertIsInstance(object, bytes)
+
+
 # set default datetimes to now
 class Email(formats.Email, String):
     pass
 
 
-class Uuid(String, formats.Format["uuid"]):
+class Uuid(String, formats.Uuid):
     def __new__(cls, object=EMPTY, *args, **kwargs):
         import uuid
 
@@ -77,14 +69,8 @@ class Uuid(String, formats.Format["uuid"]):
             else:
                 object = "00000000-0000-0000-0000-000000000000"
         else:
-            object = uuid.UUID(object, *args, **kwargs)
+            object = cls.validator(object, *args, **kwargs)
         return super().__new__(cls, str(object))
-
-    @utils.validates(str)
-    def validator(cls, object):
-        import uuid
-
-        uuid.UUID(object)
 
     def __class_getitem__(cls, object):
         return cls + Uuid.Version[object]
@@ -147,17 +133,11 @@ class Uri(String, formats.Uri):
         return IPython.display.IFrame(self, width=width, height=height)
 
 
-class UriReference(Uri, formats.Format["uri-reference"]):
+class UriReference(Uri, formats.UriReference):
     pass
 
 
-class JsonPointer(String, formats.Format["json-pointer"]):
-    @utils.validates(str)
-    def validator(cls, object):
-        import jsonpointer
-
-        return jsonpointer.JsonPointer(object)
-
+class JsonPointer(String, formats.JsonPointer):
     def resolve(self, object, **kw):
         import jsonpointer
 
@@ -207,7 +187,7 @@ class Time(DateTime, formats.Time):
         return times.DateTime(times.make_datetime_rfc("1970-01-01T" + self + "+00:00"))
 
 
-JSONSCHEMA_SCHEMATA_MAPPING["string"] = String
+utils.JSONSCHEMA_SCHEMATA_MAPPING["string"] = String
 
 
 class Template:
