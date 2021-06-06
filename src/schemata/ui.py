@@ -1,5 +1,5 @@
 from . import utils
-from .types import Any
+from .types import Any, Type
 
 
 class Ui(Any):
@@ -13,11 +13,17 @@ class UiWidget(Ui):
             object = utils.enforce_tuple(current) + utils.enforce_tuple(object)
         return super().__class_getitem__(object)
 
-    def _ipython_display_(self):
+    @classmethod
+    def widget(cls, object=utils.EMPTY):
+        from .compat import ipywidgets
+
+        return ipywidgets.get_widget(object, schema=utils.merge((cls, type(object))))
+
+    def _ipython_display_(self, schema=utils.EMPTY):
         if not hasattr(self, "_display_handle"):
             from .compat import ipywidgets
 
-            self._display_handle = ipywidgets.get_widget(self)
+            self._display_handle = self.widget(self)
         self._display_handle._ipython_display_()
 
 
@@ -78,6 +84,14 @@ class Multiple(UiOptions):
     pass
 
 
+class HBox(UiWidget["hbox"]):
+    pass
+
+
+class VBox(UiWidget["vbox"]):
+    pass
+
+
 from .arrays import Arrays
 from .numbers import Numeric
 from .objects import Dict
@@ -86,7 +100,7 @@ from .types import Bool, Enum
 
 SCHEMATA_TO_UI_TYPES = {
     Bool: [Checkbox, Select, Radio],
-    Numeric: [Text, Updown, Range, Slider],
+    Numeric: [Checkbox, Text, Updown, Range, Slider],
     String: [Text, Textarea, Password, Color],
     Arrays: [Dropdown, Range, Select],
     Dict: [],
@@ -97,3 +111,7 @@ for k, v in SCHEMATA_TO_UI_TYPES.items():
         setattr(k, v.__name__, v)
 
 del k, v
+
+
+class Layout(Any):
+    pass

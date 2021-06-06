@@ -79,3 +79,26 @@ def test_get_schemata():
     assert utils.get_schemata("string") is String
 
     assert utils.get_schemata(None, cls=Type) is None
+
+
+def test_derivation(pytester):
+    import json
+
+    class MyStuff(Dict):
+        files: List[String]
+        name: String
+        id: Uri
+
+    pytester.makefile(".jsonschema", my_stuff=json.dumps(MyStuff.schema(True)))
+
+    derived = Any.from_schema(MyStuff.schema(True))
+
+    from_file = Any.from_file("my_stuff.jsonschema")
+
+    # assert {MyStuff: "our new type can reference the orgiinal"}.get(derived)
+    assert from_file is not derived is not MyStuff
+
+    # class OurStuff(Any.from_schema(MyStuff.schema(True))):
+    #     pass
+
+    # assert OurStuff == MyStuff == derived == from_file

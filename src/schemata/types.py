@@ -12,6 +12,7 @@ from .utils import ANNO, DOC, EMPTY
 __all__ = (
     "Any",
     "Bool",
+    "false",
     "Comment_",
     "Const",
     "Default",
@@ -20,7 +21,6 @@ __all__ = (
     "Definitions",
     "Enum",
     "Examples",
-    "Layout",
     "Any",
     "MetaType",
     "Null",
@@ -28,6 +28,7 @@ __all__ = (
     "ReadOnly",
     "Ref_",
     "Schema_",
+    "true",
     "Title",
     "Type",
     "Value",
@@ -64,6 +65,11 @@ instantiate a new schemata type.
             elif any(issubclass(x, objects.Dict) for x in (cls,) + bases):
                 bases += (objects.Dict.Properties[anno],)
 
+            defs = {k: v for k, v in dict.items() if isinstance(v, MetaType)}
+
+            if defs:
+                bases += (Definitions[defs],)
+
         # update the class dict payload
         key = utils.normalize_json_key(name)
         dict.setdefault(ANNO, {})
@@ -94,6 +100,16 @@ instantiate a new schemata type.
 
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
+    @classmethod
+    def from_file(cls, file):
+        import json
+
+        return cls.from_schema(json.loads(utils.Path(file).read_text()))
+
+    @classmethod
+    def from_schema(cls, schema):
+        return utils.get_class(schema)
+
     def __new__(cls, object=EMPTY):
         # fill in the default values if they exist
         object = utils.get_default(cls, default=object)
@@ -295,19 +311,26 @@ class Null(Type["null"]):
 Null.register(type(None))
 
 
-class Bool(Type["boolean"]):
+class Bool(Type["boolean"], int):
     def __new__(cls, object=EMPTY):
         if object is EMPTY:
             object = utils.get_default(cls, bool())
-        cls.validate(object)
-        return object
+        Bool.validator(object)
+        try:
+            return [false, true][object]
+        except NameError:
+            return super().__new__(cls, object)
 
     @classmethod
     def validator(cls, object):
-        exceptions.assertIsInstance(object, bool)
+        assert object in (True, False)
+
+    def __repr__(self):
+        return repr([False, True][self])
 
 
 Bool.register(bool)
+
 
 # the enum type
 class Enum(Type):
@@ -337,10 +360,6 @@ class Enum(Type):
         return cls.value(Enum)
 
 
-class Layout(Any):
-    pass
-
-
 Any.Comment_ = Comment_
 Any.Const = Const
 Any.Default = Default
@@ -349,7 +368,6 @@ Any.Deprecated = Deprecated
 Any.Description = Description
 Any.Enum = Enum
 Any.Examples = Examples
-Any.Layout = Layout
 Any.Optional = Optional
 Any.ReadOnly = ReadOnly
 Any.Ref_ = Ref_
@@ -363,3 +381,5 @@ utils.JSONSCHEMA_SCHEMATA_MAPPING.update(
     boolean=Bool,
     enum=Enum,
 )
+
+false, true = Bool(), Bool(True)

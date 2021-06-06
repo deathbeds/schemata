@@ -3,6 +3,9 @@ from .types import EMPTY, Default, Examples, Type
 
 
 class Dir(Type, utils.Path):
+    def __new__(cls, *object, **kw):
+        return utils.Path.__new__(cls, *object, **kw)
+
     def __class_getitem__(cls, object):
         return cls + Default[object]
 
@@ -15,7 +18,7 @@ class File(Dir):
     def load(self, cls=EMPTY):
         with self.open("r") as file:
             if hasattr(self, "loads"):
-                object = self.loads(file.read())
+                object = type(self).loads(file.read())
             else:
                 object = file.read()
         if cls is EMPTY:

@@ -1,6 +1,6 @@
 """composable types and traits in python"""
 __version__ = "0.0.1"
-from . import ui
+from . import compat, ui
 from .arrays import *
 from .callables import *
 from .composites import *

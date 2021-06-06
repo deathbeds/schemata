@@ -98,7 +98,7 @@ def merge_dict(object: dict, **schema):
 def merge_iter(object, **schema):
     """merge multiple schema together"""
     for object in object:
-        schema = merge(object, **schema)
+        schema.update(merge(object, **schema))
     return schema
 
 
@@ -161,7 +161,7 @@ def get_schema_type(x: type, *, ravel=True):
             data["$comment"] = get_santized_comments(comments)
 
     if ravel is None:
-        return get_schema(data, ravel=True)
+        return get_schema(data, ravel=False)
     if ravel:
         return get_schema(data, ravel=ravel)
     return x
@@ -314,7 +314,11 @@ def get_hashable(x):
 
 @get_hashable.register
 def get_hashable_dict(x: dict):
-    return tuple(zip(x.keys(), map(get_hashable, x.values())))
+    return tuple(
+        (k, get_hashable(v))
+        for k, v in x.items()
+        if k not in {"description", "$comment"}
+    )
 
 
 @get_hashable.register
@@ -377,7 +381,7 @@ def get_default_null(object: Ø, default=EMPTY):
 
 @get_default.register
 def get_default_type(cls: type, default=EMPTY):
-    from . import objects, types
+    from . import arrays, objects, types
 
     object = cls.value(types.Default, types.Const)
     if object is EMPTY:
@@ -393,6 +397,9 @@ def get_default_type(cls: type, default=EMPTY):
                 if v is not EMPTY:
                     next[k] = v
             return next
+        if issubclass(cls, arrays.Tuple):
+            return tuple(map(get_default, cls.value(arrays.Arrays.Items)))
+
     return get_default(object, default=default)
 
 
@@ -447,3 +454,41 @@ JSONSCHEMA_PY_MAPPING = dict(
 JSONSCHEMA_STR_MAPPING = dict(map(reversed, JSONSCHEMA_PY_MAPPING.items()))
 
 JSONSCHEMA_SCHEMATA_MAPPING = {}
+
+
+def get_prototype_mapping(cls=None):
+    from .types import Any
+
+    return {x.key(): x for x in filter(is_prototype, get_subclasses(cls or Any))}
+
+
+@register
+def get_class(schema, cls=EMPTY, types=EMPTY):
+    return schema
+
+
+@get_class.register
+def get_class_dict(schema: dict, cls=EMPTY, types=EMPTY):
+    types = types or get_prototype_mapping()
+    if not cls and "type" in schema:
+        if isinstance(schema["type"], str):
+            cls = get_schemata(schema["type"])
+        else:
+            cls = Type[schema["type"]]
+    for key, value in schema.items():
+        if key in {"type"}:
+            continue
+        if key in types:
+            if isinstance(value, dict):
+                cls = cls.new_type(
+                    {k: get_class(v, types=types) for k, v in value.items()}, types[key]
+                )
+            else:
+                cls = cls.new_type(value, types[key])
+    return cls
+
+
+@get_class.register(tuple)
+@get_class.register(list)
+def get_class_iter(schema, cls=EMPTY, types=EMPTY):
+    return type(schema)(map(partial(get_class, types=types), schema))

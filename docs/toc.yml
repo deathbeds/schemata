@@ -1,5 +1,5 @@
 format: jb-article
-root: readme
+root: index
 sections:
 - file: src/readme
 - file: src/schemata/readme

@@ -118,9 +118,7 @@ def test_uuid():
     assert Uuid[5]
 
 
-@pytest.mark.parametrize(
-    "type, value", ((String, 1), (Integer, "1"), (Float, "1.2"), (Dict, [("a", 1)]))
-)
+@pytest.mark.parametrize("type, value", ((String, 1), (Integer, "1"), (Float, "1.2")))
 def test_casting(type, value):
     x, y = copy.copy(value), copy.copy(value)
     with pytest.raises(AssertionError):
@@ -133,3 +131,7 @@ def test_casting_list():
     with pytest.raises(AssertionError):
         List(iter())
     assert List.cast()(iter()) == List.py()(iter())
+
+
+def test_casting_list():
+    """todo"""

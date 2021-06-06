@@ -1,3 +1,4 @@
+import enum
 import typing
 
 from schemata.callables import Cast
@@ -11,7 +12,11 @@ __all__ = ("Dict",)
 
 class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        if all(isinstance(x, dict) for x in args):
+            super().__init__(*args, **kwargs)
+            args = ()
+        else:
+            super().__init__(**kwargs)
         cls = type(self)
 
         from . import callables
@@ -21,11 +26,17 @@ class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
                 utils.get_default(cls, default=self),
             )
 
-        self.initialize()
+        self.initialize(*args)
+        self.validate(self)
 
-    def initialize(self):
+    def initialize(self, *args):
         cls = type(self)
-        for key, value in cls.value(Dict.Properties, default={}).items():
+        for i, (key, value) in enumerate(
+            cls.value(Dict.Properties, default={}).items()
+        ):
+            if i < len(args):
+                self[key] = args[i]
+
             if key not in self:
                 default = utils.get_default(value)
                 if default is not EMPTY:

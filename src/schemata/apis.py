@@ -109,7 +109,7 @@ class TypeOps:
         from .types import MetaType
 
         if isinstance(object, MetaType):
-            return cls.schema() == object.schema()
+            return int.__eq__(*map(hash, (cls, object)))
         return super().__eq__(object)
 
     eq = __eq__

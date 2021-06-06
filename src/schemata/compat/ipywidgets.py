@@ -1,3 +1,6 @@
+from numpy.lib.arraysetops import isin
+from numpy.lib.histograms import _get_outer_edges
+
 from schemata import ui, utils
 
 
@@ -8,20 +11,16 @@ def get_layout(schema):
 
 
 @utils.register
-def get_widget(object):
+def get_widget(object, schema=utils.EMPTY, **kw):
     return
 
 
 @get_widget.register
-def get_widget_bool(object: bool):
-    return
-
-
-@get_widget.register
-def get_widget_int(object: int, **kw):
+def get_widget_int(object: int, schema=utils.EMPTY, **kw):
     import ipywidgets
 
-    schema = object.schema()
+    schema = schema or object.schema()
+
     kw.update(
         {
             ipy: schema[s]
@@ -38,7 +37,9 @@ def get_widget_int(object: int, **kw):
 
     widget = schema.get(str(ui.UiWidget), tuple())
 
-    if "range" in widget:
+    if schema.get("type") == "boolean" or "checkbox" in widget:
+        cls = ipywidgets.Checkbox
+    elif "range" in widget:
         cls = ipywidgets.IntRangeSlider
     elif "slider" in widget:
         cls = ipywidgets.IntSlider
@@ -51,10 +52,10 @@ def get_widget_int(object: int, **kw):
 
 
 @get_widget.register
-def get_widget_float(object: float, **kw):
+def get_widget_float(object: float, schema=utils.EMPTY, **kw):
     import ipywidgets
 
-    schema = object.schema()
+    schema = schema or object.schema()
     kw.update(
         {
             ipy: schema[s]
@@ -84,10 +85,10 @@ def get_widget_float(object: float, **kw):
 
 
 @get_widget.register
-def get_widget_str(object: str, **kw):
+def get_widget_str(object: str, schema=utils.EMPTY, **kw):
     import ipywidgets
 
-    schema = object.schema()
+    schema = schema or object.schema()
     widget = schema.get(str(ui.UiWidget), "")
 
     if "textarea" in widget:
@@ -96,3 +97,61 @@ def get_widget_str(object: str, **kw):
         cls = ipywidgets.Text
 
     return cls(object, **kw, layout=get_layout(schema))
+
+
+@get_widget.register(list)
+@get_widget.register(tuple)
+def get_widget_iter(object, schema=utils.EMPTY, **kw):
+    import ipywidgets
+
+    schema = schema or object.schema(None)
+    widget = schema.get(str(ui.UiWidget), "")
+
+    schema = schema or object.schema()
+    kw.update(
+        {
+            ipy: schema[s]
+            for ipy, s in dict(
+                description="description",
+            ).items()
+            for s in s.split()
+            if s in schema
+        }
+    )
+
+    widget = schema.get(str(ui.UiWidget), tuple())
+
+    if "hbox" in widget:
+        cls = ipywidgets.HBox
+        object = get_children(object, schema=schema)
+    elif "vbox" in widget:
+        cls = ipywidgets.VBox
+        object = get_children(object)
+    elif "select" in widget:
+        cls = ipywidgets.Select
+    else:
+        cls = ipywidgets.Select
+
+    print(cls)
+    return cls(object, **kw, layout=get_layout(schema))
+
+
+def get_children(object, schema=utils.EMPTY):
+    if schema is utils.EMPTY:
+        schema = {}
+    typed = []
+    if "items" in schema:
+        schema = schema["items"]
+        if isinstance(schema, (list, tuple)):
+            for i, (cls, v) in enumerate(zip(schema, object)):
+                print(i, cls, v)
+                if hasattr(cls, "widget"):
+                    typed.append(cls.widget(v))
+                else:
+                    typed.append(get_widget(v, cls.schema()))
+            object = object[i:]
+            schema = utils.EMPTY
+    return typed + [
+        x.widget(x) if hasattr(x, "widget") else get_widget(x, schema=schema)
+        for x in object
+    ]
