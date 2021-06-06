@@ -1,11 +1,5 @@
-from . import base, util
+from . import utils
 from .types import Any
-
-
-class Ui(base.Form):
-    @classmethod
-    def form(cls):
-        return f"ui:{util.lowercased(cls.__name__)}"
 
 
 class Ui(Any):
@@ -13,7 +7,18 @@ class Ui(Any):
 
 
 class UiWidget(Ui):
-    pass
+    def __class_getitem__(cls, object):
+        current = cls.value(UiWidget)
+        if current:
+            object = utils.enforce_tuple(current) + utils.enforce_tuple(object)
+        return super().__class_getitem__(object)
+
+    def _ipython_display_(self):
+        if not hasattr(self, "_display_handle"):
+            from .compat import ipywidgets
+
+            self._display_handle = ipywidgets.get_widget(self)
+        self._display_handle._ipython_display_()
 
 
 class UiOptions(Ui):
@@ -32,6 +37,7 @@ class Radio(UiWidget["radio"]):
     pass
 
 
+# https://react-jsonschema-form.readthedocs.io/en/latest/usage/widgets/#for-number-and-integer-fields
 class Range(UiWidget["range"]):
     pass
 
@@ -48,7 +54,7 @@ class Text(UiWidget["text"]):
     pass
 
 
-class Textarea(UiWidget["text"]):
+class Textarea(UiWidget["textarea"]):
     pass
 
 
@@ -75,7 +81,7 @@ class Multiple(UiOptions):
 from .arrays import Arrays
 from .numbers import Numeric
 from .objects import Dict
-from .strings import String
+from .strings import String, UriTemplate
 from .types import Bool, Enum
 
 SCHEMATA_TO_UI_TYPES = {

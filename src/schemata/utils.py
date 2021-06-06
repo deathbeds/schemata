@@ -80,16 +80,16 @@ def merge_type(object: type, **schema):
 def merge_dict(object: dict, **schema):
     """merge multiple schema together"""
     for k, v in object.items():
-        if k in ("type", "enum", "cast", "anyOf", "allOf", "oneOf"):
+        if k in ("type", "enum", "cast", "anyOf", "allOf", "oneOf", "ui:widget"):
             if k in schema:
                 for y in enforce_tuple(v):
                     if y == schema[k]:
                         continue
                     if y in schema[k]:
                         continue
-                    v = enforce_tuple(schema[k]) + (y,)
+                    schema[k] = enforce_tuple(schema[k]) + (y,)
 
-        schema[k] = v
+        schema.setdefault(k, v)
     return schema
 
 

@@ -20,6 +20,7 @@ __all__ = (
     "Definitions",
     "Enum",
     "Examples",
+    "Layout",
     "Any",
     "MetaType",
     "Null",
@@ -336,6 +337,10 @@ class Enum(Type):
         return cls.value(Enum)
 
 
+class Layout(Any):
+    pass
+
+
 Any.Comment_ = Comment_
 Any.Const = Const
 Any.Default = Default
@@ -344,6 +349,7 @@ Any.Deprecated = Deprecated
 Any.Description = Description
 Any.Enum = Enum
 Any.Examples = Examples
+Any.Layout = Layout
 Any.Optional = Optional
 Any.ReadOnly = ReadOnly
 Any.Ref_ = Ref_

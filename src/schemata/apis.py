@@ -128,7 +128,9 @@ class TypeOps:
             name = utils.uppercase(str)
             if hasattr(cls, name):
 
-                def caller(*args):
+                def caller(*args, **kw):
+                    if (not args) and kw:
+                        args = (kw,)
                     nonlocal cls
                     object = getattr(cls, name)
                     if not args:
