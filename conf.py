@@ -28,9 +28,9 @@ extensions = [
     "sphinx_panels",
     "sphinx_book_theme",
     "sphinx_sitemap",
-    "sphinx.ext.napoleon",
+    # "sphinx.ext.napoleon",
     "sphinx.ext.todo",
-    "sphinx.ext.autodoc",
+    # "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
     "jupyterbook_latex",
 ]
