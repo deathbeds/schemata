@@ -42,6 +42,8 @@
     <script src="_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -373,6 +375,7 @@
  &#39;properties&#39;: {&#39;name&#39;: {&#39;type&#39;: &#39;string&#39;,
    &#39;minLength&#39;: 1,
    &#39;@type&#39;: &#39;http://www.w3.org/2001/XMLSchema#string&#39;,
+   &#39;description&#39;: &#39;the users name. user a single to satisfy any naming except empty.&#39;,
    &#39;default&#39;: &#39;schemata&#39;,
    &#39;ui:widget&#39;: &#39;text&#39;},
   &#39;positive_integer&#39;: {&#39;type&#39;: &#39;integer&#39;,

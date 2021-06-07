@@ -42,6 +42,8 @@
     <script src="../_static/copybutton.js"></script>
     <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
     <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
     <script >
         const thebe_selector = ".thebe"
@@ -282,6 +284,389 @@
                 
   <div class="section" id="schemata-schema-definitions">
 <h1><code class="docutils literal notranslate"><span class="pre">schemata</span></code> schema definitions<a class="headerlink" href="#schemata-schema-definitions" title="Permalink to this headline">¶</a></h1>
+<table class="table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<tbody>
+<tr class="row-odd"><td colspan="4"><p>definitions</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>bmp</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>bool</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>boolean</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>bytes</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>cache</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>checkbox</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>color</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>contentEncoding</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>contentMediaType</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>dataUrl</p></li>
+</ul>
+</td>
+<td><p>format</p></td>
+<td colspan="2"><p>data-url</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>date</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>date-time</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>dateTime</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>date-time</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>dict</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>object</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>dropdown</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>email</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>email</p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>f</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>float</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>format</p></li>
+</ul>
+</td>
+<td><p>format</p></td>
+<td colspan="2"><p>uri-reference</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>hBox</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>html</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>integer</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>integer</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>items</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>jinja</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>jpeg</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>json</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>jsonPointer</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>json-pointer</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>lD</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td rowspan="3"><ul class="simple">
+<li><p>list</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><p>items</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td><p>uri</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="3"><ul class="simple">
+<li><p>listofUri</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td rowspan="2"><p>items</p></td>
+<td><p>type</p></td>
+<td><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>uri</p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>markdown</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>null</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>null</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>password</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>plain</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>png</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>radio</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>range</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>rdf</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>select</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>set</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>slider</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><ul class="simple">
+<li><p>string</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>stringTemplate</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>text</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>textarea</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>time</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>date-time</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>toml</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>tuple</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>array</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>turtle</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><ul class="simple">
+<li><p>type</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>number</em></p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>ui:widget</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>updown</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>uri</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>uri</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>uriReference</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>uri</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>uriTemplate</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>uri-template</p></td>
+</tr>
+<tr class="row-odd"><td rowspan="2"><ul class="simple">
+<li><p>uuid</p></li>
+</ul>
+</td>
+<td><p>type</p></td>
+<td colspan="2"><p><em>string</em></p></td>
+</tr>
+<tr class="row-even"><td><p>format</p></td>
+<td colspan="2"><p>uuid</p></td>
+</tr>
+<tr class="row-odd"><td colspan="4"><ul class="simple">
+<li><p>vBox</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td colspan="4"><ul class="simple">
+<li><p>yaml</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 
     <script type="text/x-thebe-config">
