@@ -8,6 +8,10 @@ globals().update(
 __all__ = ("ValidationError",)
 
 
+class ConsentException(BaseException):
+    pass
+
+
 class ValidationError(AssertionError, suppress):
     def __init__(self, *args, **kw):
         if AssertionError not in args:

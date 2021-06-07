@@ -19,7 +19,7 @@ def get_widget_int(object: int, schema=utils.EMPTY, **kw):
     schema = schema or object.schema()
 
     kw.update(
-        {
+        utils.get_schema({
             ipy: schema[s]
             for ipy, s in dict(
                 description="description",
@@ -29,7 +29,7 @@ def get_widget_int(object: int, schema=utils.EMPTY, **kw):
             ).items()
             for s in s.split()
             if s in schema
-        }
+        }, ravel=True)
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())
@@ -54,7 +54,7 @@ def get_widget_float(object: float, schema=utils.EMPTY, **kw):
 
     schema = schema or object.schema()
     kw.update(
-        {
+        utils.get_schema({
             ipy: schema[s]
             for ipy, s in dict(
                 description="description",
@@ -64,7 +64,7 @@ def get_widget_float(object: float, schema=utils.EMPTY, **kw):
             ).items()
             for s in s.split()
             if s in schema
-        }
+        }, ravel=True)
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())
@@ -106,14 +106,14 @@ def get_widget_iter(object, schema=utils.EMPTY, **kw):
 
     schema = schema or object.schema()
     kw.update(
-        {
+        utils.get_schema({
             ipy: schema[s]
             for ipy, s in dict(
                 description="description",
             ).items()
             for s in s.split()
             if s in schema
-        }
+        }, ravel=True)
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())

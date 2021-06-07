@@ -10,6 +10,16 @@ from typing import Type
 from unittest import TestCase
 from unittest.runner import TextTestResult
 
+try:
+    from typing import _ForwardRef as ForwardRef
+
+    _root = True  # pragma: no cover
+except ImportError:
+    from typing import ForwardRef
+
+    _root = False  # pragma: no cover
+
+
 Pattern = type(re.compile(""))
 
 testing = TestCase()
@@ -164,6 +174,14 @@ def get_schema_type(x: type, *, ravel=True):
         return get_schema(data, ravel=False)
     if ravel:
         return get_schema(data, ravel=ravel)
+    return x
+
+
+@get_schema.register
+def get_schema_forward(x: ForwardRef, *, ravel=True):
+    """get the schema from an object"""
+    if ravel:
+        return x.__forward_code__
     return x
 
 
@@ -492,3 +510,70 @@ def get_class_dict(schema: dict, cls=EMPTY, types=EMPTY):
 @get_class.register(list)
 def get_class_iter(schema, cls=EMPTY, types=EMPTY):
     return type(schema)(map(partial(get_class, types=types), schema))
+
+
+class Literal(ForwardRef, _root=_root):
+    # an overloaded forward reference method that allows both strings and literals.
+    def __new__(cls, object):
+        # only check string Forward References.
+        if isinstance(object, str):
+            self = ForwardRef.__new__(cls)
+            return self
+        return object
+
+    def __init__(self, object):
+        self.__forward_evaluated__ = True
+        self.__forward_value__ = self.__forward_arg__ = self.__forward_code__ = object
+
+    def _evaluate(self, force=False, globals=None, locals=None):
+        return self.__forward_code__
+
+    def __str__(self):
+        return self.__forward_arg__
+
+    __repr__ = __str__
+
+    def __contains__(self, object):
+        return object in self.__forward_value__
+
+    def __repr__(self):
+        return repr(self.__forward_value__)
+# class Forward(ForwardRef, _root=_root):
+#     # an overloaded forward reference method that allows both strings and literals.
+#     def __new__(cls, object):
+#         # only check string Forward References.
+#         if isinstance(object, str):
+#             self = ForwardRef.__new__(cls)
+#             self.__init__(object)
+#             return self
+#         return object
+
+#     def consent(self):
+#         # it would be dangerous too allow any forward reference anytime.
+#         # consent means that the end user has imported the namespace in sys.modules
+#         # this will indicate consent
+#         if isinstance(self.__forward_arg__, str):
+#             module = self.__forward_arg__.partition(".")[0]
+#             if module not in sys.modules:
+#                 raise ConsentException(
+#                     f"Import {module} to consent to making forward references to its attributes."
+#                 )
+
+#     def _evaluate(self, force=False, globals=None, locals=None):
+#         if self.__forward_evaluated__:
+#             return self.__forward_value__
+#         if not globals or locals:
+#             # we've redirected our interests to explicit forward reference off of sys.modules.
+#             # no errors, just False exceptions
+#             globals = locals = sys.modules
+#         self.consent()
+#         self.__forward_value__ = eval(self.__forward_code__, globals, locals)
+#         self.__forward_evaluated__ = True
+#         return self.__forward_value__
+
+#     def object(self):
+#         return self._evaluate()
+
+#     __call__ = object
+
+del _root

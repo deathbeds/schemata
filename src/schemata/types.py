@@ -92,7 +92,11 @@ instantiate a new schemata type.
                 k = k.key()
 
             if k in cls.__annotations__:
-                return cls.__annotations__[k]
+                v = cls.__annotations__[k]
+                if isinstance(v, utils.Literal):
+                    v = str(v)
+                return v
+
         return default
 
     def __str__(cls):
@@ -122,6 +126,8 @@ class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaTyp
 
     @classmethod
     def new_type(cls, value=EMPTY, bases=None, **kwargs):
+        if isinstance(value, str):
+            value = utils.Literal(value)
         return type(cls.__name__, (cls,) + utils.enforce_tuple(bases), {}, value=value)
 
     @classmethod
