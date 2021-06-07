@@ -290,7 +290,7 @@
 <span class="p">)</span>
 
 
-<div class="viewcode-block" id="MetaType"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType">[docs]</a><span class="k">class</span> <span class="nc">MetaType</span><span class="p">(</span><span class="n">apis</span><span class="o">.</span><span class="n">TypeOps</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">MetaType</span><span class="p">(</span><span class="n">apis</span><span class="o">.</span><span class="n">TypeOps</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;a schemaful python type&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -324,6 +324,9 @@
             <span class="k">if</span> <span class="n">defs</span><span class="p">:</span>
                 <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Definitions</span><span class="p">[</span><span class="n">defs</span><span class="p">],)</span>
 
+        <span class="k">if</span> <span class="n">DOC</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Description</span><span class="p">[</span><span class="nb">dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">DOC</span><span class="p">)],)</span>
+
         <span class="c1"># update the class dict payload</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="nb">dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ANNO</span><span class="p">,</span> <span class="p">{})</span>
@@ -336,10 +339,10 @@
 
         <span class="k">return</span> <span class="bp">cls</span>
 
-<div class="viewcode-block" id="MetaType.key"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType.key">[docs]</a>    <span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
 
-<div class="viewcode-block" id="MetaType.value"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;get the corresponding value to the class key&quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key</span><span class="p">(),):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
@@ -351,10 +354,14 @@
                     <span class="n">v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">v</span>
 
-        <span class="k">return</span> <span class="n">default</span></div>
+        <span class="k">return</span> <span class="n">default</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">__doc__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_docstring</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Any"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any">[docs]</a><span class="k">class</span> <span class="nc">Any</span><span class="p">(</span><span class="n">apis</span><span class="o">.</span><span class="n">FluentType</span><span class="p">,</span> <span class="n">apis</span><span class="o">.</span><span class="n">Validate</span><span class="p">,</span> <span class="n">apis</span><span class="o">.</span><span class="n">TypeConversion</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">MetaType</span><span class="p">):</span>

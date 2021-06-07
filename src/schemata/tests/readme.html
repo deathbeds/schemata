@@ -275,8 +275,15 @@
 <span class="target" id="module-schemata.tests.test_types"></span><dl class="py class">
 <dt id="schemata.tests.test_types.ABool">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">ABool</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#ABool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.ABool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../readme.html#schemata.types.Bool" title="schemata.types.Bool"><code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.types.Bool</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="../readme.html#schemata.types.Bool" title="schemata.types.Bool"><code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.types.Bool</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A Bool type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ABool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ABool</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.ABool.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">boolean</span></em><a class="headerlink" href="#schemata.tests.test_types.ABool.type" title="Permalink to this definition">¶</a></dt>
@@ -287,8 +294,15 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.ADict">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">ADict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#ADict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.ADict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.objects.Dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.objects.Dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A Dict</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ADict</span><span class="p">({})</span>
+<span class="go">{}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ADict</span><span class="p">({</span><span class="s1">&#39;foo&#39;</span><span class="p">:</span> <span class="s1">&#39;bar&#39;</span><span class="p">})</span>
+<span class="go">{&#39;foo&#39;: &#39;bar&#39;}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.ADict.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">object</span></em><a class="headerlink" href="#schemata.tests.test_types.ADict.type" title="Permalink to this definition">¶</a></dt>
@@ -299,7 +313,7 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.ADictWithProperties">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">ADictWithProperties</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#ADictWithProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.ADictWithProperties" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.objects.Dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Properties</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.objects.Dict</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Properties</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">ADictWithProperties</span><span class="p">,</span> <span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="n">ADictWithProperties</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">)[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">Integer</span>
 </pre></div>
@@ -314,8 +328,21 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.AFloat">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">AFloat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#AFloat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.AFloat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.numbers.Float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.numbers.Float</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>An Float type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AFloat</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AFloat</span><span class="p">(</span><span class="mf">6.283185307179586</span><span class="p">)</span>
+<span class="go">6.283185307179586</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AFloat</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AFloat</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="go">0.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AFloat</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="go">1.0</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.AFloat.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">number</span></em><a class="headerlink" href="#schemata.tests.test_types.AFloat.type" title="Permalink to this definition">¶</a></dt>
@@ -326,8 +353,15 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.AList">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">AList</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#AList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.AList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.arrays.List</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.arrays.List</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A List</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AList</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AList</span><span class="p">((</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">))</span>
+<span class="go">(&#39;a&#39;, &#39;b&#39;, &#39;c&#39;)</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.AList.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">array</span></em><a class="headerlink" href="#schemata.tests.test_types.AList.type" title="Permalink to this definition">¶</a></dt>
@@ -338,7 +372,7 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.AListWithItems">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">AListWithItems</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#AListWithItems"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.AListWithItems" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.arrays.List</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Items</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.arrays.List</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Items</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">AListWithItems</span><span class="p">,</span> <span class="n">List</span><span class="o">.</span><span class="n">Items</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">assert</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">AListWithItems</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">List</span><span class="o">.</span><span class="n">Items</span><span class="p">),</span> <span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">)</span>
 </pre></div>
@@ -353,8 +387,9 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.ANull">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">ANull</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#ANull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.ANull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="../readme.html#schemata.types.Null" title="schemata.types.Null"><code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.types.Null</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <a class="reference internal" href="../readme.html#schemata.types.Null" title="schemata.types.Null"><code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.types.Null</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A Null type</p>
+<p class="rubric">Examples</p>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.ANull.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">null</span></em><a class="headerlink" href="#schemata.tests.test_types.ANull.type" title="Permalink to this definition">¶</a></dt>
@@ -365,8 +400,17 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.APattern">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">APattern</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#APattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.APattern" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.String</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.String</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A Pattern string</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">APattern</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+<span class="go">&#39;abc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">APattern</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">&#39;a&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">APattern</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.APattern.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">string</span></em><a class="headerlink" href="#schemata.tests.test_types.APattern.type" title="Permalink to this definition">¶</a></dt>
@@ -377,8 +421,17 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.AString">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">AString</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#AString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.AString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.strings.String</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.strings.String</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A String type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AString</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AString</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+<span class="go">&#39;abc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AString</span><span class="p">(</span><span class="s2">&quot;123&quot;</span><span class="p">)</span>
+<span class="go">&#39;123&#39;</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.AString.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">string</span></em><a class="headerlink" href="#schemata.tests.test_types.AString.type" title="Permalink to this definition">¶</a></dt>
@@ -389,8 +442,19 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.AnInteger">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">AnInteger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#AnInteger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.AnInteger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.numbers.Integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">schemata.numbers.Integer</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>An Integer type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">AnInteger</span><span class="p">(</span><span class="o">-</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">-100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AnInteger</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AnInteger</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">AnInteger</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">10</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.AnInteger.type">
 <code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">integer</span></em><a class="headerlink" href="#schemata.tests.test_types.AnInteger.type" title="Permalink to this definition">¶</a></dt>
@@ -401,8 +465,24 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotABool">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotABool</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotABool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotABool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non-Bool type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="go">2</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotABool</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotABool.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <a class="reference internal" href="#schemata.tests.test_types.ABool" title="schemata.tests.test_types.ABool"><span class="pre">schemata.tests.test_types.ABool</span></a></em><a class="headerlink" href="#schemata.tests.test_types.NotABool.not" title="Permalink to this definition">¶</a></dt>
@@ -413,8 +493,24 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotADict">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotADict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotADict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotADict" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non Dict types</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotADict</span><span class="p">(())</span>
+<span class="go">()</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotADict.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <a class="reference internal" href="#schemata.tests.test_types.ADict" title="schemata.tests.test_types.ADict"><span class="pre">schemata.tests.test_types.ADict</span></a></em><a class="headerlink" href="#schemata.tests.test_types.NotADict.not" title="Permalink to this definition">¶</a></dt>
@@ -425,8 +521,26 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotAFloat">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotAFloat</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotAFloat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotAFloat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non-Float type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAFloat</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotAFloat.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <span class="pre">schemata.numbers.Float</span></em><a class="headerlink" href="#schemata.tests.test_types.NotAFloat.not" title="Permalink to this definition">¶</a></dt>
@@ -437,8 +551,24 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotAList">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotAList</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotAList"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotAList" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non List types</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="go">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAList</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotAList.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <a class="reference internal" href="#schemata.tests.test_types.AList" title="schemata.tests.test_types.AList"><span class="pre">schemata.tests.test_types.AList</span></a></em><a class="headerlink" href="#schemata.tests.test_types.NotAList.not" title="Permalink to this definition">¶</a></dt>
@@ -449,8 +579,23 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotANull">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotANull</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotANull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotANull" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non-Null types</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotANull</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotANull.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <a class="reference internal" href="#schemata.tests.test_types.ANull" title="schemata.tests.test_types.ANull"><span class="pre">schemata.tests.test_types.ANull</span></a></em><a class="headerlink" href="#schemata.tests.test_types.NotANull.not" title="Permalink to this definition">¶</a></dt>
@@ -461,8 +606,17 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotAPattern">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotAPattern</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotAPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotAPattern" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Invalid string Patterns</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAPattern</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="go">&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAPattern</span><span class="p">(</span><span class="s2">&quot;123&quot;</span><span class="p">)</span>
+<span class="go">&#39;123&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAPattern</span><span class="p">(</span><span class="s2">&quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotAPattern.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <a class="reference internal" href="#schemata.tests.test_types.APattern" title="schemata.tests.test_types.APattern"><span class="pre">schemata.tests.test_types.APattern</span></a></em><a class="headerlink" href="#schemata.tests.test_types.NotAPattern.not" title="Permalink to this definition">¶</a></dt>
@@ -473,8 +627,24 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotAString">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotAString</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotAString"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotAString" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>A String type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAString</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotAString.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <span class="pre">schemata.strings.String</span></em><a class="headerlink" href="#schemata.tests.test_types.NotAString.not" title="Permalink to this definition">¶</a></dt>
@@ -485,8 +655,24 @@
 <dl class="py class">
 <dt id="schemata.tests.test_types.NotAnInteger">
 <em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.tests.test_types.</span></code><code class="sig-name descname"><span class="pre">NotAnInteger</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../../_modules/schemata/tests/test_types.html#NotAnInteger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.tests.test_types.NotAnInteger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Not</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Examples</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.Description</span></code></p>
 <p>Non-Integer type</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">(</span><span class="mf">3.141592653589793</span><span class="p">)</span>
+<span class="go">3.141592653589793</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">(</span><span class="s2">&quot;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;</span><span class="p">)</span>
+<span class="go">&#39;abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">(())</span>
+<span class="go">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">NotAnInteger</span><span class="p">({})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
 <dl class="py attribute">
 <dt id="schemata.tests.test_types.NotAnInteger.not">
 <code class="sig-name descname"><span class="pre">not</span></code><em class="property"><span class="pre">:</span> <span class="pre">schemata.numbers.Integer</span></em><a class="headerlink" href="#schemata.tests.test_types.NotAnInteger.not" title="Permalink to this definition">¶</a></dt>
