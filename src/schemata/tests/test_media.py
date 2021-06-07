@@ -1,5 +1,3 @@
-from rich import print
-
 from schemata import *
 
 sample_data = dict(a=1)
