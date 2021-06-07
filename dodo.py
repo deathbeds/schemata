@@ -37,17 +37,16 @@ def task_schema():
         import schemata
 
         with open("src/schemata.jsonschema", "w") as f:
+            data = schemata.utils.get_schema(
+                {x.key(): x for x in schemata.utils.get_subclasses(schemata.Any)},
+                ravel=True,
+            )
+
+            order = sorted(data)
+            data = dict(zip(order, map(data.get, order)))
             f.write(
                 json.dumps(
-                    schemata.utils.get_schema(
-                        schemata.Definitions[
-                            {
-                                x.key(): x
-                                for x in schemata.utils.get_subclasses(schemata.Any)
-                            }
-                        ],
-                        ravel=True,
-                    ),
+                    schemata.Definitions[data].schema(True),
                     indent=2,
                 )
             )

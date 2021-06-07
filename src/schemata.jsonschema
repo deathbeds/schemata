@@ -1,81 +1,153 @@
 {
   "definitions": {
-    "type": {
-      "type": "number"
-    },
-    "null": {
-      "type": "null"
+    "$comment": {},
+    "$eval": {},
+    "$flatten": {},
+    "$flattenDeep": {},
+    "$fromNow": {},
+    "$if": {},
+    "$json": {},
+    "$let": {},
+    "$map": {},
+    "$match": {},
+    "$merge": {},
+    "$mergeDeep": {},
+    "$ref": {},
+    "$reverse": {},
+    "$schema": {},
+    "$sort": {},
+    "$switch": {},
+    "@": {},
+    "@base": {},
+    "@container": {},
+    "@context": {},
+    "@direction": {},
+    "@graph": {},
+    "@id": {},
+    "@import": {},
+    "@included": {},
+    "@index": {},
+    "@json": {},
+    "@language": {},
+    "@list": {},
+    "@nest": {},
+    "@prefix": {},
+    "@protected": {},
+    "@set": {},
+    "@type": {},
+    "@version": {},
+    "@vocab": {},
+    "additionalItems": {},
+    "additionalProperties": {},
+    "allOf": {},
+    "anyOf": {},
+    "args": {},
+    "bmp": {
+      "contentMediaType": "image/bmp"
     },
     "bool": {
       "type": "boolean"
     },
-    "enum": {},
-    "$eval": {},
-    "$json": {},
-    "$if": {},
-    "then": {},
-    "else": {},
-    "$flatten": {},
-    "$flattenDeep": {},
-    "$fromNow": {},
-    "$let": {},
-    "$map": {},
-    "$match": {},
-    "$switch": {},
-    "$merge": {},
-    "$mergeDeep": {},
-    "$sort": {},
-    "$reverse": {},
-    "juxt": {},
-    "string": {
-      "type": "string"
+    "bytes": {
+      "contentEncoding": "base64"
     },
-    "email": {
-      "format": "email",
-      "type": "string"
-    },
-    "uuid": {
-      "type": "string",
-      "format": "uuid"
-    },
-    "uri": {
-      "type": "string",
-      "format": "uri",
+    "cache": {
       "cache": true
     },
-    "uriReference": {
-      "type": "string",
-      "format": "uri"
+    "callable": {},
+    "cast": {},
+    "checkbox": {
+      "ui:widget": "checkbox"
     },
-    "jsonPointer": {
-      "type": "string",
-      "format": "json-pointer"
+    "color": {
+      "ui:widget": "color"
     },
-    "dateTime": {
-      "type": "string",
-      "format": "date-time"
+    "const": {},
+    "contains": {},
+    "contentEncoding": {
+      "contentEncoding": "base64"
+    },
+    "contentMediaType": {
+      "contentMediaType": "image/jpeg"
+    },
+    "dataUrl": {
+      "format": "data-url"
     },
     "date": {
       "type": "string",
       "format": "date-time"
     },
-    "time": {
+    "dateTime": {
       "type": "string",
       "format": "date-time"
     },
-    "stringTemplate": {
+    "default": {},
+    "definitions": {},
+    "dependencies": {},
+    "deprecated": {},
+    "description": {},
+    "dict": {
+      "type": "object"
+    },
+    "dir": {},
+    "do": {},
+    "dropdown": {
+      "ui:widget": "dropdown"
+    },
+    "else": {},
+    "email": {
+      "format": "email",
       "type": "string"
     },
+    "enum": {},
+    "examples": {},
+    "exclusiveMaximum": {},
+    "exclusiveMinimum": {},
     "f": {
       "type": "string"
+    },
+    "file": {},
+    "float": {
+      "type": "number"
+    },
+    "format": {
+      "format": "uri-reference"
+    },
+    "hBox": {
+      "ui:widget": "hbox"
+    },
+    "html": {
+      "contentMediaType": "text/html"
+    },
+    "if": {},
+    "integer": {
+      "type": "integer"
+    },
+    "items": {
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
     },
     "jinja": {
       "type": "string"
     },
-    "uriTemplate": {
-      "type": "string",
-      "format": "uri-template"
+    "jpeg": {
+      "contentMediaType": "image/jpeg"
     },
+    "json": {
+      "contentMediaType": "application/json"
+    },
+    "jsonPointer": {
+      "type": "string",
+      "format": "json-pointer"
+    },
+    "juxt": {},
+    "kwargs": {},
+    "lD": {
+      "contentMediaType": "application/json"
+    },
+    "layout": {},
     "list": {
       "type": "array",
       "items": {
@@ -90,200 +162,128 @@
         "format": "uri"
       }
     },
-    "dict": {
-      "type": "object"
-    },
-    "tuple": {
-      "type": "array"
-    },
-    "set": {
-      "type": "array"
-    },
-    "integer": {
-      "type": "integer"
-    },
-    "float": {
-      "type": "number"
-    },
-    "dir": {},
-    "file": {},
-    "const": {},
-    "$schema": {},
-    "$comment": {},
-    "default": {},
-    "definitions": {},
-    "deprecated": {},
-    "description": {},
-    "examples": {},
-    "optional": {},
-    "readOnly": {},
-    "$ref": {},
-    "title": {},
-    "value": {},
-    "writeOnly": {},
-    "format": {
-      "format": "uri-reference"
-    },
-    "dataUrl": {
-      "format": "data-url"
-    },
-    "tZ": {},
-    "contentMediaType": {
-      "contentMediaType": "image/jpeg"
-    },
-    "plain": {
-      "contentMediaType": "application"
-    },
-    "json": {
-      "contentMediaType": "application/json"
-    },
-    "lD": {
-      "contentMediaType": "application/json"
-    },
-    "yaml": {
-      "contentMediaType": "application/yaml"
-    },
-    "toml": {
-      "contentMediaType": "text/toml"
-    },
     "markdown": {
       "contentMediaType": "text/markdown"
     },
-    "html": {
-      "contentMediaType": "text/html"
+    "maxItems": {},
+    "maxLength": {},
+    "maxProperties": {},
+    "maximum": {},
+    "minItems": {},
+    "minLength": {},
+    "minProperties": {},
+    "minimum": {},
+    "multiple": {},
+    "multipleOf": {},
+    "not": {},
+    "null": {
+      "type": "null"
     },
-    "turtle": {
-      "contentMediaType": "text/turtle"
+    "offset": {},
+    "oneOf": {},
+    "optional": {},
+    "password": {
+      "ui:widget": "password"
     },
-    "rdf": {
-      "contentMediaType": "application/rdf+xml"
+    "pattern": {},
+    "patternProperties": {},
+    "picker": {},
+    "plain": {
+      "contentMediaType": "application"
     },
     "png": {
       "contentMediaType": "image/png"
     },
-    "bmp": {
-      "contentMediaType": "image/bmp"
-    },
-    "jpeg": {
-      "contentMediaType": "image/jpeg"
-    },
-    "contentEncoding": {
-      "contentEncoding": "base64"
-    },
-    "bytes": {
-      "contentEncoding": "base64"
-    },
-    "return": {},
-    "args": {},
-    "kwargs": {},
-    "cast": {},
-    "callable": {},
-    "do": {},
-    "pattern": {},
-    "minLength": {},
-    "maxLength": {},
-    "version": {},
-    "cache": {
-      "cache": true
-    },
-    "items": {
-      "items": {
-        "type": "string",
-        "format": "uri"
-      }
-    },
-    "additionalItems": {},
-    "minItems": {},
-    "maxItems": {},
-    "uniqueItems": {},
-    "contains": {},
-    "sorted": {},
-    "reversed": {},
     "properties": {},
-    "additionalProperties": {},
-    "required": {},
-    "patternProperties": {},
     "propertyNames": {},
-    "minProperties": {},
-    "maxProperties": {},
-    "dependencies": {},
-    "ui:": {},
-    "ui:widget": {
-      "ui:widget": "vbox"
-    },
-    "checkbox": {
-      "ui:widget": "checkbox"
-    },
-    "select": {
-      "ui:widget": "select"
-    },
     "radio": {
       "ui:widget": "radio"
     },
     "range": {
       "ui:widget": "range"
     },
+    "rdf": {
+      "contentMediaType": "application/rdf+xml"
+    },
+    "readOnly": {},
+    "required": {},
+    "return": {},
+    "reversed": {},
+    "select": {
+      "ui:widget": "select"
+    },
+    "set": {
+      "type": "array"
+    },
     "slider": {
       "ui:widget": "slider"
     },
-    "dropdown": {
-      "ui:widget": "dropdown"
+    "sorted": {},
+    "string": {
+      "type": "string"
     },
+    "stringTemplate": {
+      "type": "string"
+    },
+    "tZ": {},
     "text": {
       "ui:widget": "text"
     },
     "textarea": {
       "ui:widget": "textarea"
     },
-    "password": {
-      "ui:widget": "password"
+    "then": {},
+    "time": {
+      "type": "string",
+      "format": "date-time"
     },
+    "title": {},
+    "toml": {
+      "contentMediaType": "text/toml"
+    },
+    "tuple": {
+      "type": "array"
+    },
+    "turtle": {
+      "contentMediaType": "text/turtle"
+    },
+    "type": {
+      "type": "number"
+    },
+    "ui:": {},
+    "ui:options": {},
+    "ui:widget": {
+      "ui:widget": "vbox"
+    },
+    "uniqueItems": {},
     "updown": {
       "ui:widget": "updown"
     },
-    "color": {
-      "ui:widget": "color"
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "cache": true
     },
-    "hBox": {
-      "ui:widget": "hbox"
+    "uriReference": {
+      "type": "string",
+      "format": "uri"
+    },
+    "uriTemplate": {
+      "type": "string",
+      "format": "uri-template"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
     },
     "vBox": {
       "ui:widget": "vbox"
     },
-    "ui:options": {},
-    "picker": {},
-    "multiple": {},
-    "minimum": {},
-    "maximum": {},
-    "exclusiveMinimum": {},
-    "exclusiveMaximum": {},
-    "multipleOf": {},
-    "offset": {},
-    "layout": {},
-    "not": {},
-    "allOf": {},
-    "anyOf": {},
-    "oneOf": {},
-    "if": {},
-    "@base": {},
-    "@container": {},
-    "@direction": {},
-    "@graph": {},
-    "@": {},
-    "@id": {},
-    "@import": {},
-    "@included": {},
-    "@index": {},
-    "@json": {},
-    "@language": {},
-    "@nest": {},
-    "@list": {},
-    "@prefix": {},
-    "@protected": {},
-    "@type": {},
-    "@set": {},
-    "@vocab": {},
-    "@version": {},
-    "@context": {}
+    "value": {},
+    "version": {},
+    "writeOnly": {},
+    "yaml": {
+      "contentMediaType": "application/yaml"
+    }
   }
 }
