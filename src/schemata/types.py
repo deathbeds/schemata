@@ -70,6 +70,9 @@ instantiate a new schemata type.
             if defs:
                 bases += (Definitions[defs],)
 
+        if DOC in dict:
+            bases += (Description[dict.pop(DOC)],)
+
         # update the class dict payload
         key = utils.normalize_json_key(name)
         dict.setdefault(ANNO, {})
@@ -101,6 +104,10 @@ instantiate a new schemata type.
 
     def __str__(cls):
         return cls.key() or super().__str__()
+
+    @property
+    def __doc__(cls):
+        return utils.get_docstring(cls)
 
 
 class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):

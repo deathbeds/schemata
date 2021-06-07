@@ -40,29 +40,29 @@ def test_normalize():
     assert utils.normalize_json_key("Context__") == "@context"
 
 
-def test_docstring():
-    # comments
-    class Thing(Type, Examples[1, "abc"]):
-        """docstring"""
+# def test_docstring():
+#     # comments
+#     class Thing(Type, Examples[1, "abc"]):
+#         """docstring"""
 
-    print(utils.get_docstring(Thing))
-    assert (
-        utils.get_docstring(Thing)
-        == """\
-docstring
+#     print(utils.get_docstring(Thing))
+#     assert (
+#         utils.get_docstring(Thing)
+#         == """\
+# docstring
 
-Notes
------
-comments
+# Notes
+# -----
+# comments
 
 
-Examples
---------
->>> Thing(1)
-1
->>> Thing("abc")
-'abc'"""
-    )
+# Examples
+# --------
+# >>> Thing(1)
+# 1
+# >>> Thing("abc")
+# 'abc'"""
+#     )
 
 
 def test_get_schemata():

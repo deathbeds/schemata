@@ -158,18 +158,6 @@ def get_schema_type(x: type, *, ravel=True):
 
     data = getattr(x, ANNO, {})
 
-    if ravel:
-        if hasattr(x, "__raw_doc__"):
-            data["description"] = x.__raw_doc__
-        else:
-            if x.__doc__:
-                data["description"] = x.__doc__
-
-        comments = inspect.getcomments(x)
-
-        if comments:
-            data["$comment"] = get_santized_comments(comments)
-
     if ravel is None:
         return get_schema(data, ravel=False)
     if ravel:
@@ -207,8 +195,6 @@ def get_schema_re(x: Pattern, *, ravel=True):
 
 def get_docstring(cls, docstring=""):
     """build a docstring for a schemata type"""
-    if not hasattr(cls, "__raw_doc__"):
-        cls.__raw_doc__ = cls.__doc__
     schema = cls.schema(True)
     docstring = """"""
     if "title" in schema:
@@ -538,6 +524,8 @@ class Literal(ForwardRef, _root=_root):
 
     def __repr__(self):
         return repr(self.__forward_value__)
+
+
 # class Forward(ForwardRef, _root=_root):
 #     # an overloaded forward reference method that allows both strings and literals.
 #     def __new__(cls, object):
