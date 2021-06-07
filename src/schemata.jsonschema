@@ -1,47 +1,5 @@
 {
   "definitions": {
-    "$comment": {},
-    "$eval": {},
-    "$flatten": {},
-    "$flattenDeep": {},
-    "$fromNow": {},
-    "$if": {},
-    "$json": {},
-    "$let": {},
-    "$map": {},
-    "$match": {},
-    "$merge": {},
-    "$mergeDeep": {},
-    "$ref": {},
-    "$reverse": {},
-    "$schema": {},
-    "$sort": {},
-    "$switch": {},
-    "@": {},
-    "@base": {},
-    "@container": {},
-    "@context": {},
-    "@direction": {},
-    "@graph": {},
-    "@id": {},
-    "@import": {},
-    "@included": {},
-    "@index": {},
-    "@json": {},
-    "@language": {},
-    "@list": {},
-    "@nest": {},
-    "@prefix": {},
-    "@protected": {},
-    "@set": {},
-    "@type": {},
-    "@version": {},
-    "@vocab": {},
-    "additionalItems": {},
-    "additionalProperties": {},
-    "allOf": {},
-    "anyOf": {},
-    "args": {},
     "bmp": {
       "contentMediaType": "image/bmp"
     },
@@ -54,16 +12,12 @@
     "cache": {
       "cache": true
     },
-    "callable": {},
-    "cast": {},
     "checkbox": {
       "ui:widget": "checkbox"
     },
     "color": {
       "ui:widget": "color"
     },
-    "const": {},
-    "contains": {},
     "contentEncoding": {
       "contentEncoding": "base64"
     },
@@ -81,32 +35,19 @@
       "type": "string",
       "format": "date-time"
     },
-    "default": {},
-    "definitions": {},
-    "dependencies": {},
-    "deprecated": {},
-    "description": {},
     "dict": {
       "type": "object"
     },
-    "dir": {},
-    "do": {},
     "dropdown": {
       "ui:widget": "dropdown"
     },
-    "else": {},
     "email": {
       "format": "email",
       "type": "string"
     },
-    "enum": {},
-    "examples": {},
-    "exclusiveMaximum": {},
-    "exclusiveMinimum": {},
     "f": {
       "type": "string"
     },
-    "file": {},
     "float": {
       "type": "number"
     },
@@ -119,7 +60,6 @@
     "html": {
       "contentMediaType": "text/html"
     },
-    "if": {},
     "integer": {
       "type": "integer"
     },
@@ -142,12 +82,9 @@
       "type": "string",
       "format": "json-pointer"
     },
-    "juxt": {},
-    "kwargs": {},
     "lD": {
       "contentMediaType": "application/json"
     },
-    "layout": {},
     "list": {
       "type": "array",
       "items": {
@@ -165,37 +102,18 @@
     "markdown": {
       "contentMediaType": "text/markdown"
     },
-    "maxItems": {},
-    "maxLength": {},
-    "maxProperties": {},
-    "maximum": {},
-    "minItems": {},
-    "minLength": {},
-    "minProperties": {},
-    "minimum": {},
-    "multiple": {},
-    "multipleOf": {},
-    "not": {},
     "null": {
       "type": "null"
     },
-    "offset": {},
-    "oneOf": {},
-    "optional": {},
     "password": {
       "ui:widget": "password"
     },
-    "pattern": {},
-    "patternProperties": {},
-    "picker": {},
     "plain": {
       "contentMediaType": "application"
     },
     "png": {
       "contentMediaType": "image/png"
     },
-    "properties": {},
-    "propertyNames": {},
     "radio": {
       "ui:widget": "radio"
     },
@@ -205,10 +123,6 @@
     "rdf": {
       "contentMediaType": "application/rdf+xml"
     },
-    "readOnly": {},
-    "required": {},
-    "return": {},
-    "reversed": {},
     "select": {
       "ui:widget": "select"
     },
@@ -218,26 +132,22 @@
     "slider": {
       "ui:widget": "slider"
     },
-    "sorted": {},
     "string": {
       "type": "string"
     },
     "stringTemplate": {
       "type": "string"
     },
-    "tZ": {},
     "text": {
       "ui:widget": "text"
     },
     "textarea": {
       "ui:widget": "textarea"
     },
-    "then": {},
     "time": {
       "type": "string",
       "format": "date-time"
     },
-    "title": {},
     "toml": {
       "contentMediaType": "text/toml"
     },
@@ -250,12 +160,9 @@
     "type": {
       "type": "number"
     },
-    "ui:": {},
-    "ui:options": {},
     "ui:widget": {
       "ui:widget": "vbox"
     },
-    "uniqueItems": {},
     "updown": {
       "ui:widget": "updown"
     },
@@ -279,9 +186,6 @@
     "vBox": {
       "ui:widget": "vbox"
     },
-    "value": {},
-    "version": {},
-    "writeOnly": {},
     "yaml": {
       "contentMediaType": "application/yaml"
     }

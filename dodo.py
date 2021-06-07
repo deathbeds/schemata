@@ -14,8 +14,11 @@ def task_format():
 
 
 def task_docs():
-    return dict(actions=["sphinx-build . _build/html"], task_dep=["confpy"])
-    return dict(actions=["jb build --toc docs/toc.yml --config docs/config.yml ."])
+    return dict(
+        actions=["sphinx-build . _build/html"],
+        task_dep=["confpy", "schema"],
+        verbosity=2,
+    )
 
 
 def task_confpy():
@@ -42,7 +45,7 @@ def task_schema():
                 ravel=True,
             )
 
-            order = sorted(data)
+            order = sorted(k for k, v in data.items() if v)
             data = dict(zip(order, map(data.get, order)))
             f.write(
                 json.dumps(

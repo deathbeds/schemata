@@ -8,6 +8,7 @@ exclude_patterns = [
     ".DS_Store",
     ".pytest_cache",
     "Thumbs.db",
+    "Untitled*",
     "_build",
     "jupyter_execute",
     "old",
@@ -65,7 +66,7 @@ html_theme_options = {
 }
 html_title = "schemata"
 jupyter_cache = ""
-jupyter_execute_notebooks = "off"
+jupyter_execute_notebooks = "cache"
 language = None
 latex_engine = "pdflatex"
 myst_enable_extensions = ["colon_fence", "dollarmath", "linkify", "substitution"]
