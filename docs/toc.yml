@@ -2,6 +2,7 @@ format: jb-article
 root: index
 sections:
 - file: src/readme
+- file: docs/about-schema
 - file: src/schemata/readme
 - file: src/schemata/tests/readme
 
