@@ -1,6 +1,3 @@
-from numpy.lib.arraysetops import isin
-from numpy.lib.histograms import _get_outer_edges
-
 from schemata import ui, utils
 
 
