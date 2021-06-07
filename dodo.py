@@ -30,19 +30,26 @@ def task_confpy():
     )
 
 
-def get_type_hints(obj, globalns=None, localns=None):
-    from sphinx.util.inspect import safe_getattr  # lazy loading
+def task_schema():
+    def export():
+        import json
 
-    try:
-        return __import__("typing").get_type_hints(obj, globalns, localns)
-    except (NameError, SyntaxError):
-        # Failed to evaluate ForwardRef (maybe TYPE_CHECKING)
-        return safe_getattr(obj, "__annotations__", {})
-    except TypeError:
-        return {}
-    except KeyError:
-        # a broken class found (refs: https://github.com/sphinx-doc/sphinx/issues/8084)
-        return {}
-    except AttributeError:
-        # AttributeError is raised on 3.5.2 (fixed by 3.5.3)
-        return {}
+        import schemata
+
+        with open("src/schemata.jsonschema", "w") as f:
+            f.write(
+                json.dumps(
+                    schemata.utils.get_schema(
+                        schemata.Definitions[
+                            {
+                                x.key(): x
+                                for x in schemata.utils.get_subclasses(schemata.Any)
+                            }
+                        ],
+                        ravel=True,
+                    ),
+                    indent=2,
+                )
+            )
+
+    return dict(actions=[export], targets=["src/schemata.jsonschema"])

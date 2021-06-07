@@ -32,6 +32,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinx.ext.autodoc",
     "sphinx.ext.viewcode",
+    "sphinx-jsonschema",
     "jupyterbook_latex",
 ]
 external_toc_exclude_missing = False

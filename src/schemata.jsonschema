@@ -1,0 +1,289 @@
+{
+  "definitions": {
+    "type": {
+      "type": "number"
+    },
+    "null": {
+      "type": "null"
+    },
+    "bool": {
+      "type": "boolean"
+    },
+    "enum": {},
+    "$eval": {},
+    "$json": {},
+    "$if": {},
+    "then": {},
+    "else": {},
+    "$flatten": {},
+    "$flattenDeep": {},
+    "$fromNow": {},
+    "$let": {},
+    "$map": {},
+    "$match": {},
+    "$switch": {},
+    "$merge": {},
+    "$mergeDeep": {},
+    "$sort": {},
+    "$reverse": {},
+    "juxt": {},
+    "string": {
+      "type": "string"
+    },
+    "email": {
+      "format": "email",
+      "type": "string"
+    },
+    "uuid": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri",
+      "cache": true
+    },
+    "uriReference": {
+      "type": "string",
+      "format": "uri"
+    },
+    "jsonPointer": {
+      "type": "string",
+      "format": "json-pointer"
+    },
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "time": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "stringTemplate": {
+      "type": "string"
+    },
+    "f": {
+      "type": "string"
+    },
+    "jinja": {
+      "type": "string"
+    },
+    "uriTemplate": {
+      "type": "string",
+      "format": "uri-template"
+    },
+    "list": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "listofUri": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "dict": {
+      "type": "object"
+    },
+    "tuple": {
+      "type": "array"
+    },
+    "set": {
+      "type": "array"
+    },
+    "integer": {
+      "type": "integer"
+    },
+    "float": {
+      "type": "number"
+    },
+    "dir": {},
+    "file": {},
+    "const": {},
+    "$schema": {},
+    "$comment": {},
+    "default": {},
+    "definitions": {},
+    "deprecated": {},
+    "description": {},
+    "examples": {},
+    "optional": {},
+    "readOnly": {},
+    "$ref": {},
+    "title": {},
+    "value": {},
+    "writeOnly": {},
+    "format": {
+      "format": "uri-reference"
+    },
+    "dataUrl": {
+      "format": "data-url"
+    },
+    "tZ": {},
+    "contentMediaType": {
+      "contentMediaType": "image/jpeg"
+    },
+    "plain": {
+      "contentMediaType": "application"
+    },
+    "json": {
+      "contentMediaType": "application/json"
+    },
+    "lD": {
+      "contentMediaType": "application/json"
+    },
+    "yaml": {
+      "contentMediaType": "application/yaml"
+    },
+    "toml": {
+      "contentMediaType": "text/toml"
+    },
+    "markdown": {
+      "contentMediaType": "text/markdown"
+    },
+    "html": {
+      "contentMediaType": "text/html"
+    },
+    "turtle": {
+      "contentMediaType": "text/turtle"
+    },
+    "rdf": {
+      "contentMediaType": "application/rdf+xml"
+    },
+    "png": {
+      "contentMediaType": "image/png"
+    },
+    "bmp": {
+      "contentMediaType": "image/bmp"
+    },
+    "jpeg": {
+      "contentMediaType": "image/jpeg"
+    },
+    "contentEncoding": {
+      "contentEncoding": "base64"
+    },
+    "bytes": {
+      "contentEncoding": "base64"
+    },
+    "return": {},
+    "args": {},
+    "kwargs": {},
+    "cast": {},
+    "callable": {},
+    "do": {},
+    "pattern": {},
+    "minLength": {},
+    "maxLength": {},
+    "version": {},
+    "cache": {
+      "cache": true
+    },
+    "items": {
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
+    },
+    "additionalItems": {},
+    "minItems": {},
+    "maxItems": {},
+    "uniqueItems": {},
+    "contains": {},
+    "sorted": {},
+    "reversed": {},
+    "properties": {},
+    "additionalProperties": {},
+    "required": {},
+    "patternProperties": {},
+    "propertyNames": {},
+    "minProperties": {},
+    "maxProperties": {},
+    "dependencies": {},
+    "ui:": {},
+    "ui:widget": {
+      "ui:widget": "vbox"
+    },
+    "checkbox": {
+      "ui:widget": "checkbox"
+    },
+    "select": {
+      "ui:widget": "select"
+    },
+    "radio": {
+      "ui:widget": "radio"
+    },
+    "range": {
+      "ui:widget": "range"
+    },
+    "slider": {
+      "ui:widget": "slider"
+    },
+    "dropdown": {
+      "ui:widget": "dropdown"
+    },
+    "text": {
+      "ui:widget": "text"
+    },
+    "textarea": {
+      "ui:widget": "textarea"
+    },
+    "password": {
+      "ui:widget": "password"
+    },
+    "updown": {
+      "ui:widget": "updown"
+    },
+    "color": {
+      "ui:widget": "color"
+    },
+    "hBox": {
+      "ui:widget": "hbox"
+    },
+    "vBox": {
+      "ui:widget": "vbox"
+    },
+    "ui:options": {},
+    "picker": {},
+    "multiple": {},
+    "minimum": {},
+    "maximum": {},
+    "exclusiveMinimum": {},
+    "exclusiveMaximum": {},
+    "multipleOf": {},
+    "offset": {},
+    "layout": {},
+    "not": {},
+    "allOf": {},
+    "anyOf": {},
+    "oneOf": {},
+    "if": {},
+    "@base": {},
+    "@container": {},
+    "@direction": {},
+    "@graph": {},
+    "@": {},
+    "@id": {},
+    "@import": {},
+    "@included": {},
+    "@index": {},
+    "@json": {},
+    "@language": {},
+    "@nest": {},
+    "@list": {},
+    "@prefix": {},
+    "@protected": {},
+    "@type": {},
+    "@set": {},
+    "@vocab": {},
+    "@version": {},
+    "@context": {}
+  }
+}
