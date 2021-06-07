@@ -49,9 +49,10 @@
         const thebe_selector_output = ".output"
     </script>
     <script async="async" src="_static/sphinx-thebe.js"></script>
-    <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/readme.html" />
+    <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/index.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="schemata types and traits" href="src/readme.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -68,7 +69,7 @@
 <div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
     
         <div class="navbar-brand-box">
-    <a class="navbar-brand text-wrap" href="index.html">
+    <a class="navbar-brand text-wrap" href="#">
       
       
       <h1 class="site-logo" id="site-title">schemata</h1>
@@ -80,8 +81,8 @@
 </form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
- <li class="toctree-l1">
-  <a class="reference internal" href="index.html">
+ <li class="toctree-l1 current">
+  <a class="reference internal" href="#">
    schemata
   </a>
  </li>
@@ -235,9 +236,9 @@
         <!-- ipynb file if we had a myst markdown file -->
         
         <!-- Download raw file -->
-        <a class="dropdown-buttons" href="_sources/readme.md"><button type="button"
+        <a class="dropdown-buttons" href="_sources/index.ipynb"><button type="button"
                 class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
-                data-placement="left">.md</button></a>
+                data-placement="left">.ipynb</button></a>
         <!-- Download PDF via print -->
         <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
             onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
@@ -255,11 +256,56 @@
 
             <!-- Launch buttons -->
 
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/index.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
         </div>
 
         <!-- Table of contents -->
         <div class="d-none d-md-block col-md-2 bd-toc show">
             
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#describing-many-facets-of-a-data-structure">
+   describing many facets of a data structure
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#validation">
+   validation
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#rich-display">
+   rich display
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#metadata-context">
+   metadata context
+  </a>
+ </li>
+</ul>
+
+            </nav>
         </div>
     </div>
 </div>
@@ -273,15 +319,117 @@
 <p><a class="reference external" href="https://schemata.readthedocs.io/en/edits/readme.html"><img alt="rtd-badge" src="https://readthedocs.org/projects/schemata/badge/" /></a>
 <a class="reference external" href="https://github.com/deathbeds/schemata/actions/workflows/python-package.yml"><img alt="gh-badge" src="https://github.com/deathbeds/schemata/actions/workflows/python-package.yml/badge.svg" /></a>
 <a class="reference external" href="https://app.codecov.io/gh/deathbeds/schemata"><img alt="cov-badge" src="https://img.shields.io/codecov/c/github/deathbeds/schemata?token=hob01Xmh6Z" /></a></p>
-<p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> is a composable type and trait system for python. it allows python types to define more complex scenarios than the standard by extending the jsonschema vocabulary to python.</p>
+<p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> is a composable type and trait system for python. through <code class="docutils literal notranslate"><span class="pre">schemata</span></code>s fluent and symbollic type compositions we can define complex scenarios in python, as an extension of the jsonschema specification.</p>
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>pip install schemata
 </pre></div>
 </div>
+<div class="section" id="describing-many-facets-of-a-data-structure">
+<h2>describing many facets of a data structure<a class="headerlink" href="#describing-many-facets-of-a-data-structure" title="Permalink to this headline">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> makes it possible to combine different forms of schema like:</p>
 <ul class="simple">
-<li><p>pythonic type validation with jsonschema-ish conventions</p></li>
-<li><p>rich displays</p></li>
-<li><p>observable pattern trait patterns</p></li>
+<li><p>react json schema ui with ipywidgets</p></li>
+<li><p>validation with an external <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code> dependency</p></li>
+<li><p>rdf context</p></li>
+<li><p>exporting to other pythonic models like <code class="docutils literal notranslate"><span class="pre">traitlets</span></code>, <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> and <code class="docutils literal notranslate"><span class="pre">pydantic</span></code></p></li>
 </ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>we use python syntax to compose our schema.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">Thing</span><span class="p">(</span><span class="n">Dict</span><span class="p">):</span>
+        
+        <span class="k">class</span> <span class="nc">Name</span><span class="p">(</span><span class="n">String</span><span class="o">.</span><span class="n">minLength</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span> <span class="n">Type__</span><span class="p">[</span><span class="n">XSD</span><span class="o">.</span><span class="n">string</span><span class="p">]):</span>
+            <span class="s2">&quot;the users name. user a single to satisfy any naming except empty.&quot;</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">Name</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="s2">&quot;schemata&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="p">()</span>
+        <span class="n">positive_integer</span><span class="p">:</span> <span class="n">Integer</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">+</span> <span class="n">Type__</span><span class="p">[</span><span class="n">XSD</span><span class="o">.</span><span class="n">integer</span><span class="p">]</span>            
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Thing</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;object&#39;,
+ &#39;properties&#39;: {&#39;name&#39;: {&#39;type&#39;: &#39;string&#39;,
+   &#39;minLength&#39;: 1,
+   &#39;@type&#39;: &#39;http://www.w3.org/2001/XMLSchema#string&#39;,
+   &#39;default&#39;: &#39;schemata&#39;,
+   &#39;ui:widget&#39;: &#39;text&#39;},
+  &#39;positive_integer&#39;: {&#39;type&#39;: &#39;integer&#39;,
+   &#39;minimum&#39;: 1,
+   &#39;@type&#39;: &#39;http://www.w3.org/2001/XMLSchema#integer&#39;}},
+ &#39;definitions&#39;: {&#39;Name&#39;: {&#39;type&#39;: &#39;string&#39;,
+   &#39;minLength&#39;: 1,
+   &#39;@type&#39;: &#39;http://www.w3.org/2001/XMLSchema#string&#39;,
+   &#39;description&#39;: &#39;the users name. user a single to satisfy any naming except empty.&#39;}}}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">Thing</span><span class="o">.</span><span class="n">cast</span><span class="p">()(</span><span class="s2">&quot;yo&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;name&#39;: &#39;yo&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+</details></div>
+<div class="section" id="validation">
+<h2>validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Thing</span><span class="p">()</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;schemata&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Thing</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;not schemata&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;not schemata&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Thing</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;not schemata&quot;</span><span class="p">)</span>\
+    <span class="o">==</span> <span class="n">Thing</span><span class="o">.</span><span class="n">cast</span><span class="p">()(</span><span class="s2">&quot;not schemata&quot;</span><span class="p">)</span>\
+    <span class="o">==</span> <span class="nb">dict</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;not schemata&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">exceptions</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">Thing</span><span class="o">.</span><span class="n">cast</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="rich-display">
+<h2>rich display<a class="headerlink" href="#rich-display" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="metadata-context">
+<h2>metadata context<a class="headerlink" href="#metadata-context" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="toctree-wrapper compound">
+</div>
 </div>
 
     <script type="text/x-thebe-config">
@@ -309,6 +457,7 @@
         
         <div class='prev-next-bottom'>
             
+    <a class='right-next' id="next-link" href="src/readme.html" title="next page"><code class="docutils literal notranslate"><span class="pre">schemata</span></code> types and traits</a>
 
         </div>
         

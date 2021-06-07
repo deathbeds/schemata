@@ -1,0 +1,678 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schemata.types &#8212; schemata</title>
+    
+  <link href="../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/togglebutton.js"></script>
+    <script src="../../_static/clipboard.min.js"></script>
+    <script src="../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/_modules/schemata/types.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">schemata</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../index.html">
+   schemata
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../src/readme.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     schemata
+    </span>
+   </code>
+   types and traits
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/literals.html">
+     Numeric Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/types.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/numbers.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Numeric
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/strings.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       String
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/arrays.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Sequence
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/objects.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Dict
+      </span>
+     </code>
+     type
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/composites.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       composites
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../src/ui.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       UiWidgets
+      </span>
+     </code>
+     s
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../src/schemata/readme.html">
+   schemata
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../src/schemata/tests/readme.html">
+   schemata tests
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for schemata.types</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;the basis of schemata that begins defining the type system&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">builtins</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">typing</span>
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">apis</span><span class="p">,</span> <span class="n">exceptions</span><span class="p">,</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">ANNO</span><span class="p">,</span> <span class="n">DOC</span><span class="p">,</span> <span class="n">EMPTY</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Any&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Bool&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;false&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Comment_&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Const&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Default&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Deprecated&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Description&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Definitions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Enum&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Examples&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Any&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MetaType&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Null&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Optional&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ReadOnly&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Ref_&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Schema_&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;true&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Title&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Type&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Value&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;WriteOnly&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="MetaType"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType">[docs]</a><span class="k">class</span> <span class="nc">MetaType</span><span class="p">(</span><span class="n">apis</span><span class="o">.</span><span class="n">TypeOps</span><span class="p">,</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;a schemaful python type&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">instantiate a new schemata type.</span>
+
+<span class="sd">* __annotations__ refer to dictionary properties of like array or object flavor</span>
+<span class="sd">* __doc__ refers the description of the class</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># resolve docstrings</span>
+        <span class="c1"># if DOC in dict and isinstance(dict[DOC], (str, type(None))):</span>
+        <span class="c1">#     doc = dict.pop(DOC)</span>
+        <span class="c1">#     if doc and isinstance(doc, str):</span>
+        <span class="c1">#         bases += (Description[doc],)</span>
+
+        <span class="k">if</span> <span class="n">ANNO</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">anno</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ANNO</span><span class="p">)</span>
+            <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">arrays</span><span class="p">,</span> <span class="n">objects</span>
+
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">anno</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
+                    <span class="n">anno</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">anno</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arrays</span><span class="o">.</span><span class="n">Arrays</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,)</span> <span class="o">+</span> <span class="n">bases</span><span class="p">):</span>
+                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">arrays</span><span class="o">.</span><span class="n">Arrays</span><span class="o">.</span><span class="n">Items</span><span class="p">[</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">anno</span><span class="p">]],)</span>
+            <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,)</span> <span class="o">+</span> <span class="n">bases</span><span class="p">):</span>
+                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">anno</span><span class="p">],)</span>
+
+            <span class="n">defs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">MetaType</span><span class="p">)}</span>
+
+            <span class="k">if</span> <span class="n">defs</span><span class="p">:</span>
+                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Definitions</span><span class="p">[</span><span class="n">defs</span><span class="p">],)</span>
+
+        <span class="c1"># update the class dict payload</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="nb">dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ANNO</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">})</span>
+
+        <span class="c1"># build</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">bases</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span>
+
+<div class="viewcode-block" id="MetaType.key"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType.key">[docs]</a>    <span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MetaType.value"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.MetaType.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;get the corresponding value to the class key&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">key</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">key</span><span class="p">(),):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="n">k</span><span class="o">.</span><span class="n">key</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">:</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__annotations__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">utils</span><span class="o">.</span><span class="n">Literal</span><span class="p">):</span>
+                    <span class="n">v</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">v</span>
+
+        <span class="k">return</span> <span class="n">default</span></div>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="ow">or</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Any"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any">[docs]</a><span class="k">class</span> <span class="nc">Any</span><span class="p">(</span><span class="n">apis</span><span class="o">.</span><span class="n">FluentType</span><span class="p">,</span> <span class="n">apis</span><span class="o">.</span><span class="n">Validate</span><span class="p">,</span> <span class="n">apis</span><span class="o">.</span><span class="n">TypeConversion</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">MetaType</span><span class="p">):</span>
+<div class="viewcode-block" id="Any.from_file"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">json</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_schema</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()))</span></div>
+
+<div class="viewcode-block" id="Any.from_schema"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any.from_schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_class</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+        <span class="c1"># fill in the default values if they exist</span>
+        <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">Any</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_schemata</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">object</span>
+
+    <span class="k">def</span> <span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">new_type</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Any.new_type"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any.new_type">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new_type</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span> <span class="n">bases</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">Literal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,)</span> <span class="o">+</span> <span class="n">utils</span><span class="o">.</span><span class="n">enforce_tuple</span><span class="p">(</span><span class="n">bases</span><span class="p">),</span> <span class="p">{},</span> <span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Any.schema"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any.schema">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ravel</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_schema</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">ravel</span><span class="o">=</span><span class="n">ravel</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Any.cast"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Any.cast">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">cast</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">callables</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">callables</span><span class="o">.</span><span class="n">Cast</span><span class="p">[(</span><span class="nb">object</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span><span class="p">]</span> <span class="o">+</span> <span class="bp">cls</span>
+        <span class="k">return</span> <span class="n">callables</span><span class="o">.</span><span class="n">Cast</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">+</span> <span class="bp">cls</span></div></div>
+
+
+<div class="viewcode-block" id="Type"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Type">[docs]</a><span class="k">class</span> <span class="nc">Type</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;validation:/properties/type&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+
+        <span class="kn">from</span> <span class="nn">.callables</span> <span class="kn">import</span> <span class="n">Cast</span>
+
+        <span class="nb">type</span><span class="p">,</span> <span class="n">cast</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Type</span><span class="p">),</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Cast</span><span class="p">)</span>
+
+        <span class="c1"># when the type is a tuple iterate through allowing</span>
+        <span class="c1"># for conformations like (&quot;integer&quot;, &quot;string&quot;) which are valid jsonschema</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">exception</span> <span class="o">=</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">exception</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">Type</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">cast</span><span class="p">)(</span><span class="nb">object</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+            <span class="n">exception</span><span class="o">.</span><span class="n">raises</span><span class="p">()</span>
+
+        <span class="c1"># update the arguments</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="nb">object</span><span class="p">,)</span> <span class="o">+</span> <span class="n">args</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">cast</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">),)</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">type</span><span class="p">:</span>
+            <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Any</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="Type.validator"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Type.validator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="n">exception</span> <span class="o">=</span> <span class="n">exceptions</span><span class="o">.</span><span class="n">ValidationError</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">enforce_tuple</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Type</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_SCHEMATA_MAPPING</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">exception</span><span class="p">:</span>
+                        <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_SCHEMATA_MAPPING</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="s2">&quot;we&#39;ll consider these forward references&quot;</span>
+
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">exception</span><span class="p">:</span>
+                    <span class="n">exceptions</span><span class="o">.</span><span class="n">assertIsInstance</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;don&#39;t know how to enfore type: </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">exception</span><span class="o">.</span><span class="n">raises</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Type.py"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Type.py">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">py</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="nb">type</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">typing</span><span class="o">.</span><span class="n">Union</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">type</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_PY_MAPPING</span><span class="p">[</span><span class="nb">type</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">object</span></div>
+
+    <span class="k">def</span> <span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_STR_MAPPING</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_STR_MAPPING</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">in</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_SCHEMATA_MAPPING</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_SCHEMATA_MAPPING</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">Any</span><span class="o">.</span><span class="n">__class_getitem__</span><span class="o">.</span><span class="vm">__func__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Const"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Const">[docs]</a><span class="k">class</span> <span class="nc">Const</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;validation:/properties/const&quot;</span>
+
+<div class="viewcode-block" id="Const.validator"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Const.validator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="n">exceptions</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Const</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Const.map"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Const.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">[</span><span class="nb">type</span><span class="p">](</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Const.filter"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Const.filter">[docs]</a>    <span class="k">def</span> <span class="nf">filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">x</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Const.groupby"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Const.groupby">[docs]</a>    <span class="k">def</span> <span class="nf">groupby</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">itertools</span></div></div>
+
+
+<div class="viewcode-block" id="Schema_"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Schema_">[docs]</a><span class="k">class</span> <span class="nc">Schema_</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Comment_"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Comment_">[docs]</a><span class="k">class</span> <span class="nc">Comment_</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;core:/properties/$comment&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Default"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Default">[docs]</a><span class="k">class</span> <span class="nc">Default</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/default&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Definitions"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Definitions">[docs]</a><span class="k">class</span> <span class="nc">Definitions</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;core:/properties/$defs&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Deprecated"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Deprecated">[docs]</a><span class="k">class</span> <span class="nc">Deprecated</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/default&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Description"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Description">[docs]</a><span class="k">class</span> <span class="nc">Description</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/description&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Examples"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Examples">[docs]</a><span class="k">class</span> <span class="nc">Examples</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/examples&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Optional"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Optional">[docs]</a><span class="k">class</span> <span class="nc">Optional</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ReadOnly"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.ReadOnly">[docs]</a><span class="k">class</span> <span class="nc">ReadOnly</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/default&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Ref_"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Ref_">[docs]</a><span class="k">class</span> <span class="nc">Ref_</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;core:/properties/$ref&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Title"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Title">[docs]</a><span class="k">class</span> <span class="nc">Title</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/title&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="Value"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Value">[docs]</a><span class="k">class</span> <span class="nc">Value</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="WriteOnly"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.WriteOnly">[docs]</a><span class="k">class</span> <span class="nc">WriteOnly</span><span class="p">(</span><span class="n">Any</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;metadata:/properties/default&quot;</span></div>
+
+
+<div class="viewcode-block" id="Null"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Null">[docs]</a><span class="k">class</span> <span class="nc">Null</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;null&quot;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">cls</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Null.validator"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Null.validator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="n">exceptions</span><span class="o">.</span><span class="n">assertIs</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div></div>
+
+
+<span class="n">Null</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="Bool"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Bool">[docs]</a><span class="k">class</span> <span class="nc">Bool</span><span class="p">(</span><span class="n">Type</span><span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_default</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">bool</span><span class="p">())</span>
+        <span class="n">Bool</span><span class="o">.</span><span class="n">validator</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">false</span><span class="p">,</span> <span class="n">true</span><span class="p">][</span><span class="nb">object</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Bool.validator"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Bool.validator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">object</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">([</span><span class="kc">False</span><span class="p">,</span> <span class="kc">True</span><span class="p">][</span><span class="bp">self</span><span class="p">])</span></div>
+
+
+<span class="n">Bool</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+
+
+<span class="c1"># the enum type</span>
+<div class="viewcode-block" id="Enum"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Enum">[docs]</a><span class="k">class</span> <span class="nc">Enum</span><span class="p">(</span><span class="n">Type</span><span class="p">):</span>
+    <span class="nb">id</span> <span class="o">=</span> <span class="s2">&quot;validation:/properties/enum&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="o">=</span><span class="n">EMPTY</span><span class="p">):</span>
+        <span class="n">enum</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Enum</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">object</span> <span class="ow">is</span> <span class="n">EMPTY</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">__members__</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">enum</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__class_getitem__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">object</span><span class="p">:</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">object</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">enforce_tuple</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+            <span class="nb">object</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">),</span> <span class="nb">object</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__class_getitem__</span><span class="p">(</span><span class="n">utils</span><span class="o">.</span><span class="n">make_enum</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Enum.validator"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Enum.validator">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="nb">object</span><span class="p">):</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Enum</span><span class="p">)(</span><span class="nb">object</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">object</span></div>
+
+<div class="viewcode-block" id="Enum.py"><a class="viewcode-back" href="../../src/schemata/readme.html#schemata.types.Enum.py">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">py</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">Enum</span><span class="p">)</span></div></div>
+
+
+<span class="n">Any</span><span class="o">.</span><span class="n">Comment_</span> <span class="o">=</span> <span class="n">Comment_</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Const</span> <span class="o">=</span> <span class="n">Const</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Default</span> <span class="o">=</span> <span class="n">Default</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Definitions</span> <span class="o">=</span> <span class="n">Definitions</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Deprecated</span> <span class="o">=</span> <span class="n">Deprecated</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Description</span> <span class="o">=</span> <span class="n">Description</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Enum</span> <span class="o">=</span> <span class="n">Enum</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Examples</span> <span class="o">=</span> <span class="n">Examples</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Optional</span> <span class="o">=</span> <span class="n">Optional</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">ReadOnly</span> <span class="o">=</span> <span class="n">ReadOnly</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Ref_</span> <span class="o">=</span> <span class="n">Ref_</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">Title</span> <span class="o">=</span> <span class="n">Title</span>
+<span class="n">Any</span><span class="o">.</span><span class="n">WriteOnly</span> <span class="o">=</span> <span class="n">WriteOnly</span>
+
+
+<span class="c1"># map a jsonschema to the schemata type</span>
+<span class="n">utils</span><span class="o">.</span><span class="n">JSONSCHEMA_SCHEMATA_MAPPING</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="n">null</span><span class="o">=</span><span class="n">Null</span><span class="p">,</span>
+    <span class="n">boolean</span><span class="o">=</span><span class="n">Bool</span><span class="p">,</span>
+    <span class="n">enum</span><span class="o">=</span><span class="n">Enum</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">false</span><span class="p">,</span> <span class="n">true</span> <span class="o">=</span> <span class="n">Bool</span><span class="p">(),</span> <span class="n">Bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By deathbeds<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

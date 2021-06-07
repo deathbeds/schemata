@@ -52,7 +52,7 @@
     <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/src/types.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="schemata" href="schemata/readme.html" />
+    <link rel="next" title="schemata UiWidgetss" href="ui.html" />
     <link rel="prev" title="composites" href="composites.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
@@ -83,7 +83,7 @@
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="../readme.html">
+  <a class="reference internal" href="../index.html">
    schemata
   </a>
  </li>
@@ -171,6 +171,21 @@
        composites
       </span>
      </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="ui.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       UiWidgets
+      </span>
+     </code>
+     s
     </a>
    </li>
   </ul>
@@ -269,23 +284,12 @@
             </div>
             <nav id="bd-toc-nav">
                 <ul class="visible nav section-nav flex-column">
- <li class="toc-h1 nav-item toc-entry">
-  <a class="reference internal nav-link" href="#">
-   the
-   <code class="docutils literal notranslate">
-    <span class="pre">
-     schemata
-    </span>
-   </code>
-   types
-  </a>
- </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#the-common-types">
    the common types
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-null-type">
      the
      <code class="docutils literal notranslate">
@@ -296,7 +300,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-bool-type">
      the
      <code class="docutils literal notranslate">
@@ -307,7 +311,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-integer-type">
      the
      <code class="docutils literal notranslate">
@@ -318,7 +322,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-float-type">
      the
      <code class="docutils literal notranslate">
@@ -329,7 +333,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-string-type">
      the
      <code class="docutils literal notranslate">
@@ -340,7 +344,7 @@
      type
     </a>
     <ul class="nav section-nav flex-column">
-     <li class="toc-h3 nav-item toc-entry">
+     <li class="toc-h4 nav-item toc-entry">
       <a class="reference internal nav-link" href="#string-patterns">
        <code class="docutils literal notranslate">
         <span class="pre">
@@ -352,7 +356,7 @@
      </li>
     </ul>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-list-type">
      the
      <code class="docutils literal notranslate">
@@ -363,7 +367,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-dict-type">
      the
      <code class="docutils literal notranslate">
@@ -374,7 +378,7 @@
      type
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#the-enum-type">
      the
      <code class="docutils literal notranslate">
@@ -387,29 +391,34 @@
    </li>
   </ul>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#combined-types">
+   combined types
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#type-metadata">
    type metadata
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#constants-and-defaults">
      constants and defaults
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#meta-data-descriptions">
      meta-data descriptions
     </a>
    </li>
-   <li class="toc-h2 nav-item toc-entry">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#interactive-docstrings">
      interactive docstrings
     </a>
    </li>
   </ul>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#extra-schemata-types">
    extra
    <code class="docutils literal notranslate">
@@ -420,12 +429,12 @@
    types
   </a>
  </li>
- <li class="toc-h1 nav-item toc-entry">
+ <li class="toc-h2 nav-item toc-entry">
   <a class="reference internal nav-link" href="#combinations-of-types">
    combinations of types
   </a>
-  <ul class="visible nav section-nav flex-column">
-   <li class="toc-h2 nav-item toc-entry">
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
     <a class="reference internal nav-link" href="#union-types">
      union types
     </a>
@@ -443,20 +452,13 @@
         
               <div>
                 
-  <div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
-    <span class="kn">import</span> <span class="nn">typing</span>
-</pre></div>
-</div>
-</div>
-</div>
-<div class="section" id="the-schemata-types">
+  <div class="section" id="the-schemata-types">
 <h1>the <code class="docutils literal notranslate"><span class="pre">schemata</span></code> types<a class="headerlink" href="#the-schemata-types" title="Permalink to this headline">¶</a></h1>
 <p>we begin with the <code class="docutils literal notranslate"><span class="pre">Any</span></code> type, this is common type declaration, but it is rarely used for instantiation. <code class="docutils literal notranslate"><span class="pre">schemata</span></code> implements creating <code class="docutils literal notranslate"><span class="pre">Any</span></code> type <code class="docutils literal notranslate"><span class="pre">object</span></code>s that carry a schema with them.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="kn">import</span> <span class="nn">typing</span>
 </pre></div>
 </div>
 </div>
@@ -468,9 +470,8 @@
 </div>
 </div>
 </div>
-</div>
 <div class="section" id="the-common-types">
-<h1>the common types<a class="headerlink" href="#the-common-types" title="Permalink to this headline">¶</a></h1>
+<h2>the common types<a class="headerlink" href="#the-common-types" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> provides the common python types</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -488,7 +489,7 @@
 </div>
 </div>
 <div class="section" id="the-null-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Null</span></code> type<a class="headerlink" href="#the-null-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Null</span></code> type<a class="headerlink" href="#the-null-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;null&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">Null</span>
@@ -500,26 +501,28 @@
 </div>
 </div>
 <div class="section" id="the-bool-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Bool</span></code> type<a class="headerlink" href="#the-bool-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Bool</span></code> type<a class="headerlink" href="#the-bool-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;boolean&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="n">Bool</span>
-    <span class="k">assert</span> <span class="n">Bool</span><span class="p">()</span> <span class="ow">is</span> <span class="n">Bool</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span>
-    <span class="k">assert</span> <span class="n">Bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Bool</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="kc">True</span><span class="p">)()</span> <span class="ow">is</span> <span class="kc">True</span>
+    <span class="k">assert</span> <span class="n">Bool</span><span class="p">()</span> <span class="ow">is</span> <span class="n">Bool</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span> <span class="ow">is</span> <span class="n">false</span>
+    <span class="k">assert</span> <span class="n">Bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Bool</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="kc">True</span><span class="p">)()</span> <span class="ow">is</span> <span class="n">true</span>
     <span class="k">assert</span> <span class="n">Bool</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">bool</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">(</span><span class="kc">True</span><span class="p">),</span> <span class="n">Bool</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="the-integer-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Integer</span></code> type<a class="headerlink" href="#the-integer-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Integer</span></code> type<a class="headerlink" href="#the-integer-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Integer</span> <span class="ow">is</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;integer&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">Integer</span><span class="p">()</span> <span class="o">==</span> <span class="n">Integer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span>
     <span class="k">assert</span> <span class="n">Integer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Integer</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="mi">1</span><span class="p">)()</span> <span class="o">==</span> <span class="mi">1</span>
     <span class="k">assert</span> <span class="n">Integer</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">int</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">Integer</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -529,32 +532,34 @@
 </div></blockquote>
 </div>
 <div class="section" id="the-float-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Float</span></code> type<a class="headerlink" href="#the-float-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Float</span></code> type<a class="headerlink" href="#the-float-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Float</span> <span class="ow">is</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;number&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">Float</span><span class="p">()</span> <span class="o">==</span> <span class="n">Float</span><span class="p">(</span><span class="mf">0.</span><span class="p">)</span> <span class="o">==</span> <span class="nb">float</span><span class="p">()</span> <span class="o">==</span> <span class="mf">0.</span>
     <span class="k">assert</span> <span class="n">Float</span><span class="p">(</span><span class="mf">1.1</span><span class="p">)</span> <span class="o">==</span> <span class="n">Float</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="mf">1.1</span><span class="p">)()</span> <span class="o">==</span> <span class="mf">1.1</span>
     <span class="k">assert</span> <span class="n">Float</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">float</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">(</span><span class="mf">1.1</span><span class="p">),</span> <span class="n">Float</span><span class="p">)</span>    
 </pre></div>
 </div>
 </div>
 </div>
 </div>
 <div class="section" id="the-string-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">String</span></code> type<a class="headerlink" href="#the-string-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">String</span></code> type<a class="headerlink" href="#the-string-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">String</span> <span class="ow">is</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">String</span><span class="p">()</span> <span class="o">==</span> <span class="nb">str</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">String</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;abc&quot;</span>
     <span class="k">assert</span> <span class="n">String</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">str</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">),</span> <span class="n">String</span><span class="p">)</span>    
 </pre></div>
 </div>
 </div>
 </div>
 <div class="section" id="string-patterns">
-<h3><code class="docutils literal notranslate"><span class="pre">String</span></code> patterns<a class="headerlink" href="#string-patterns" title="Permalink to this headline">¶</a></h3>
+<h4><code class="docutils literal notranslate"><span class="pre">String</span></code> patterns<a class="headerlink" href="#string-patterns" title="Permalink to this headline">¶</a></h4>
 <p>a primary definition for strings includes a regular expression pattern for the string. the <code class="docutils literal notranslate"><span class="pre">String</span></code> type defines patterns using the getitem square bracket syntax.</p>
 <p>for example, a string beginning with the letter <code class="docutils literal notranslate"><span class="pre">a</span></code> is defined by the regular expression<code class="docutils literal notranslate"><span class="pre">&quot;^a&quot;</span></code></p>
 <div class="cell docutils container">
@@ -572,6 +577,20 @@
 </div>
 </div>
 </div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">String</span><span class="p">[</span><span class="s2">&quot;^a&quot;</span><span class="p">](</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;abc&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">exceptions</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">String</span><span class="p">[</span><span class="s2">&quot;^a&quot;</span><span class="p">],</span> <span class="s2">&quot;123&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
 <p>the pattern is stored as part of the schema and carried along with the object</p>
 <blockquote>
 <div><p><code class="docutils literal notranslate"><span class="pre">String</span></code>s have other properties you can learn about in <code class="docutils literal notranslate"><span class="pre">strings.ipynb</span></code></p>
@@ -579,13 +598,14 @@
 </div>
 </div>
 <div class="section" id="the-list-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">List</span></code> type<a class="headerlink" href="#the-list-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">List</span></code> type<a class="headerlink" href="#the-list-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">List</span> <span class="ow">is</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;array&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">List</span><span class="p">()</span> <span class="o">==</span> <span class="nb">list</span><span class="p">()</span> <span class="o">==</span> <span class="p">[]</span>
     <span class="k">assert</span> <span class="n">List</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">List</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">list</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">([]),</span> <span class="n">List</span><span class="p">)</span>    
 </pre></div>
 </div>
 </div>
@@ -595,13 +615,26 @@
 </div></blockquote>
 </div>
 <div class="section" id="the-dict-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Dict</span></code> type<a class="headerlink" href="#the-dict-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Dict</span></code> type<a class="headerlink" href="#the-dict-type" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">Type</span><span class="p">({})</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{}
+</pre></div>
+</div>
+</div>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Dict</span> <span class="ow">is</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;object&quot;</span><span class="p">]</span>
     <span class="k">assert</span> <span class="n">Dict</span><span class="p">()</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">()</span> <span class="o">==</span> <span class="p">{}</span>
     <span class="k">assert</span> <span class="n">Dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
     <span class="k">assert</span> <span class="n">Dict</span><span class="o">.</span><span class="n">py</span><span class="p">()</span> <span class="ow">is</span> <span class="nb">dict</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">Type</span><span class="p">({}),</span> <span class="n">Dict</span><span class="p">)</span>    
 </pre></div>
 </div>
 </div>
@@ -611,12 +644,11 @@
 </div></blockquote>
 </div>
 <div class="section" id="the-enum-type">
-<h2>the <code class="docutils literal notranslate"><span class="pre">Enum</span></code> type<a class="headerlink" href="#the-enum-type" title="Permalink to this headline">¶</a></h2>
+<h3>the <code class="docutils literal notranslate"><span class="pre">Enum</span></code> type<a class="headerlink" href="#the-enum-type" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Enum</span><span class="p">[</span><span class="s2">&quot;a b&quot;</span><span class="p">]()</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="n">Enum</span><span class="p">[</span><span class="s2">&quot;a b&quot;</span><span class="p">](</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
     <span class="k">assert</span> <span class="n">Enum</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">](</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">1</span>
-    <span class="k">assert</span> <span class="n">Enum</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">](</span><span class="s2">&quot;a&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span>
 </pre></div>
 </div>
 </div>
@@ -626,10 +658,34 @@
 </div></blockquote>
 </div>
 </div>
+<div class="section" id="combined-types">
+<h2>combined types<a class="headerlink" href="#combined-types" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>   <span class="n">string_or_int</span> <span class="o">=</span> <span class="n">Type</span><span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">];</span> <span class="n">string_or_int</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: (&#39;string&#39;, &#39;integer&#39;)}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">string_or_int</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="n">string_or_int</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">exceptions</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="n">string_or_int</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 <div class="section" id="type-metadata">
-<h1>type metadata<a class="headerlink" href="#type-metadata" title="Permalink to this headline">¶</a></h1>
+<h2>type metadata<a class="headerlink" href="#type-metadata" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="constants-and-defaults">
-<h2>constants and defaults<a class="headerlink" href="#constants-and-defaults" title="Permalink to this headline">¶</a></h2>
+<h3>constants and defaults<a class="headerlink" href="#constants-and-defaults" title="Permalink to this headline">¶</a></h3>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">Default</span><span class="p">,</span> <span class="n">Const</span><span class="p">;</span>
@@ -639,7 +695,7 @@
 </div>
 </div>
 <div class="section" id="meta-data-descriptions">
-<h2>meta-data descriptions<a class="headerlink" href="#meta-data-descriptions" title="Permalink to this headline">¶</a></h2>
+<h3>meta-data descriptions<a class="headerlink" href="#meta-data-descriptions" title="Permalink to this headline">¶</a></h3>
 <p>these types have no effect on validation or instantiation</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -651,12 +707,12 @@
 </div>
 </div>
 <div class="section" id="interactive-docstrings">
-<h2>interactive docstrings<a class="headerlink" href="#interactive-docstrings" title="Permalink to this headline">¶</a></h2>
+<h3>interactive docstrings<a class="headerlink" href="#interactive-docstrings" title="Permalink to this headline">¶</a></h3>
 <p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> uses the meta-data types to construct <code class="docutils literal notranslate"><span class="pre">numpy</span></code> docstrings.</p>
 </div>
 </div>
 <div class="section" id="extra-schemata-types">
-<h1>extra <code class="docutils literal notranslate"><span class="pre">schemata</span></code> types<a class="headerlink" href="#extra-schemata-types" title="Permalink to this headline">¶</a></h1>
+<h2>extra <code class="docutils literal notranslate"><span class="pre">schemata</span></code> types<a class="headerlink" href="#extra-schemata-types" title="Permalink to this headline">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> provides an extended type system based on the <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code> specification. below are some other types available to <code class="docutils literal notranslate"><span class="pre">schemata</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -667,7 +723,7 @@
 </div>
 </div>
 <div class="section" id="combinations-of-types">
-<h1>combinations of types<a class="headerlink" href="#combinations-of-types" title="Permalink to this headline">¶</a></h1>
+<h2>combinations of types<a class="headerlink" href="#combinations-of-types" title="Permalink to this headline">¶</a></h2>
 <p>types can combine into different conformations that describe more complex types.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -677,7 +733,7 @@
 </div>
 </div>
 <div class="section" id="union-types">
-<h2>union types<a class="headerlink" href="#union-types" title="Permalink to this headline">¶</a></h2>
+<h3>union types<a class="headerlink" href="#union-types" title="Permalink to this headline">¶</a></h3>
 <p>the <code class="docutils literal notranslate"><span class="pre">Type</span> <span class="pre">and</span> <span class="pre">AnyOf</span></code> types provide commonly supported union types.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
@@ -704,6 +760,7 @@
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">Integer</span> <span class="o">^</span> <span class="n">Float</span> <span class="o">==</span> <span class="n">Integer</span><span class="o">.</span><span class="n">xor</span><span class="p">(</span><span class="n">Float</span><span class="p">)</span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>
@@ -736,7 +793,7 @@
         <div class='prev-next-bottom'>
             
     <a class='left-prev' id="prev-link" href="composites.html" title="previous page"><code class="docutils literal notranslate"><span class="pre">composites</span></code></a>
-    <a class='right-next' id="next-link" href="schemata/readme.html" title="next page">schemata</a>
+    <a class='right-next' id="next-link" href="ui.html" title="next page"><code class="docutils literal notranslate"><span class="pre">schemata</span></code> <code class="docutils literal notranslate"><span class="pre">UiWidgets</span></code>s</a>
 
         </div>
         

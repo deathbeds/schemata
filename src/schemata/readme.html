@@ -53,7 +53,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="schemata tests" href="tests/readme.html" />
-    <link rel="prev" title="the schemata types" href="../types.html" />
+    <link rel="prev" title="schemata UiWidgetss" href="../ui.html" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="docsearch:language" content="en" />
     
@@ -83,7 +83,7 @@
     <div class="bd-toc-item active">
         <ul class="nav bd-sidenav">
  <li class="toctree-l1">
-  <a class="reference internal" href="../../readme.html">
+  <a class="reference internal" href="../../index.html">
    schemata
   </a>
  </li>
@@ -171,6 +171,21 @@
        composites
       </span>
      </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../ui.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       UiWidgets
+      </span>
+     </code>
+     s
     </a>
    </li>
   </ul>
@@ -262,6 +277,579 @@
 <p>build the core types of the schema validation need to build the properties of the validation schema.# schemata tests</p>
 </li>
 </ol>
+<span class="target" id="module-schemata.types"></span><p>the basis of schemata that begins defining the type system</p>
+<dl class="py class">
+<dt id="schemata.types.Any">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Any</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py class">
+<dt id="schemata.types.Any.Comment_">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Comment_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Comment_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Comment_.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$comment'</span></em><a class="headerlink" href="#schemata.types.Any.Comment_.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Const">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Const</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Const" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="schemata.types.Any.Const.filter">
+<code class="sig-name descname"><span class="pre">filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Const.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.Const.groupby">
+<code class="sig-name descname"><span class="pre">groupby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Const.groupby" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Any.Const.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'validation:/properties/const'</span></em><a class="headerlink" href="#schemata.types.Any.Const.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.Const.map">
+<code class="sig-name descname"><span class="pre">map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Const.map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.Const.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Const.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Default">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Default" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Default.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Any.Default.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Definitions">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Definitions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Definitions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Definitions.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$defs'</span></em><a class="headerlink" href="#schemata.types.Any.Definitions.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Deprecated">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Deprecated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Deprecated" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Deprecated.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Any.Deprecated.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Description">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Description</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Description" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Description.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/description'</span></em><a class="headerlink" href="#schemata.types.Any.Description.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Enum">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Enum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py class">
+<dt id="schemata.types.Any.Enum.Dropdown">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Dropdown</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.Dropdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Enum.Radio">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Radio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.Radio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Enum.Range">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Range</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.Range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Enum.Select">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Select</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.Select" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Any.Enum.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'validation:/properties/enum'</span></em><a class="headerlink" href="#schemata.types.Any.Enum.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.Enum.py">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">py</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.py" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.Enum.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Enum.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Examples">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Examples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Examples" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Examples.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/examples'</span></em><a class="headerlink" href="#schemata.types.Any.Examples.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Optional">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Optional</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Optional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.ReadOnly">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">ReadOnly</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.ReadOnly" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.ReadOnly.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Any.ReadOnly.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Ref_">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Ref_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Ref_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Ref_.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$ref'</span></em><a class="headerlink" href="#schemata.types.Any.Ref_.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.Title">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Title</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.Title" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.Title.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/title'</span></em><a class="headerlink" href="#schemata.types.Any.Title.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Any.WriteOnly">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">WriteOnly</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Any.WriteOnly" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Any.WriteOnly.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Any.WriteOnly.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.cast">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">cast</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any.cast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any.cast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.from_file">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_file</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any.from_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.from_schema">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">from_schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any.from_schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any.from_schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.new_type">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">new_type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">value=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">bases=None</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any.new_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any.new_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Any.schema">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">schema</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ravel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Any.schema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Any.schema" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Bool">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Bool</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Bool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Bool" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py class">
+<dt id="schemata.types.Bool.Checkbox">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Checkbox</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Bool.Checkbox" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Bool.Radio">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Radio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Bool.Radio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Bool.Select">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Select</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Bool.Select" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Bool.type">
+<code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">boolean</span></em><a class="headerlink" href="#schemata.types.Bool.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Bool.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Bool.validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Bool.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Comment_">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Comment_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Comment_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Comment_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Comment_.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$comment'</span></em><a class="headerlink" href="#schemata.types.Comment_.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Const">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Const</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Const"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Const" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt id="schemata.types.Const.filter">
+<code class="sig-name descname"><span class="pre">filter</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Const.filter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Const.filter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Const.groupby">
+<code class="sig-name descname"><span class="pre">groupby</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Const.groupby"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Const.groupby" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Const.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'validation:/properties/const'</span></em><a class="headerlink" href="#schemata.types.Const.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Const.map">
+<code class="sig-name descname"><span class="pre">map</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Const.map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Const.map" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Const.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Const.validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Const.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Default">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Default</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Default"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Default" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Default.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Default.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Definitions">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Definitions</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Definitions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Definitions.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$defs'</span></em><a class="headerlink" href="#schemata.types.Definitions.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Deprecated">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Deprecated</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Deprecated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Deprecated" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Deprecated.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.Deprecated.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Description">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Description</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Description" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Description.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/description'</span></em><a class="headerlink" href="#schemata.types.Description.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Enum">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Enum</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Enum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Enum" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py class">
+<dt id="schemata.types.Enum.Dropdown">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Dropdown</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Enum.Dropdown" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Enum.Radio">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Radio</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Enum.Radio" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Enum.Range">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Range</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Enum.Range" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Enum.Select">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Select</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Enum.Select" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Enum.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'validation:/properties/enum'</span></em><a class="headerlink" href="#schemata.types.Enum.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Enum.py">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">py</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Enum.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Enum.py" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Enum.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Enum.validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Enum.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Examples">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Examples</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Examples"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Examples" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Examples.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/examples'</span></em><a class="headerlink" href="#schemata.types.Examples.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.MetaType">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">MetaType</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name</span></em>, <em class="sig-param"><span class="pre">bases</span></em>, <em class="sig-param"><span class="pre">dict</span></em>, <em class="sig-param"><span class="pre">value=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">**kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#MetaType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.MetaType" title="Permalink to this definition">¶</a></dt>
+<dd><p>a schemaful python type</p>
+<dl class="py method">
+<dt id="schemata.types.MetaType.key">
+<code class="sig-name descname"><span class="pre">key</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#MetaType.key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.MetaType.key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.MetaType.value">
+<code class="sig-name descname"><span class="pre">value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">*key</span></em>, <em class="sig-param"><span class="pre">default=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#MetaType.value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.MetaType.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the corresponding value to the class key</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Null">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Null</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Null"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Null" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Null.type">
+<code class="sig-name descname"><span class="pre">type</span></code><em class="property"><span class="pre">:</span> <span class="pre">null</span></em><a class="headerlink" href="#schemata.types.Null.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Null.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Null.validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Null.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Optional">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Optional</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Optional"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Optional" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.ReadOnly">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">ReadOnly</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#ReadOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.ReadOnly" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.ReadOnly.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.ReadOnly.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Ref_">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Ref_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Ref_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Ref_" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Ref_.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'core:/properties/$ref'</span></em><a class="headerlink" href="#schemata.types.Ref_.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Schema_">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Schema_</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Schema_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Schema_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Title">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Title</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Title"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Title" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Title.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/title'</span></em><a class="headerlink" href="#schemata.types.Title.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Type</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em>, <em class="sig-param"><span class="pre">*args</span></em>, <em class="sig-param"><span class="pre">**kw</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Type" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py class">
+<dt id="schemata.types.Type.Html">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Html</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Html" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Html.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">text/html</span></em><a class="headerlink" href="#schemata.types.Type.Html.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type.Json">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Json</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Json" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Json.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">application/json</span></em><a class="headerlink" href="#schemata.types.Type.Json.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Json.dumps">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">dumps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Json.dumps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Json.loads">
+<code class="sig-name descname"><span class="pre">loads</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Json.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type.Markdown">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Markdown</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Markdown" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Markdown.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">text/markdown</span></em><a class="headerlink" href="#schemata.types.Type.Markdown.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type.Plain">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Plain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Plain" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Plain.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">application</span></em><a class="headerlink" href="#schemata.types.Type.Plain.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Plain.dumps">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">dumps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Plain.dumps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Plain.loads">
+<code class="sig-name descname"><span class="pre">loads</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Plain.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type.Toml">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Toml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Toml" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Toml.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">text/toml</span></em><a class="headerlink" href="#schemata.types.Type.Toml.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Toml.dumps">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">dumps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Toml.dumps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Toml.loads">
+<code class="sig-name descname"><span class="pre">loads</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Toml.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Type.Yaml">
+<em class="property"><span class="pre">class</span> </em><code class="sig-name descname"><span class="pre">Yaml</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Yaml" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.Type.Yaml.contentMediaType">
+<code class="sig-name descname"><span class="pre">contentMediaType</span></code><em class="property"><span class="pre">:</span> <span class="pre">application/yaml</span></em><a class="headerlink" href="#schemata.types.Type.Yaml.contentMediaType" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Yaml.dumps">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">dumps</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Yaml.dumps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.Yaml.loads">
+<code class="sig-name descname"><span class="pre">loads</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#schemata.types.Type.Yaml.loads" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="schemata.types.Type.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'validation:/properties/type'</span></em><a class="headerlink" href="#schemata.types.Type.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.py">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">py</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Type.py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Type.py" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="schemata.types.Type.validator">
+<em class="property"><span class="pre">classmethod</span> </em><code class="sig-name descname"><span class="pre">validator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Type.validator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Type.validator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.Value">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">Value</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#Value"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.Value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="schemata.types.WriteOnly">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">schemata.types.</span></code><code class="sig-name descname"><span class="pre">WriteOnly</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">object=&lt;class</span> <span class="pre">'schemata.utils.EMPTY'&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/schemata/types.html#WriteOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#schemata.types.WriteOnly" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt id="schemata.types.WriteOnly.id">
+<code class="sig-name descname"><span class="pre">id</span></code><em class="property"> <span class="pre">=</span> <span class="pre">'metadata:/properties/default'</span></em><a class="headerlink" href="#schemata.types.WriteOnly.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 </div>
 
     <script type="text/x-thebe-config">
@@ -289,7 +877,7 @@
         
         <div class='prev-next-bottom'>
             
-    <a class='left-prev' id="prev-link" href="../types.html" title="previous page">the <code class="docutils literal notranslate"><span class="pre">schemata</span></code> types</a>
+    <a class='left-prev' id="prev-link" href="../ui.html" title="previous page"><code class="docutils literal notranslate"><span class="pre">schemata</span></code> <code class="docutils literal notranslate"><span class="pre">UiWidgets</span></code>s</a>
     <a class='right-next' id="next-link" href="tests/readme.html" title="next page">schemata tests</a>
 
         </div>

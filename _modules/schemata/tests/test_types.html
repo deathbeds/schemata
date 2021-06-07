@@ -1,0 +1,424 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>schemata.tests.test_types &#8212; schemata</title>
+    
+  <link href="../../../_static/css/theme.css" rel="stylesheet" />
+  <link href="../../../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../../../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../../../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../../../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/togglebutton.js"></script>
+    <script src="../../../_static/clipboard.min.js"></script>
+    <script src="../../../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../../../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../../../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/_modules/schemata/tests/test_types.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../../../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">schemata</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../../../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../index.html">
+   schemata
+  </a>
+ </li>
+</ul>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../../../src/readme.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     schemata
+    </span>
+   </code>
+   types and traits
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/literals.html">
+     Numeric Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/types.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/numbers.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Numeric
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/strings.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       String
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/arrays.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Sequence
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/objects.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Dict
+      </span>
+     </code>
+     type
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/composites.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       composites
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../../../src/ui.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       UiWidgets
+      </span>
+     </code>
+     s
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../src/schemata/readme.html">
+   schemata
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../../../src/schemata/tests/readme.html">
+   schemata tests
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <h1>Source code for schemata.tests.test_types</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">import</span> <span class="nn">hypothesis</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">schemata.utils</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="ANull"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.ANull">[docs]</a><span class="k">class</span> <span class="nc">ANull</span><span class="p">(</span><span class="n">Null</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;A Null type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotANull"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotANull">[docs]</a><span class="k">class</span> <span class="nc">NotANull</span><span class="p">(</span><span class="o">-</span><span class="n">ANull</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}]):</span>
+    <span class="sd">&quot;&quot;&quot;Non-Null types&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ABool"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.ABool">[docs]</a><span class="k">class</span> <span class="nc">ABool</span><span class="p">(</span><span class="n">Bool</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="kc">False</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;A Bool type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotABool"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotABool">[docs]</a><span class="k">class</span> <span class="nc">NotABool</span><span class="p">(</span><span class="o">-</span><span class="n">ABool</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}]):</span>
+    <span class="sd">&quot;&quot;&quot;Non-Bool type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AnInteger"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.AnInteger">[docs]</a><span class="k">class</span> <span class="nc">AnInteger</span><span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;An Integer type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotAnInteger"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotAnInteger">[docs]</a><span class="k">class</span> <span class="nc">NotAnInteger</span><span class="p">(</span>
+    <span class="o">-</span><span class="n">Integer</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}]</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Non-Integer type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AFloat"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.AFloat">[docs]</a><span class="k">class</span> <span class="nc">AFloat</span><span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">tau</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;An Float type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotAFloat"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotAFloat">[docs]</a><span class="k">class</span> <span class="nc">NotAFloat</span><span class="p">(</span>
+    <span class="o">-</span><span class="n">Float</span><span class="p">,</span>
+    <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Non-Float type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AString"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.AString">[docs]</a><span class="k">class</span> <span class="nc">AString</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">]):</span>
+    <span class="sd">&quot;&quot;&quot;A String type&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotAString"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotAString">[docs]</a><span class="k">class</span> <span class="nc">NotAString</span><span class="p">(</span><span class="o">-</span><span class="n">String</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="p">[],</span> <span class="p">{}]):</span>
+    <span class="s2">&quot;A String type&quot;</span></div>
+
+
+<div class="viewcode-block" id="APattern"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.APattern">[docs]</a><span class="k">class</span> <span class="nc">APattern</span><span class="p">(</span>
+    <span class="n">String</span><span class="p">[</span><span class="s2">&quot;^a&quot;</span><span class="p">],</span>
+    <span class="n">Examples</span><span class="p">[</span><span class="s2">&quot;abc&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A Pattern string&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotAPattern"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotAPattern">[docs]</a><span class="k">class</span> <span class="nc">NotAPattern</span><span class="p">(</span>
+    <span class="o">-</span><span class="n">APattern</span><span class="p">,</span>
+    <span class="n">Examples</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;123&quot;</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Invalid string Patterns&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="AList"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.AList">[docs]</a><span class="k">class</span> <span class="nc">AList</span><span class="p">(</span><span class="n">List</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[[],</span> <span class="nb">list</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)]):</span>
+    <span class="sd">&quot;&quot;&quot;A List&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotAList"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotAList">[docs]</a><span class="k">class</span> <span class="nc">NotAList</span><span class="p">(</span><span class="o">-</span><span class="n">AList</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">{}]):</span>
+    <span class="sd">&quot;&quot;&quot;Non List types&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ADict"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.ADict">[docs]</a><span class="k">class</span> <span class="nc">ADict</span><span class="p">(</span><span class="n">Dict</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[{},</span> <span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">)]):</span>
+    <span class="sd">&quot;&quot;&quot;A Dict&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="NotADict"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.NotADict">[docs]</a><span class="k">class</span> <span class="nc">NotADict</span><span class="p">(</span>
+    <span class="o">-</span><span class="n">ADict</span><span class="p">,</span>
+    <span class="n">Examples</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_letters</span><span class="p">,</span> <span class="p">[]],</span>
+<span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Non Dict types&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ADictWithProperties"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.ADictWithProperties">[docs]</a><span class="k">class</span> <span class="nc">ADictWithProperties</span><span class="p">(</span><span class="n">Dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">&gt;&gt;&gt; assert issubclass(ADictWithProperties, Dict.Properties)</span>
+<span class="sd">&gt;&gt;&gt; assert ADictWithProperties.value(Dict.Properties)[&quot;foo&quot;] is Integer</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">foo</span><span class="p">:</span> <span class="n">Integer</span></div>
+
+
+<div class="viewcode-block" id="AListWithItems"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.AListWithItems">[docs]</a><span class="k">class</span> <span class="nc">AListWithItems</span><span class="p">(</span><span class="n">List</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;\</span>
+<span class="sd">&gt;&gt;&gt; assert issubclass(AListWithItems, List.Items)</span>
+<span class="sd">&gt;&gt;&gt; assert issubclass(AListWithItems.value(List.Items), Dict.Properties)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">foo</span><span class="p">:</span> <span class="n">Integer</span></div>
+
+
+<div class="viewcode-block" id="test_uri"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.test_uri">[docs]</a><span class="k">def</span> <span class="nf">test_uri</span><span class="p">():</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="p">[</span><span class="s2">&quot;https://api.github.com/users{/user}&quot;</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">uri</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="s2">&quot;tonyfast&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;https://api.github.com/users/tonyfast&quot;</span></div>
+
+
+<div class="viewcode-block" id="test_uuid"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.test_uuid">[docs]</a><span class="k">def</span> <span class="nf">test_uuid</span><span class="p">():</span>
+    <span class="k">assert</span> <span class="n">Uuid</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;00000000-0000-0000-0000-000000000000&quot;</span>
+    <span class="k">assert</span> <span class="n">Uuid</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">Uuid</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">Uuid</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+    <span class="k">assert</span> <span class="n">Uuid</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="test_casting"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.test_casting">[docs]</a><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span><span class="s2">&quot;type, value&quot;</span><span class="p">,</span> <span class="p">((</span><span class="n">String</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="n">Integer</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">),</span> <span class="p">(</span><span class="n">Float</span><span class="p">,</span> <span class="s2">&quot;1.2&quot;</span><span class="p">)))</span>
+<span class="k">def</span> <span class="nf">test_casting</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">value</span><span class="p">),</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span>
+        <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">type</span><span class="o">.</span><span class="n">cast</span><span class="p">()(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="o">.</span><span class="n">py</span><span class="p">()(</span><span class="n">y</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">test_casting_list</span><span class="p">():</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="nb">map</span><span class="p">(</span><span class="nb">type</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">AssertionError</span><span class="p">):</span>
+        <span class="n">List</span><span class="p">(</span><span class="nb">iter</span><span class="p">())</span>
+    <span class="k">assert</span> <span class="n">List</span><span class="o">.</span><span class="n">cast</span><span class="p">()(</span><span class="nb">iter</span><span class="p">())</span> <span class="o">==</span> <span class="n">List</span><span class="o">.</span><span class="n">py</span><span class="p">()(</span><span class="nb">iter</span><span class="p">())</span>
+
+
+<div class="viewcode-block" id="test_casting_list"><a class="viewcode-back" href="../../../src/schemata/tests/readme.html#schemata.tests.test_types.test_casting_list">[docs]</a><span class="k">def</span> <span class="nf">test_casting_list</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;todo&quot;&quot;&quot;</span></div>
+</pre></div>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By deathbeds<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../../../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>
