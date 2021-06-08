@@ -213,22 +213,34 @@ Notes
 
     if "examples" in schema:
 
-        docstring += (
-            f"""\
+        docstring += f"""\
 Examples
 --------
+
+{get_examples(cls, schema)}
 """
-            + "\n".join(
-                f"""\
+
+    return docstring.rstrip() or ""
+
+
+def get_examples(cls, schema):
+    schema = schema or {}
+    doctests = """"""
+    for x in schema.get("examples", ()) or ():
+        doctests += (
+            f"""\
 >>> {cls.__name__}({F'"{x}"' if isinstance(x, str) else x})
 """
-                + ("" if x is None else f"'{x}'" if isinstance(x, str) else str(x))
-                for x in schema["examples"] or []
-            )
+            + ("" if x is None else f"'{x}'" if isinstance(x, str) else str(x))
             + "\n"
         )
 
-    return docstring.rstrip() or ""
+    if "not" in schema:
+        for x in schema["not"].get("examples", ()) or ():
+            doctests += f"""\
+>>> with __import__("pytest").raises(BaseException): {cls.__name__}({F'"{x}"' if isinstance(x, str) else x})
+"""
+    return doctests
 
 
 def get_santized_comments(x):
@@ -319,9 +331,14 @@ def get_hashable(x):
 @get_hashable.register
 def get_hashable_dict(x: dict):
     return tuple(
-        (k, get_hashable(v))
-        for k, v in x.items()
-        if k not in {"description", "$comment"}
+        sorted(
+            (
+                (k, get_hashable(v))
+                for k, v in x.items()
+                if k not in {"description", "$comment"}
+            ),
+            key=lambda x: x[0],
+        )
     )
 
 

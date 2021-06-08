@@ -115,3 +115,7 @@ del k, v
 
 class Layout(Any):
     pass
+
+
+class Style(Any):
+    pass

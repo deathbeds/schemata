@@ -47,33 +47,6 @@ instantiate a new schemata type.
 * __doc__ refers the description of the class
         
         """
-        # resolve docstrings
-        # if DOC in dict and isinstance(dict[DOC], (str, type(None))):
-        #     doc = dict.pop(DOC)
-        #     if doc and isinstance(doc, str):
-        #         bases += (Description[doc],)
-
-        if ANNO in dict:
-            anno = dict.pop(ANNO)
-            from . import arrays, objects
-
-            for k, v in anno.items():
-                if k in dict:
-                    anno[k] = anno[k].default(dict[k])
-            if any(issubclass(x, arrays.Arrays) for x in (cls,) + bases):
-                bases += (arrays.Arrays.Items[objects.Dict[anno]],)
-            elif any(issubclass(x, objects.Dict) for x in (cls,) + bases):
-                bases += (objects.Dict.Properties[anno],)
-
-            defs = {k: v for k, v in dict.items() if isinstance(v, MetaType)}
-
-            if defs:
-                bases += (Definitions[defs],)
-
-        if DOC in dict:
-            bases += (Description[dict.pop(DOC)],)
-
-        # update the class dict payload
         key = utils.normalize_json_key(name)
         dict.setdefault(ANNO, {})
         if value is not EMPTY:
@@ -84,6 +57,66 @@ instantiate a new schemata type.
         cls.__annotations__ = utils.merge(cls)
 
         return cls
+
+    def mro(cls):
+        bases = super().mro()
+
+        is_array = any(issubclass(x, (tuple, list, set)) for x in bases)
+        is_object = any(issubclass(x, builtins.dict) for x in bases)
+
+        dict = vars(cls)
+        if dict.get(DOC):
+            bases += (Description[dict[DOC]],)
+
+        comments = inspect.getcomments(cls)
+        if comments:
+            bases += (Comment_[comments],)
+
+        if is_array or is_object:
+            extra = []
+
+            defs, deps = {}, __import__("collections").defaultdict(tuple)
+            for k, v in dict.items():
+                if isinstance(v, MetaType):
+                    if getattr(v, ANNO, None):
+                        defs[k] = v
+                elif inspect.isfunction(v):
+                    sig = inspect.signature(v)
+
+                    if sig.return_annotation != inspect._empty:
+                        dict[ANNO].setdefault(k, sig.return_annotation)
+
+                    for i, (key, param) in enumerate(sig.parameters.items()):
+                        if isinstance(param.annotation, MetaType):
+                            deps.setdefault(k, param.annotation)
+
+                elif callable(v):
+                    pass
+
+            for k, v in dict.items():
+                if not callable(v) and k in dict[ANNO]:
+                    dict[ANNO][k] = dict[ANNO][k].default(v)
+
+            if dict[ANNO]:
+                from . import objects
+
+                extra += (objects.Dict.Properties[builtins.dict(dict[ANNO])],)
+                dict[ANNO].clear()
+
+            if deps:
+                extra += (objects.Dict.Dependencies[deps],)
+
+            if is_array and extra:
+                from .arrays import Arrays
+
+                extra = (Arrays.Items[type("Annotations", tuple(extra), {})],)
+
+            if defs:
+                extra += (Definitions[defs],)
+
+            id = bases.index(object)
+            bases = bases[:id] + list(extra) + bases[id:]
+        return bases
 
     def key(cls):
         return utils.normalize_json_key(cls.__name__)

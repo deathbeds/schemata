@@ -19,17 +19,20 @@ def get_widget_int(object: int, schema=utils.EMPTY, **kw):
     schema = schema or object.schema()
 
     kw.update(
-        utils.get_schema({
-            ipy: schema[s]
-            for ipy, s in dict(
-                description="description",
-                min="minimum exclusiveMinimum",
-                max="maximum exclusiveMaximum",
-                step="multipleOf",
-            ).items()
-            for s in s.split()
-            if s in schema
-        }, ravel=True)
+        utils.get_schema(
+            {
+                ipy: schema[s]
+                for ipy, s in dict(
+                    description="description",
+                    min="minimum exclusiveMinimum",
+                    max="maximum exclusiveMaximum",
+                    step="multipleOf",
+                ).items()
+                for s in s.split()
+                if s in schema
+            },
+            ravel=True,
+        )
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())
@@ -54,17 +57,20 @@ def get_widget_float(object: float, schema=utils.EMPTY, **kw):
 
     schema = schema or object.schema()
     kw.update(
-        utils.get_schema({
-            ipy: schema[s]
-            for ipy, s in dict(
-                description="description",
-                min="minimum exclusiveMinimum",
-                max="maximum exclusiveMaximum",
-                step="multipleOf",
-            ).items()
-            for s in s.split()
-            if s in schema
-        }, ravel=True)
+        utils.get_schema(
+            {
+                ipy: schema[s]
+                for ipy, s in dict(
+                    description="description",
+                    min="minimum exclusiveMinimum",
+                    max="maximum exclusiveMaximum",
+                    step="multipleOf",
+                ).items()
+                for s in s.split()
+                if s in schema
+            },
+            ravel=True,
+        )
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())
@@ -78,7 +84,12 @@ def get_widget_float(object: float, schema=utils.EMPTY, **kw):
     else:
         cls = ipywidgets.FloatSlider
 
-    return cls(object, **kw, layout=get_layout(schema))
+    return cls(
+        object,
+        **kw,
+        layout=get_layout(schema),
+        style=schema.get("style", type(object).value(ui.Style) or {})
+    )
 
 
 @get_widget.register
@@ -93,7 +104,7 @@ def get_widget_str(object: str, schema=utils.EMPTY, **kw):
     else:
         cls = ipywidgets.Text
 
-    return cls(object, **kw, layout=get_layout(schema))
+    return cls(object, **kw, layout=get_layout(schema), style=schema.get("style", {}))
 
 
 @get_widget.register(list)
@@ -106,14 +117,17 @@ def get_widget_iter(object, schema=utils.EMPTY, **kw):
 
     schema = schema or object.schema()
     kw.update(
-        utils.get_schema({
-            ipy: schema[s]
-            for ipy, s in dict(
-                description="description",
-            ).items()
-            for s in s.split()
-            if s in schema
-        }, ravel=True)
+        utils.get_schema(
+            {
+                ipy: schema[s]
+                for ipy, s in dict(
+                    description="description",
+                ).items()
+                for s in s.split()
+                if s in schema
+            },
+            ravel=True,
+        )
     )
 
     widget = schema.get(str(ui.UiWidget), tuple())
@@ -129,8 +143,7 @@ def get_widget_iter(object, schema=utils.EMPTY, **kw):
     else:
         cls = ipywidgets.Select
 
-    print(cls)
-    return cls(object, **kw, layout=get_layout(schema))
+    return cls(object, **kw, layout=get_layout(schema), style=schema.get("style", {}))
 
 
 def get_children(object, schema=utils.EMPTY):
@@ -141,7 +154,6 @@ def get_children(object, schema=utils.EMPTY):
         schema = schema["items"]
         if isinstance(schema, (list, tuple)):
             for i, (cls, v) in enumerate(zip(schema, object)):
-                print(i, cls, v)
                 if hasattr(cls, "widget"):
                     typed.append(cls.widget(v))
                 else:

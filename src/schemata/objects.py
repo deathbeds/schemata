@@ -46,6 +46,9 @@ class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
                 if value in type(self[key]).__mro__:
                     key[self] = value(self[key])
 
+        if cls.value(Dict.Dependencies):
+            Dict.Dependencies.update_dependencies(self)
+
     @classmethod
     def default(cls, object=EMPTY, **kwargs):
         return cls + Default[dict(*object or {}, **kwargs)]
@@ -158,8 +161,34 @@ class Dict(Type["object"], apis.FluentDict, apis.Meaning, dict):
             keys = list(object)
             for k, v in dict.items(deps or {}):
                 if k in keys:
-                    for required in v:
-                        testing.assertIn(required, keys)
+                    if isinstance(v, type):
+                        v.validate(object)
+                    else:
+                        for required in v:
+                            if required == "null":
+                                continue
+                            testing.assertIn(required, keys)
+
+        def update_dependencies(self, *keys):
+            cls = type(self)
+            deps = cls.value(Dict.Dependencies) or {}
+            for key in keys or tuple(deps):
+                d = deps[key]
+                if isinstance(d, (tuple, list)):
+                    for t in d:
+                        if t == "null":
+                            if key not in self:
+                                dict.__setitem__(self, key, getattr(cls, key)(self))
+                                break
+                        if t not in self:
+                            break
+                    else:
+                        dict.__setitem__(self, key, getattr(cls, key)(self))
+
+        def __setitem__(self, key, value):
+            object = dict.__setitem__(self, key, value)
+            Dict.Dependencies.update_dependencies(self)
+            return object
 
     def remove(self, *args):
         for x in args:
