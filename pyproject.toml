@@ -42,6 +42,7 @@ test = [
   "jinja2",
   "json-e",
   "nbval",
+  "pandas",
   "parse",
   "pytest-cov",
   "pytest",
