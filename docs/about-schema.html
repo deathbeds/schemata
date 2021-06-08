@@ -1,0 +1,994 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>what can schema do for you! &#8212; schemata</title>
+    
+  <link href="../_static/css/theme.css" rel="stylesheet" />
+  <link href="../_static/css/index.c5995385ac14fb8791e8eb36b4908be2.css" rel="stylesheet" />
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    
+      
+
+    
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/sphinx-book-theme.acff12b8f9c144ce68a297486a2fa670.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-main.c949a650a448cc0ae9fd3441c0e17fb0.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/panels-variables.06eb56fa6e07937060861dad626602ad.css" />
+    
+  <link rel="preload" as="script" href="../_static/js/index.1c5a1a01449ed65a7b51.js">
+
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/togglebutton.js"></script>
+    <script src="../_static/clipboard.min.js"></script>
+    <script src="../_static/copybutton.js"></script>
+    <script >var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="../_static/sphinx-book-theme.12a9622fbb08dcb3a2a40b2c02b83a57.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+    <script async="async" src="https://unpkg.com/thebelab@latest/lib/index.js"></script>
+    <script >
+        const thebe_selector = ".thebe"
+        const thebe_selector_input = "pre"
+        const thebe_selector_output = ".output"
+    </script>
+    <script async="async" src="../_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://schemata.readthedocs.io/en/latest/docs/about-schema.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="schemata" href="../src/schemata/readme.html" />
+    <link rel="prev" title="schemata schema definitions" href="../src/schema.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="en" />
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="80">
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<div class="col-12 col-md-3 bd-sidebar site-navigation show" id="site-navigation">
+    
+        <div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+      
+      <h1 class="site-logo" id="site-title">schemata</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main navigation">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   schemata
+  </a>
+ </li>
+</ul>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1 has-children">
+  <a class="reference internal" href="../src/readme.html">
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     schemata
+    </span>
+   </code>
+   types and traits
+  </a>
+  <input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/>
+  <label for="toctree-checkbox-1">
+   <i class="fas fa-chevron-down">
+   </i>
+  </label>
+  <ul>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/literals.html">
+     Numeric Types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/types.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/numbers.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Numeric
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/strings.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       String
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/arrays.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Sequence
+      </span>
+     </code>
+     types
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/objects.html">
+     the
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       Dict
+      </span>
+     </code>
+     type
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/composites.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       composites
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/ui.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       UiWidgets
+      </span>
+     </code>
+     s
+    </a>
+   </li>
+   <li class="toctree-l2">
+    <a class="reference internal" href="../src/schema.html">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       schemata
+      </span>
+     </code>
+     schema definitions
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   what can schema do for you!
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../src/schemata/readme.html">
+   schemata
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../src/schemata/tests/readme.html">
+   schemata tests
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav> <!-- To handle the deprecated key -->
+
+</div>
+
+
+          
+
+
+          
+<main class="col py-md-3 pl-md-4 bd-content overflow-auto" role="main">
+    
+    <div class="topbar container-xl fixed-top">
+    <div class="topbar-contents row">
+        <div class="col-12 col-md-3 bd-topbar-whitespace site-navigation show"></div>
+        <div class="col pl-md-4 topbar-main">
+            
+            <button id="navbar-toggler" class="navbar-toggler ml-0" type="button" data-toggle="collapse"
+                data-toggle="tooltip" data-placement="bottom" data-target=".site-navigation" aria-controls="navbar-menu"
+                aria-expanded="true" aria-label="Toggle navigation" aria-controls="site-navigation"
+                title="Toggle navigation" data-toggle="tooltip" data-placement="left">
+                <i class="fas fa-bars"></i>
+                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-up"></i>
+            </button>
+            
+            
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn" aria-label="Download this page"><i
+            class="fas fa-download"></i></button>
+
+    <div class="dropdown-buttons">
+        <!-- ipynb file if we had a myst markdown file -->
+        
+        <!-- Download raw file -->
+        <a class="dropdown-buttons" href="../_sources/docs/about-schema.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Download source file" data-toggle="tooltip"
+                data-placement="left">.ipynb</button></a>
+        <!-- Download PDF via print -->
+        <button type="button" id="download-print" class="btn btn-secondary topbarbtn" title="Print to PDF"
+            onClick="window.print()" data-toggle="tooltip" data-placement="left">.pdf</button>
+    </div>
+</div>
+
+            <!-- Source interaction buttons -->
+
+            <!-- Full screen (wrap in <a> to have style consistency -->
+
+<a class="full-screen-button"><button type="button" class="btn btn-secondary topbarbtn" data-toggle="tooltip"
+        data-placement="bottom" onclick="toggleFullScreen()" aria-label="Fullscreen mode"
+        title="Fullscreen mode"><i
+            class="fas fa-expand"></i></button></a>
+
+            <!-- Launch buttons -->
+
+<div class="dropdown-buttons-trigger">
+    <button id="dropdown-buttons-trigger" class="btn btn-secondary topbarbtn"
+        aria-label="Launch interactive content"><i class="fas fa-rocket"></i></button>
+    <div class="dropdown-buttons">
+        
+        <a class="binder-button" href="https://mybinder.org/v2/gh/executablebooks/jupyter-book/master?urlpath=tree/docs/about-schema.ipynb"><button type="button"
+                class="btn btn-secondary topbarbtn" title="Launch Binder" data-toggle="tooltip"
+                data-placement="left"><img class="binder-button-logo"
+                    src="../_static/images/logo_binder.svg"
+                    alt="Interact on binder">Binder</button></a>
+        
+        
+        
+        
+    </div>
+</div>
+
+        </div>
+
+        <!-- Table of contents -->
+        <div class="d-none d-md-block col-md-2 bd-toc show">
+            
+            <div class="tocsection onthispage pt-5 pb-3">
+                <i class="fas fa-list"></i> Contents
+            </div>
+            <nav id="bd-toc-nav">
+                <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#a-practical-study-of-the-github-api-schema">
+   a practical study of the github api schema
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#dtypes">
+     dtypes
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#table-schema">
+     table schema
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#learning-some-schema-by-writing-it">
+   learning some schema by writing it
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-provides-validation">
+     schema provides validation
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-define-the-null-space">
+     schema define the null space
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-describe-things">
+     schema describe things
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-generate-documentation">
+     schema generate documentation
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#sphinx-jsonschema">
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         sphinx-jsonschema
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-generate-test-cases">
+     schema generate test cases
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#advanced-testing-with-hypothesis">
+       advanced testing with
+       <code class="docutils literal notranslate">
+        <span class="pre">
+         hypothesis
+        </span>
+       </code>
+      </a>
+     </li>
+    </ul>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#schema-constrains-form">
+     schema constrains form
+    </a>
+    <ul class="nav section-nav flex-column">
+     <li class="toc-h4 nav-item toc-entry">
+      <a class="reference internal nav-link" href="#schema-and-form">
+       schema and form
+      </a>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conclusion">
+   conclusion
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#understanding-schema-takes-time">
+   understanding schema takes time.
+  </a>
+ </li>
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+    <div id="main-content" class="row">
+        <div class="col-12 col-md-9 pl-md-3 pr-md-0">
+        
+              <div>
+                
+  <div class="section" id="what-can-schema-do-for-you">
+<h1>what can schema do for you!<a class="headerlink" href="#what-can-schema-do-for-you" title="Permalink to this headline">¶</a></h1>
+<p>schema are critical to strong software interfaces. we can note this in modern python, type annotations, sql schema, numpy and pandas dtypes. the open web is driven off of schema such resource description frameworks that description html metadata. there are standards for presenting schema in <code class="docutils literal notranslate"><span class="pre">json</span></code>.</p>
+<p>in all, schema, non-empircal rules, are consistent features across programming interfaces, and cultures at large. perhaps, schema are so embedded into our systems because it was first discussed <a class="reference external" href="https://plato.stanford.edu/entries/schema/#ScheHistLogi">Plato and Aristotle’s philosopical camps</a>.</p>
+<p>in this work we will not define what schema are, we will discuss different forms of schema and what their definitions provide.</p>
+<p>from here on we’ll use schemata to demonstrate what external affordances schema provide us. what we will observe are different forms, or outward representations, of schema in different contexts. for example, <code class="docutils literal notranslate"><span class="pre">repr</span></code> and <code class="docutils literal notranslate"><span class="pre">str</span></code> are contents <code class="docutils literal notranslate"><span class="pre">object</span></code> with <em>perhaps</em> differing forms. within interactive computing environments, like <code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, we can extend our schema to interactive, modern web displays.</p>
+<div class="section" id="a-practical-study-of-the-github-api-schema">
+<h2>a practical study of the github api schema<a class="headerlink" href="#a-practical-study-of-the-github-api-schema" title="Permalink to this headline">¶</a></h2>
+<p>the github api defines an openapi specification. this is helpful to their product because this schema provides a general description, in json, that can be translated into different systems or environments. one immediate benefit to github, by having a conventional schema, is they api documentation and playground for free <a class="reference external" href="https://docs.github.com/en/rest">https://docs.github.com/en/rest</a></p>
+<p>another position we can view that api schema from is the <code class="docutils literal notranslate"><span class="pre">https://api.github.com</span></code> endpoint. we could explore the schema in our web browser or <code class="docutils literal notranslate"><span class="pre">pandas</span></code> to observe different forms of our schema.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">pandas</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">if</span> <span class="s2">&quot;api&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">locals</span><span class="p">():</span>
+        <span class="n">api</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;pandas&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">&quot;https://api.github.com&quot;</span><span class="p">,</span> <span class="n">typ</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span><span class="o">.</span><span class="n">to_frame</span><span class="p">(</span><span class="s2">&quot;github api&quot;</span><span class="p">)</span>
+    <span class="n">api</span><span class="o">.</span><span class="n">T</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>current_user_url</th>
+      <th>current_user_authorizations_html_url</th>
+      <th>authorizations_url</th>
+      <th>code_search_url</th>
+      <th>commit_search_url</th>
+      <th>emails_url</th>
+      <th>emojis_url</th>
+      <th>events_url</th>
+      <th>feeds_url</th>
+      <th>followers_url</th>
+      <th>...</th>
+      <th>rate_limit_url</th>
+      <th>repository_url</th>
+      <th>repository_search_url</th>
+      <th>current_user_repositories_url</th>
+      <th>starred_url</th>
+      <th>starred_gists_url</th>
+      <th>user_url</th>
+      <th>user_organizations_url</th>
+      <th>user_repositories_url</th>
+      <th>user_search_url</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>github api</th>
+      <td>https://api.github.com/user</td>
+      <td>https://github.com/settings/connections/applic...</td>
+      <td>https://api.github.com/authorizations</td>
+      <td>https://api.github.com/search/code?q={query}{&amp;...</td>
+      <td>https://api.github.com/search/commits?q={query...</td>
+      <td>https://api.github.com/user/emails</td>
+      <td>https://api.github.com/emojis</td>
+      <td>https://api.github.com/events</td>
+      <td>https://api.github.com/feeds</td>
+      <td>https://api.github.com/user/followers</td>
+      <td>...</td>
+      <td>https://api.github.com/rate_limit</td>
+      <td>https://api.github.com/repos/{owner}/{repo}</td>
+      <td>https://api.github.com/search/repositories?q={...</td>
+      <td>https://api.github.com/user/repos{?type,page,p...</td>
+      <td>https://api.github.com/user/starred{/owner}{/r...</td>
+      <td>https://api.github.com/gists/starred</td>
+      <td>https://api.github.com/users/{user}</td>
+      <td>https://api.github.com/user/orgs</td>
+      <td>https://api.github.com/users/{user}/repos{?typ...</td>
+      <td>https://api.github.com/search/users?q={query}{...</td>
+    </tr>
+  </tbody>
+</table>
+<p>1 rows × 32 columns</p>
+</div></div></div>
+</div>
+<p>because github obeys a schema, we can be confident that the shape of this data we consistently be the same, and if something is wrong we know their is documentation in the open api docs.</p>
+<p>an important feature of schema are that they may translated and applied into different languages. for example, when we load the github api into pandas we can translate the schema to dtypes or json table schema.</p>
+<div class="section" id="dtypes">
+<h3>dtypes<a class="headerlink" href="#dtypes" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">api</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dtypes</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>current_user_url                        object
+current_user_authorizations_html_url    object
+authorizations_url                      object
+code_search_url                         object
+commit_search_url                       object
+emails_url                              object
+emojis_url                              object
+events_url                              object
+feeds_url                               object
+followers_url                           object
+following_url                           object
+gists_url                               object
+hub_url                                 object
+issue_search_url                        object
+issues_url                              object
+keys_url                                object
+label_search_url                        object
+notifications_url                       object
+organization_url                        object
+organization_repositories_url           object
+organization_teams_url                  object
+public_gists_url                        object
+rate_limit_url                          object
+repository_url                          object
+repository_search_url                   object
+current_user_repositories_url           object
+starred_url                             object
+starred_gists_url                       object
+user_url                                object
+user_organizations_url                  object
+user_repositories_url                   object
+user_search_url                         object
+dtype: object
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="table-schema">
+<h3>table schema<a class="headerlink" href="#table-schema" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">pandas</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="n">api</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s2">&quot;table&quot;</span><span class="p">),</span> <span class="n">typ</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">)[</span><span class="s2">&quot;schema&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;fields&#39;: [{&#39;name&#39;: &#39;index&#39;, &#39;type&#39;: &#39;string&#39;},
+  {&#39;name&#39;: &#39;github api&#39;, &#39;type&#39;: &#39;string&#39;}],
+ &#39;primaryKey&#39;: [&#39;index&#39;],
+ &#39;pandas_version&#39;: &#39;0.20.0&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<p><a class="reference external" href="https://github.blog/2020-07-27-introducing-githubs-openapi-description/">https://github.blog/2020-07-27-introducing-githubs-openapi-description/</a>
+<a class="reference external" href="https://github.com/github/rest-api-description">https://github.com/github/rest-api-description</a></p>
+</div>
+</div>
+<div class="section" id="learning-some-schema-by-writing-it">
+<h2>learning some schema by writing it<a class="headerlink" href="#learning-some-schema-by-writing-it" title="Permalink to this headline">¶</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">pytest</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NegativeNumber</span> <span class="o">=</span> <span class="n">Numeric</span><span class="o">.</span><span class="n">ExclusiveMaximum</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> 
+    <span class="n">NegativeNumber</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">ravel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;exclusiveMaximum&#39;: 0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NegativeNumber</span> <span class="o">=</span> <span class="n">Float</span><span class="p">[</span><span class="n">NegativeNumber</span><span class="p">]</span>
+    <span class="n">NegativeNumber</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">ravel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;number&#39;, &#39;exclusiveMaximum&#39;: 0}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="schema-provides-validation">
+<h3>schema provides validation<a class="headerlink" href="#schema-provides-validation" title="Permalink to this headline">¶</a></h3>
+<p>one of the most immediate of defining is schema is that it provides validation.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">):</span>
+        <span class="n">NegativeNumber</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">assert</span> <span class="n">NegativeNumber</span><span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="p">)</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="schema-define-the-null-space">
+<h3>schema define the null space<a class="headerlink" href="#schema-define-the-null-space" title="Permalink to this headline">¶</a></h3>
+<p>sometimes what a thing is can only be defined by what it is not.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NotNegativeNumber</span> <span class="o">=</span> <span class="o">-</span><span class="n">NegativeNumber</span>
+    <span class="n">NotNegativeNumber</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="n">ravel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;not&#39;: {&#39;type&#39;: &#39;number&#39;, &#39;exclusiveMaximum&#39;: 0}}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="schema-describe-things">
+<h3>schema describe things<a class="headerlink" href="#schema-describe-things" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">NegativeNumber</span><span class="p">(</span><span class="n">NegativeNumber</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="o">-</span><span class="mf">42.</span><span class="p">]</span> <span class="o">+</span> <span class="n">Description</span><span class="p">[</span>
+        <span class="s2">&quot;a castable negative float&quot;</span>
+    <span class="p">]):</span> 
+        <span class="k">pass</span>
+    <span class="n">NegativeNumber</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;number&#39;,
+ &#39;exclusiveMaximum&#39;: 0,
+ &#39;examples&#39;: (-3.141592653589793, -42.0),
+ &#39;description&#39;: &#39;a castable negative float&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">NotNegativeNumber</span><span class="p">(</span><span class="o">-</span><span class="n">NegativeNumber</span><span class="p">,</span> <span class="n">Examples</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="n">Description</span><span class="p">[</span>
+        <span class="s2">&quot;the null space of negative numbers&quot;</span>
+    <span class="p">]):</span>
+        <span class="k">pass</span>
+    <span class="n">NotNegativeNumber</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;not&#39;: __main__.NegativeNumber,
+ &#39;examples&#39;: (0, 3.141592653589793, 100),
+ &#39;description&#39;: &#39;the null space of negative numbers&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<p>based on the enriched schema we can infer <code class="docutils literal notranslate"><span class="pre">numpy</span></code> style docstrings as shown for <code class="docutils literal notranslate"><span class="pre">NegativeNumber</span></code> and <code class="docutils literal notranslate"><span class="pre">NotNegativeNumber</span></code> below.</p>
+</div>
+<div class="section" id="schema-generate-documentation">
+<h3>schema generate documentation<a class="headerlink" href="#schema-generate-documentation" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="nb">print</span><span class="p">(</span><span class="n">NegativeNumber</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="n">NotNegativeNumber</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a castable negative float
+
+Examples
+--------
+
+&gt;&gt;&gt; NegativeNumber(-3.141592653589793)
+-3.141592653589793
+&gt;&gt;&gt; NegativeNumber(-42.0)
+-42.0 
+
+
+ the null space of negative numbers
+
+Examples
+--------
+
+&gt;&gt;&gt; NotNegativeNumber(0)
+0
+&gt;&gt;&gt; NotNegativeNumber(3.141592653589793)
+3.141592653589793
+&gt;&gt;&gt; NotNegativeNumber(100)
+100
+&gt;&gt;&gt; with __import__(&quot;pytest&quot;).raises(BaseException): NotNegativeNumber(-3.141592653589793)
+&gt;&gt;&gt; with __import__(&quot;pytest&quot;).raises(BaseException): NotNegativeNumber(-42.0)
+</pre></div>
+</div>
+</div>
+</div>
+<p>by formalizing a schema as numpy docstrings we can immediately use the <code class="docutils literal notranslate"><span class="pre">builtins</span></code> <code class="docutils literal notranslate"><span class="pre">doctest</span></code> module to test our types. with the test results shown below.</p>
+<p>these generated docstrings also enrich the translation to documentation using the <code class="docutils literal notranslate"><span class="pre">autodoc</span></code> and <code class="docutils literal notranslate"><span class="pre">napolean</span></code> <code class="docutils literal notranslate"><span class="pre">sphinx</span></code> extensions.</p>
+<p><a class="reference external" href="https://schemata--4.org.readthedocs.build/en/4/src/schemata/tests/readme.html">https://schemata–4.org.readthedocs.build/en/4/src/schemata/tests/readme.html</a></p>
+<div class="section" id="sphinx-jsonschema">
+<h4><code class="docutils literal notranslate"><span class="pre">sphinx-jsonschema</span></code><a class="headerlink" href="#sphinx-jsonschema" title="Permalink to this headline">¶</a></h4>
+<p><a class="reference external" href="https://schemata--4.org.readthedocs.build/en/4/src/schema.html">https://schemata–4.org.readthedocs.build/en/4/src/schema.html</a></p>
+</div>
+</div>
+<div class="section" id="schema-generate-test-cases">
+<h3>schema generate test cases<a class="headerlink" href="#schema-generate-test-cases" title="Permalink to this headline">¶</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">doctest</span><span class="p">;</span><span class="n">doctest</span><span class="o">.</span><span class="n">testmod</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">optionflags</span><span class="o">=</span><span class="n">doctest</span><span class="o">.</span><span class="n">ELLIPSIS</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Trying:
+    NegativeNumber(-3.141592653589793)
+Expecting:
+    -3.141592653589793
+ok
+Trying:
+    NegativeNumber(-42.0)
+Expecting:
+    -42.0
+ok
+Trying:
+    NotNegativeNumber(0)
+Expecting:
+    0
+ok
+Trying:
+    NotNegativeNumber(3.141592653589793)
+Expecting:
+    3.141592653589793
+ok
+Trying:
+    NotNegativeNumber(100)
+Expecting:
+    100
+ok
+Trying:
+    with __import__(&quot;pytest&quot;).raises(BaseException): NotNegativeNumber(-3.141592653589793)
+Expecting nothing
+ok
+Trying:
+    with __import__(&quot;pytest&quot;).raises(BaseException): NotNegativeNumber(-42.0)
+Expecting nothing
+ok
+1 items had no tests:
+    __main__
+2 items passed all tests:
+   2 tests in __main__.NegativeNumber
+   5 tests in __main__.NotNegativeNumber
+7 tests in 3 items.
+7 passed and 0 failed.
+Test passed.
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>TestResults(failed=0, attempted=7)
+</pre></div>
+</div>
+</div>
+</div>
+<p>let’s catch our breath here. we just demonstrated that python can be used to write <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code> specifications describing a <code class="docutils literal notranslate"><span class="pre">NegativeNumber</span></code> and it’s null space <code class="docutils literal notranslate"><span class="pre">NotNegativeNumber</span></code>. by using specific keys, described in the <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code> specification would could infer:</p>
+<ul class="simple">
+<li><p>numpy docstrings</p>
+<ul>
+<li><p>include <code class="docutils literal notranslate"><span class="pre">doctest</span></code>s</p></li>
+</ul>
+</li>
+<li><p>evaluated both the null and non-space of our <code class="docutils literal notranslate"><span class="pre">NegativeNumber</span></code></p></li>
+</ul>
+<div class="section" id="advanced-testing-with-hypothesis">
+<h4>advanced testing with <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code><a class="headerlink" href="#advanced-testing-with-hypothesis" title="Permalink to this headline">¶</a></h4>
+<p>an advanced application in statistically samples tests with <code class="docutils literal notranslate"><span class="pre">hypothesis</span></code></p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">import</span> <span class="nn">hypothesis</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="n">hypothesis</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">sampled_from</span><span class="p">((</span><span class="n">NegativeNumber</span><span class="p">,</span> <span class="n">NotNegativeNumber</span><span class="p">))</span>
+
+    <span class="nd">@hypothesis</span><span class="o">.</span><span class="n">strategies</span><span class="o">.</span><span class="n">composite</span>
+    <span class="k">def</span> <span class="nf">draw_pair</span><span class="p">(</span><span class="n">draw</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">types</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">draw</span><span class="p">(</span><span class="nb">type</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span><span class="p">,</span> <span class="n">draw</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">strategy</span><span class="p">())</span>
+
+    <span class="nd">@hypothesis</span><span class="o">.</span><span class="n">given</span><span class="p">(</span><span class="n">draw_pair</span><span class="p">())</span>
+    <span class="nd">@hypothesis</span><span class="o">.</span><span class="n">settings</span><span class="p">(</span><span class="n">max_examples</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">test_types</span><span class="p">(</span><span class="n">pair</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">counter</span>
+        <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">pair</span>
+        <span class="k">assert</span> <span class="bp">cls</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>running the test type functions same types and values.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">test_types</span><span class="p">()</span>
+    <span class="sa">F</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">counter</span><span class="si">}</span><span class="s2"> tests run&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>&#39;4 tests run&#39;
+</pre></div>
+</div>
+</div>
+</div>
+<p>at this point we haven’t really made our own instance, the python form of the schema, of <code class="docutils literal notranslate"><span class="pre">NegativeNumber</span></code>.</p>
+</div>
+</div>
+<div class="section" id="schema-constrains-form">
+<h3>schema constrains form<a class="headerlink" href="#schema-constrains-form" title="Permalink to this headline">¶</a></h3>
+<p>the form is what it looks like.</p>
+<p>there are different context that this <code class="docutils literal notranslate"><span class="pre">NegativeNumber</span></code> can be printed in like:</p>
+<ul class="simple">
+<li><p>the standard python <code class="docutils literal notranslate"><span class="pre">print</span></code></p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NegativeNumber</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-3.141592653589793
+</pre></div>
+</div>
+</div>
+</div>
+<ul class="simple">
+<li><p>a richer ascii representation using the <code class="docutils literal notranslate"><span class="pre">rich</span></code> library</p></li>
+</ul>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="c1"># NBVAL_IGNORE_OUTPUT</span>
+    <span class="n">NegativeNumber</span><span class="p">(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">.</span><span class="n">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>-3.141592653589793
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="schema-and-form">
+<h4>schema and form<a class="headerlink" href="#schema-and-form" title="Permalink to this headline">¶</a></h4>
+<p>i think now is a good place for a little wordplay. to me, i find validation in the nearness of <strong>schema</strong> and <strong>form</strong> in the name of the popular <code class="docutils literal notranslate"><span class="pre">react-jsonschema-form</span></code> library that presents user interfaces bases on schema. it has widespread use in other in the javascript community.</p>
+<p><code class="docutils literal notranslate"><span class="pre">schemata</span></code> ~loosely~ adopts  <code class="docutils literal notranslate"><span class="pre">react-jsonschema-form</span></code> to encode user interfaces, including layout and styling. the back haul for <code class="docutils literal notranslate"><span class="pre">schemata</span></code> UI are the popular <code class="docutils literal notranslate"><span class="pre">ipywidgets</span></code> that construct similar widgets to rjsf</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">WideSlider</span> <span class="o">=</span> <span class="n">ui</span><span class="o">.</span><span class="n">Slider</span> <span class="o">+</span> <span class="n">ui</span><span class="o">.</span><span class="n">Layout</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;60%&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="n">ui</span><span class="o">.</span><span class="n">Style</span><span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s2">&quot;100px&quot;</span><span class="p">)]</span> <span class="o">+</span> <span class="n">Numeric</span><span class="o">.</span><span class="n">Minimum</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">WideSlider</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;ui:widget&#39;: &#39;slider&#39;,
+ &#39;layout&#39;: {&#39;width&#39;: &#39;60%&#39;},
+ &#39;style&#39;: {&#39;width&#39;: &#39;100px&#39;},
+ &#39;minimum&#39;: -10}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NegativeNumber</span><span class="p">[</span><span class="n">WideSlider</span><span class="p">](</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "e0616458e30a48328aa703780bfe6e08", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">NegativeNumber</span><span class="o">.</span><span class="n">text</span><span class="p">()(</span><span class="o">-</span><span class="n">math</span><span class="o">.</span><span class="n">tau</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "52f8802b35274cee9f7bc26d21035a7b", "version_major": 2, "version_minor": 0}
+</script></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="conclusion">
+<h2>conclusion<a class="headerlink" href="#conclusion" title="Permalink to this headline">¶</a></h2>
+<p>a general feature of schema, particularly <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code>, is that its definition impacts documentation, testing, and interactive programming experiences.</p>
+<p>there is a healthy practice into translating code or ideas in schema. it is a pathway to understanding the basis of a thing.</p>
+</div>
+<hr class="docutils" />
+<div class="section" id="understanding-schema-takes-time">
+<h2>understanding schema takes time.<a class="headerlink" href="#understanding-schema-takes-time" title="Permalink to this headline">¶</a></h2>
+<p>this document has been a journey from me, i’ve approached schema from literary, scientific, and computable schema hunting for a ghost. because, at best, a schema is an informal abstract.</p>
+<p>while learning schema, it is important to observe many positions for schema, and the extended outcomes of well described systems. schema can move between systems and define constraints. each schema translated into a different system creates a different. these are the forms we must observe.</p>
+<p>so to understand schema, i wrote code about schema, and explored tools that extended schema to help me do more with less. the outcome of these studies is a python library called <code class="docutils literal notranslate"><span class="pre">schemata</span></code> that implements, and extends, <code class="docutils literal notranslate"><span class="pre">jsonschema</span></code> conventions to python in general.</p>
+<p>on the open web however, we have explicit specifications for schema, written in terse language, that all others to adopt implementations in their language. these implementations are forms of schema, the specification languages enable consistent interfaces across programming systems.</p>
+</div>
+</div>
+
+
+<script type="application/vnd.jupyter.widget-state+json">
+{"state": {"34f4968814434e7aa14682e9f5b9c567": {"model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": null}}, "3c4d1f5e73454a809dcd9dcc4b37cea3": {"model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "model_name": "DescriptionStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "DescriptionStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": ""}}, "52f8802b35274cee9f7bc26d21035a7b": {"model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "model_name": "FloatTextModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatTextModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "FloatTextView", "continuous_update": false, "description": "a castable negative float", "description_tooltip": null, "disabled": false, "layout": "IPY_MODEL_34f4968814434e7aa14682e9f5b9c567", "step": null, "style": "IPY_MODEL_3c4d1f5e73454a809dcd9dcc4b37cea3", "value": -6.283185307179586}}, "68796e5cc58e42d8ab977c2428af2bd7": {"model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "model_name": "SliderStyleModel", "state": {"_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "SliderStyleModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "StyleView", "description_width": "", "handle_color": null}}, "a9b1fdae7d1d4d0daa7a99d3672d9a1a": {"model_module": "@jupyter-widgets/base", "model_module_version": "1.2.0", "model_name": "LayoutModel", "state": {"_model_module": "@jupyter-widgets/base", "_model_module_version": "1.2.0", "_model_name": "LayoutModel", "_view_count": null, "_view_module": "@jupyter-widgets/base", "_view_module_version": "1.2.0", "_view_name": "LayoutView", "align_content": null, "align_items": null, "align_self": null, "border": null, "bottom": null, "display": null, "flex": null, "flex_flow": null, "grid_area": null, "grid_auto_columns": null, "grid_auto_flow": null, "grid_auto_rows": null, "grid_column": null, "grid_gap": null, "grid_row": null, "grid_template_areas": null, "grid_template_columns": null, "grid_template_rows": null, "height": null, "justify_content": null, "justify_items": null, "left": null, "margin": null, "max_height": null, "max_width": null, "min_height": null, "min_width": null, "object_fit": null, "object_position": null, "order": null, "overflow": null, "overflow_x": null, "overflow_y": null, "padding": null, "right": null, "top": null, "visibility": null, "width": "60%"}}, "e0616458e30a48328aa703780bfe6e08": {"model_module": "@jupyter-widgets/controls", "model_module_version": "1.5.0", "model_name": "FloatSliderModel", "state": {"_dom_classes": [], "_model_module": "@jupyter-widgets/controls", "_model_module_version": "1.5.0", "_model_name": "FloatSliderModel", "_view_count": null, "_view_module": "@jupyter-widgets/controls", "_view_module_version": "1.5.0", "_view_name": "FloatSliderView", "continuous_update": true, "description": "a castable negative float", "description_tooltip": null, "disabled": false, "layout": "IPY_MODEL_a9b1fdae7d1d4d0daa7a99d3672d9a1a", "max": 0.0, "min": -10.0, "orientation": "horizontal", "readout": true, "readout_format": ".2f", "step": 0.1, "style": "IPY_MODEL_68796e5cc58e42d8ab977c2428af2bd7", "value": -3.141592653589793}}}, "version_major": 2, "version_minor": 0}
+</script>
+
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./docs"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+        
+        <div class='prev-next-bottom'>
+            
+    <a class='left-prev' id="prev-link" href="../src/schema.html" title="previous page"><code class="docutils literal notranslate"><span class="pre">schemata</span></code> schema definitions</a>
+    <a class='right-next' id="next-link" href="../src/schemata/readme.html" title="next page">schemata</a>
+
+        </div>
+        
+        </div>
+    </div>
+    <footer class="footer mt-5 mt-md-0">
+    <div class="container">
+      <p>
+        
+          By deathbeds<br/>
+        
+            &copy; Copyright 2021.<br/>
+      </p>
+    </div>
+  </footer>
+</main>
+
+
+      </div>
+    </div>
+  
+  <script src="../_static/js/index.1c5a1a01449ed65a7b51.js"></script>
+
+  
+  </body>
+</html>

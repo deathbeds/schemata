@@ -201,6 +201,11 @@
   </ul>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="../../docs/about-schema.html">
+   what can schema do for you!
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="../../src/schemata/readme.html">
    schemata
   </a>
@@ -313,33 +318,6 @@
 <span class="sd">* __doc__ refers the description of the class</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># resolve docstrings</span>
-        <span class="c1"># if DOC in dict and isinstance(dict[DOC], (str, type(None))):</span>
-        <span class="c1">#     doc = dict.pop(DOC)</span>
-        <span class="c1">#     if doc and isinstance(doc, str):</span>
-        <span class="c1">#         bases += (Description[doc],)</span>
-
-        <span class="k">if</span> <span class="n">ANNO</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
-            <span class="n">anno</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">ANNO</span><span class="p">)</span>
-            <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">arrays</span><span class="p">,</span> <span class="n">objects</span>
-
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">anno</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
-                    <span class="n">anno</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">anno</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
-            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">arrays</span><span class="o">.</span><span class="n">Arrays</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,)</span> <span class="o">+</span> <span class="n">bases</span><span class="p">):</span>
-                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">arrays</span><span class="o">.</span><span class="n">Arrays</span><span class="o">.</span><span class="n">Items</span><span class="p">[</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="n">anno</span><span class="p">]],)</span>
-            <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">cls</span><span class="p">,)</span> <span class="o">+</span> <span class="n">bases</span><span class="p">):</span>
-                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">anno</span><span class="p">],)</span>
-
-            <span class="n">defs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">MetaType</span><span class="p">)}</span>
-
-            <span class="k">if</span> <span class="n">defs</span><span class="p">:</span>
-                <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Definitions</span><span class="p">[</span><span class="n">defs</span><span class="p">],)</span>
-
-        <span class="k">if</span> <span class="n">DOC</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">:</span>
-            <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Description</span><span class="p">[</span><span class="nb">dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">DOC</span><span class="p">)],)</span>
-
-        <span class="c1"># update the class dict payload</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="nb">dict</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">ANNO</span><span class="p">,</span> <span class="p">{})</span>
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">EMPTY</span><span class="p">:</span>
@@ -350,6 +328,66 @@
         <span class="bp">cls</span><span class="o">.</span><span class="vm">__annotations__</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">cls</span>
+
+    <span class="k">def</span> <span class="nf">mro</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="n">bases</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">mro</span><span class="p">()</span>
+
+        <span class="n">is_array</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">list</span><span class="p">,</span> <span class="nb">set</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">)</span>
+        <span class="n">is_object</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">builtins</span><span class="o">.</span><span class="n">dict</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bases</span><span class="p">)</span>
+
+        <span class="nb">dict</span> <span class="o">=</span> <span class="nb">vars</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOC</span><span class="p">):</span>
+            <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Description</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="n">DOC</span><span class="p">]],)</span>
+
+        <span class="n">comments</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">getcomments</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comments</span><span class="p">:</span>
+            <span class="n">bases</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Comment_</span><span class="p">[</span><span class="n">comments</span><span class="p">],)</span>
+
+        <span class="k">if</span> <span class="n">is_array</span> <span class="ow">or</span> <span class="n">is_object</span><span class="p">:</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="n">defs</span><span class="p">,</span> <span class="n">deps</span> <span class="o">=</span> <span class="p">{},</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;collections&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">tuple</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">MetaType</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ANNO</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+                        <span class="n">defs</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">elif</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isfunction</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">sig</span><span class="o">.</span><span class="n">return_annotation</span> <span class="o">!=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">_empty</span><span class="p">:</span>
+                        <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">]</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">sig</span><span class="o">.</span><span class="n">return_annotation</span><span class="p">)</span>
+
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sig</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">annotation</span><span class="p">,</span> <span class="n">MetaType</span><span class="p">):</span>
+                            <span class="n">deps</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">annotation</span><span class="p">)</span>
+
+                <span class="k">elif</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
+                    <span class="k">pass</span>
+
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">callable</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="ow">and</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">]:</span>
+                    <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">][</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">]:</span>
+                <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">objects</span>
+
+                <span class="n">extra</span> <span class="o">+=</span> <span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="o">.</span><span class="n">Properties</span><span class="p">[</span><span class="n">builtins</span><span class="o">.</span><span class="n">dict</span><span class="p">(</span><span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">])],)</span>
+                <span class="nb">dict</span><span class="p">[</span><span class="n">ANNO</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">deps</span><span class="p">:</span>
+                <span class="n">extra</span> <span class="o">+=</span> <span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">Dict</span><span class="o">.</span><span class="n">Dependencies</span><span class="p">[</span><span class="n">deps</span><span class="p">],)</span>
+
+            <span class="k">if</span> <span class="n">is_array</span> <span class="ow">and</span> <span class="n">extra</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">.arrays</span> <span class="kn">import</span> <span class="n">Arrays</span>
+
+                <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span><span class="n">Arrays</span><span class="o">.</span><span class="n">Items</span><span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="s2">&quot;Annotations&quot;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">extra</span><span class="p">),</span> <span class="p">{})],)</span>
+
+            <span class="k">if</span> <span class="n">defs</span><span class="p">:</span>
+                <span class="n">extra</span> <span class="o">+=</span> <span class="p">(</span><span class="n">Definitions</span><span class="p">[</span><span class="n">defs</span><span class="p">],)</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="n">bases</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">object</span><span class="p">)</span>
+            <span class="n">bases</span> <span class="o">=</span> <span class="n">bases</span><span class="p">[:</span><span class="nb">id</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">extra</span><span class="p">)</span> <span class="o">+</span> <span class="n">bases</span><span class="p">[</span><span class="nb">id</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">bases</span>
 
     <span class="k">def</span> <span class="nf">key</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">utils</span><span class="o">.</span><span class="n">normalize_json_key</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>

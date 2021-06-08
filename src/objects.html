@@ -203,6 +203,11 @@
   </ul>
  </li>
  <li class="toctree-l1">
+  <a class="reference internal" href="../docs/about-schema.html">
+   what can schema do for you!
+  </a>
+ </li>
+ <li class="toctree-l1">
   <a class="reference internal" href="schemata/readme.html">
    schemata
   </a>
@@ -384,7 +389,7 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="kn">from</span> <span class="nn">schemata</span> <span class="kn">import</span> <span class="o">*</span>
-    <span class="kn">import</span> <span class="nn">typing</span>
+    <span class="kn">import</span> <span class="nn">typing</span><span class="p">;</span> <span class="n">raises</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;pytest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">BaseException</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -432,6 +437,37 @@
 </div>
 </div>
 </div>
+<p>when we compose type methods with the value “null” we indicate <em>to call this function to create foo</em>. in general, we think it is best practice to return the value of the key in any method sharing a namespace.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">DictWFunctionDefault</span><span class="p">(</span><span class="n">Dict</span><span class="o">.</span><span class="n">cast</span><span class="p">()):</span>
+        <span class="n">foo</span><span class="p">:</span> <span class="n">String</span>
+            
+        <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;null&quot;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="s2">&quot;xyz&quot;</span>
+
+    <span class="n">DictWFunctionDefault</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;cast&#39;: True, &#39;type&#39;: &#39;object&#39;, &#39;properties&#39;: {&#39;foo&#39;: {&#39;type&#39;: &#39;string&#39;}}}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">DictWFunctionDefault</span><span class="p">(),</span> <span class="n">DictWFunctionDefault</span><span class="p">(</span><span class="s2">&quot;abc&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>({}, {&#39;foo&#39;: &#39;abc&#39;})
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 <div class="section" id="dict-properties">
 <h2><code class="docutils literal notranslate"><span class="pre">Dict.Properties</span></code><a class="headerlink" href="#dict-properties" title="Permalink to this headline">¶</a></h2>
@@ -470,7 +506,7 @@
 <p>when <code class="docutils literal notranslate"><span class="pre">Dict.AdditionalProperties</span></code> are defined the dictionary behaves as a python dictionary.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">default_dict_list</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="n">List</span><span class="p">]()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">default_dict_list</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">list</span><span class="p">]()</span>
     <span class="n">default_dict_list</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="nb">dict</span><span class="p">(</span><span class="n">default_dict_list</span><span class="p">)</span>
 </pre></div>
@@ -505,6 +541,7 @@
 </div>
 <div class="section" id="dict-dependencies">
 <h2><code class="docutils literal notranslate"><span class="pre">Dict.Dependencies</span></code><a class="headerlink" href="#dict-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>dictionaries with dependencies in their function signature, on the <code class="docutils literal notranslate"><span class="pre">self</span></code> argument of a method function, we can define all of the key on key depends on.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">DictWDeps</span><span class="p">(</span><span class="n">Dict</span><span class="p">):</span>
@@ -513,19 +550,108 @@
             
         <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">])</span>
+    <span class="n">DictWDeps</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;object&#39;,
+ &#39;properties&#39;: {&#39;foo&#39;: schemata.numbers.Integer,
+  &#39;bar&#39;: schemata.strings.String}}
 </pre></div>
 </div>
 </div>
 </div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DictWDeps</span><span class="o">.</span><span class="n">schema</span><span class="p">()</span>
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">DictWDeps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="s1">&#39;abc&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;foo&#39;: 1, &#39;bar&#39;: &#39;abc&#39;}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="n">DictWDeps</span><span class="p">()</span>
+<span class="n">d</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">d</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;foo&#39;: 100}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">DictWTypedDeps</span><span class="p">(</span><span class="n">Dict</span><span class="p">):</span>
+        <span class="n">foo</span><span class="p">:</span> <span class="n">Integer</span>            
+        <span class="n">bar</span><span class="p">:</span> <span class="n">String</span>
+        <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Dict</span><span class="o">.</span><span class="n">Required</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,]):</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">])</span>
+    <span class="n">DictWTypedDeps</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;object&#39;,
- &#39;properties&#39;: {&#39;foo&#39;: schemata.numbers.Integer, &#39;bar&#39;: abc.String}}
+ &#39;properties&#39;: {&#39;foo&#39;: {&#39;type&#39;: &#39;integer&#39;}, &#39;bar&#39;: {&#39;type&#39;: &#39;string&#39;}},
+ &#39;dependencies&#39;: {&#39;bar&#39;: {&#39;required&#39;: (&#39;foo&#39;,)}}}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="n">DictWTypedDeps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">raises</span><span class="p">:</span>
+        <span class="n">DictWTypedDeps</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">foo</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">bar</span><span class="o">=</span><span class="mi">200</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">DictWFunctionTypedDeps</span><span class="p">(</span><span class="n">Dict</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Integer</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Dict</span><span class="o">.</span><span class="n">Required</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,])</span> <span class="o">-&gt;</span> <span class="n">String</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">])</span>
+    <span class="n">DictWFunctionTypedDeps</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;object&#39;,
+ &#39;properties&#39;: {&#39;foo&#39;: {&#39;type&#39;: &#39;integer&#39;}, &#39;bar&#39;: {&#39;type&#39;: &#39;string&#39;}},
+ &#39;dependencies&#39;: {&#39;bar&#39;: {&#39;required&#39;: (&#39;foo&#39;,)}}}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>    <span class="k">class</span> <span class="nc">ListWFunctionTypedDeps</span><span class="p">(</span><span class="n">List</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">foo</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Integer</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;foo&quot;</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">bar</span><span class="p">(</span><span class="bp">self</span><span class="p">:</span> <span class="n">Dict</span><span class="o">.</span><span class="n">Required</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">,])</span> <span class="o">-&gt;</span> <span class="n">String</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">])</span>
+        
+    <span class="n">ListWFunctionTypedDeps</span><span class="o">.</span><span class="n">schema</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{&#39;type&#39;: &#39;array&#39;,
+ &#39;items&#39;: {&#39;properties&#39;: {&#39;foo&#39;: {&#39;type&#39;: &#39;integer&#39;},
+   &#39;bar&#39;: {&#39;type&#39;: &#39;string&#39;}},
+  &#39;dependencies&#39;: {&#39;bar&#39;: {&#39;required&#39;: (&#39;foo&#39;,)}}}}
 </pre></div>
 </div>
 </div>
