@@ -1,8 +1,10 @@
 import abc
+import builtins
 import enum
 import functools
 import inspect
 import re
+import sys
 from contextlib import suppress
 from functools import partial, partialmethod
 from functools import singledispatch as register
@@ -10,6 +12,7 @@ from typing import Type
 from unittest import TestCase
 from unittest.runner import TextTestResult
 
+IN_SPHINX = "sphinx" in sys.modules
 try:
     from typing import _ForwardRef as ForwardRef
 
@@ -42,6 +45,9 @@ class Ø(abc.ABCMeta):
     def __bool__(self):
         return False
 
+    def __repr__(cls):
+        return cls.__name__
+
 
 class EMPTY(metaclass=Ø):
     """a false sentinel"""
@@ -54,9 +60,9 @@ def validates(*types):
 
     def decorator(callable):
         @functools.wraps(callable)
-        def main(cls, object):
+        def main(cls, object, *args, **kwargs):
             if isinstance(object, types):
-                return callable(cls, object)
+                return callable(cls, object, *args, **kwargs)
 
         return classmethod(main)
 
@@ -68,6 +74,8 @@ def enforce_tuple(x):
     with suppress(TypeError):
         if x in {None, EMPTY}:
             return ()
+    if isinstance(x, (list, set)):
+        x = tuple(x)
     if not isinstance(x, tuple):
         return (x,)
     return x
@@ -154,7 +162,10 @@ def get_schema_enum(x: enum.EnumMeta, *, ravel=True):
 @get_schema.register
 def get_schema_type(x: type, *, ravel=True):
     from .objects import Dict
-    from .types import MetaType
+    from .types import Schemata, Type
+
+    if not isinstance(x, Schemata):
+        x = Type[x]
 
     data = getattr(x, ANNO, {})
 
@@ -267,9 +278,9 @@ def get_schemata(x, cls=None):
 
 @get_schemata.register
 def get_schemata_type(x: type, cls=None):
-    from .types import Any, MetaType
+    from .types import Any, Schemata
 
-    if isinstance(x, MetaType):
+    if isinstance(x, Schemata):
         return x
     if x in JSONSCHEMA_STR_MAPPING:
         return JSONSCHEMA_SCHEMATA_MAPPING[JSONSCHEMA_STR_MAPPING[x]]
@@ -294,7 +305,7 @@ def get_prototypes(x):
             continue
 
         anno = getattr(cls, ANNO, {})
-        if len(anno) is 1:
+        if len(anno) == 1:
             yield cls
 
 
@@ -303,24 +314,6 @@ def get_subclasses(x):
     for cls in x.__subclasses__():
         yield cls
         yield from get_subclasses(cls)
-
-
-@register
-def get_py(x):
-    if hasattr(x, "py"):
-        return x.py()
-    return x
-
-
-@get_py.register
-def get_py_dict(x: dict):
-    return {k: get_py(v) for k, v in x.items()}
-
-
-@get_py.register(tuple)
-@get_py.register(list)
-def get_py_iter(x):
-    return type(x)(map(get_py, x))
 
 
 @register
@@ -359,16 +352,19 @@ def make_time(x):
 
 def is_type_definition(x):
     anno = getattr(x, ANNO, {})
-    if len(anno) is 1:
+    if len(anno) == 1:
         return x
     return False
 
 
 def is_validator(x):
-    from .types import Any
+    from .types import Any, Type
 
+    if x is Type:
+        return True
     anno = getattr(x, ANNO, {})
-    if len(anno) is 1:
+
+    if len(anno) == 1:
         if x.validator is not Any.validator:
             return True
     return False
@@ -377,7 +373,7 @@ def is_validator(x):
 def is_prototype(x):
     if not hasattr(x, ANNO):
         return False
-    if len(x.__annotations__) is 0:
+    if len(x.__annotations__) == 0:
         return True
     return False
 
@@ -401,6 +397,13 @@ def get_default_null(object: Ø, default=EMPTY):
 
 
 @get_default.register
+def get_default_null(object: dict, default=EMPTY):
+    if object is EMPTY:
+        return default
+    return object.get("default", default)
+
+
+@get_default.register
 def get_default_type(cls: type, default=EMPTY):
     from . import arrays, objects, types
 
@@ -409,7 +412,7 @@ def get_default_type(cls: type, default=EMPTY):
         object = cls.value(types.Enum)
         if isinstance(object, tuple):
             object = object[0]
-    if object is EMPTY:
+    if object is EMPTY or issubclass(cls, dict):
         if issubclass(cls, objects.Dict):
             props = cls.value(objects.Dict.Properties, default={})
             next = {}
@@ -424,42 +427,6 @@ def get_default_type(cls: type, default=EMPTY):
     return get_default(object, default=default)
 
 
-"""
-Args (alias of Parameters)
-
-Arguments (alias of Parameters)
-Attention
-Attributes
-Caution
-Danger
-Error
-Example
-Examples
-Hint
-Important
-Keyword Args (alias of Keyword Arguments)
-Keyword Arguments
-Methods
-Note
-Notes
-Other Parameters
-Parameters
-Return (alias of Returns)
-Returns
-Raise (alias of Raises)
-Raises
-References
-See Also
-Tip
-Todo
-Warning
-Warnings (alias of Warning)
-Warn (alias of Warns)
-Warns
-Yield (alias of Yields)
-Yields
-"""
-
 # map a jsonschema to the python type
 JSONSCHEMA_PY_MAPPING = dict(
     null=type(None),
@@ -467,7 +434,7 @@ JSONSCHEMA_PY_MAPPING = dict(
     string=str,
     integer=int,
     number=float,
-    array=list,
+    array=(set, list, tuple),
     object=dict,
 )
 
@@ -582,3 +549,33 @@ class Literal(ForwardRef, _root=_root):
 #     __call__ = object
 
 del _root
+
+
+def get_first_builtin_type(cls):
+    from . import Schemata
+
+    for cls in reversed(inspect.getmro(cls)):
+        if cls is object:
+            continue
+        if cls in vars(builtins).values():
+            return cls
+        if isinstance(cls, Schemata):
+            break
+
+
+def get_doctest(cls):
+    import doctest
+    import importlib
+
+    doctest_suite = doctest.DocTestSuite()
+    test_case = doctest.DocTestParser().get_doctest(
+        inspect.getdoc(cls) or "",
+        vars(importlib.import_module(cls.__module__)),
+        cls.__module__,
+        cls.__module__,
+        1,
+    )
+    test_case.examples and doctest_suite.addTest(
+        doctest.DocTestCase(test_case, doctest.ELLIPSIS)
+    )
+    return doctest_suite

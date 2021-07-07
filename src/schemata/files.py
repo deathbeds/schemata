@@ -1,8 +1,8 @@
-from . import mediatypes, strings, utils
+from . import formats, mediatypes, strings, utils
 from .types import EMPTY, Default, Examples, Type
 
 
-class Dir(Type, utils.Path):
+class Dir(Type, formats.Format["file-format"], utils.Path):
     def __new__(cls, *object, **kw):
         return utils.Path.__new__(cls, *object, **kw)
 
@@ -15,21 +15,27 @@ class Dir(Type, utils.Path):
 
 
 class File(Dir):
+    def mediatype(self):
+        return mediatypes.mimetypes.guess_type(str(self))[0]
+
     def load(self, cls=EMPTY):
-        with self.open("r") as file:
-            if hasattr(self, "loads"):
-                object = type(self).loads(file.read())
-            else:
-                object = file.read()
+        if hasattr(self, "loads"):
+            loader = self.loads
+        else:
+            loader = mediatypes.ContentMediaType.get_loader(self.mediatype()).loads
+        object = loader(self.read_text())
+
         if cls is EMPTY:
             return object
         return cls(object)
 
     def dump(self, object):
-        with self.open("w") as file:
-            if hasattr(self, "dumps"):
-                file.write(self.dumps(object))
-            mt = type(self).value(mediatypes.ContentMediaType)
-            if mt is EMPTY:
-                return strings.String
-            return strings.String + mt
+        if hasattr(self, "dumps"):
+            dumper = self.dumps
+        else:
+            dumper = mediatypes.ContentMediaType.get_dumper(self.mediatype()).dumps
+        object = loader(self.read_text())
+
+        if cls is EMPTY:
+            return object
+        return cls(object)

@@ -1,9 +1,8 @@
 import datetime
 import operator
 
-from . import exceptions, formats, mediatypes, templates, times, utils
-from .apis import FluentString
-from .types import EMPTY, Any, Type
+from . import exceptions, formats, mediatypes, times, utils
+from .types import EMPTY, Any, Schemata, Type
 
 __all__ = (
     "String",
@@ -12,39 +11,47 @@ __all__ = (
     "Uuid",
     "Email",
     "JsonPointer",
-    "F",
-    "Jinja",
-    "UriTemplate",
 )
 
 
-# a string type
-class String(Type["string"], FluentString, str):
-    @classmethod
-    def validator(cls, object):
-        exceptions.assertIsInstance(object, str)
-
+class String(Type["string"], str):
     def __class_getitem__(cls, object):
         if isinstance(object, str):
-            return cls + cls.Pattern[object]
+            return cls + Pattern[object]
         return cls + object
 
-    class Pattern(Any, id="validation:/properties/pattern"):
-        @utils.validates(str)
-        def validator(cls, object):
-            if not cls.value(formats.Format):
-                exceptions.assertRegex(object, cls.value(String.Pattern))
+    def splitlines(self, nl=False):
+        from .arrays import List
 
-    class MinLength(Any, id="validation:/properties/minLength"):
-        @utils.validates(str)
-        def validator(cls, object):
+        return List(str.splitlines(self, nl))
 
-            exceptions.assertGreaterEqual(len(object), cls.value(String.MinLength))
+    def split(self, by=None, n=-1):
+        from .arrays import List
 
-    class MaxLength(Any, id="validation:/properties/maxLength"):
-        @utils.validates(str)
-        def validator(cls, object):
-            exceptions.assertLessEqual(len(object), cls.value(String.MaxLength))
+        return List(str.split(self, by, n))
+
+    def __add__(self, object):
+        return type(self)(str.__add__(self, object))
+
+
+class Pattern(Any):
+    @utils.validates(str)
+    def validator(cls, object):
+        if not Schemata.value(cls, formats.Format):
+            exceptions.assertRegex(object, Schemata.value(cls, Pattern))
+
+
+class MinLength(Any):
+    @utils.validates(str)
+    def validator(cls, object):
+
+        exceptions.assertGreaterEqual(len(object), Schemata.value(cls, MinLength))
+
+
+class MaxLength(Any):
+    @utils.validates(str)
+    def validator(cls, object):
+        exceptions.assertLessEqual(len(object), Schemata.value(cls, MaxLength))
 
 
 class Bytes(mediatypes.ContentEncoding["base64"], bytes):
@@ -63,13 +70,13 @@ class Uuid(String, formats.Uuid):
         import uuid
 
         if not object:
-            version = cls.value(Uuid.Version)
+            version = Schemata.value(cls, Uuid.Version)
             if version:
                 object = getattr(uuid, f"uuid{version}")(*args, **kwargs)
             else:
                 object = "00000000-0000-0000-0000-000000000000"
         else:
-            object = cls.validator(object, *args, **kwargs)
+            object = Schemata.validator(cls, object, *args, **kwargs)
         return super().__new__(cls, str(object))
 
     def __class_getitem__(cls, object):
@@ -79,7 +86,7 @@ class Uuid(String, formats.Uuid):
         pass
 
     @classmethod
-    def py(cls):
+    def to_pytype(cls):
         import uuid
 
         return uuid.Uuid
@@ -87,7 +94,7 @@ class Uuid(String, formats.Uuid):
 
 class Uri(String, formats.Uri):
     def __new__(cls, *args, **kwargs):
-        template = cls.value(String.Pattern)
+        template = Schemata.value(cls, Pattern)
         if template:
             args, kwargs = (
                 formats.UriTemplate.render.__func__(cls, *args, **kwargs),
@@ -188,52 +195,3 @@ class Time(DateTime, formats.Time):
 
 
 utils.JSONSCHEMA_SCHEMATA_MAPPING["string"] = String
-
-
-class Template:
-    def __class_getitem__(cls, object):
-        return Any.__class_getitem__.__func__(cls, object)
-
-    def __new__(cls, *args, **kwargs):
-        return super().__new__(cls, cls.render(*args, **kwargs))
-
-
-class StringTemplate(Template, String):
-    pass
-
-
-class F(StringTemplate):
-    @classmethod
-    def render(cls, *args, **kwargs):
-        return cls.value(F).format(*args, **kwargs)
-
-
-class Jinja(StringTemplate):
-    @classmethod
-    def render(cls, *args, **kwargs):
-        import jinja2
-
-        return jinja2.Template(cls.value(Jinja)).render(*args, **kwargs)
-
-    @classmethod
-    def input(cls):
-        import jinja2.meta
-
-        from . import Any, Dict
-
-        return Dict.properties(
-            {
-                x: Any
-                for x in jinja2.meta.find_undeclared_variables(
-                    jinja2.Environment().parse(cls.value(Jinja))
-                )
-            }
-        )
-
-
-class UriTemplate(String, formats.UriTemplate):
-    def render(self, *args, **kw):
-        import uritemplate
-
-        template = uritemplate.URITemplate(self)
-        return Uri(template.expand(dict(zip(template.variable_names, args)), **kw))

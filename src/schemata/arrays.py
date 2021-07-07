@@ -1,160 +1,159 @@
+import enum
 import typing
 
-from . import apis, exceptions, utils
+from numpy.lib.arraysetops import isin
+
+import schemata
+from schemata.numbers import MultipleOf
+
+from . import exceptions, mixins, utils
 from .strings import Uri
-from .types import EMPTY, Any, Type
+from .types import EMPTY, Any, Schemata, Type
 
 __all__ = "List", "Tuple", "Set", "Arrays"
 
 
-class Arrays(apis.FluentArrays):
+validates = utils.validates(list, tuple, set)
+
+
+class Arrays(mixins.Array):
     def __class_getitem__(cls, object):
-        from .builders import build_list
+        """
+        >>> List[1:10:schemata.String].schema(1)
+        {'type': 'array', 'minItems': 1, 'maxItems': 10, 'items': {'type': 'string'}}
 
-        if isinstance(object, tuple):
-            return Tuple.items(object)
-        return cls.add(*utils.enforce_tuple(build_list(object)))
+        >>> List[schemata.String].schema(1)
+        {'type': 'array', 'items': {'type': 'string'}}
 
-    class Items(Any, id="applicator:/properties/items"):
-        @utils.validates(list, tuple, set)
-        def validator(cls, object):
-            value = cls.value(Arrays.Items)
-            if value:
-                if isinstance(value, (tuple, list)):
-                    for i, (x, y) in enumerate(zip(value, object)):
-                        x.validate(y)
-                    other = cls.value(Arrays.AdditionalItems)
-                    if other:
-                        for x in other[i:]:
-                            other.validate(x)
-                else:
-                    for i, x in enumerate(object):
-                        value.validate(x)
+        >>> List[dict(a=Integer)].schema(1)
+        {'type': 'array', 'items': {'type': 'object', 'properties': {'a': {'type': 'integer'}}}}
 
-    class AdditionalItems(Any, id="applicator:/properties/additionalItems"):
-        pass
+        >>> List[Integer, String].schema(1)
+        {'type': 'array', 'items': ({'type': 'integer'}, {'type': 'string', 'examples': ('abc', '123'), 'description': 'string types'})}
 
-    class MinItems(Any, id="validation:/properties/minItems"):
-        @utils.validates(list, tuple, set)
-        def validator(cls, object):
-            exceptions.assertGreaterEqual(len(object), cls.value(Arrays.MinItems))
+        >>> List[10].schema()
+        {'type': 'array', 'minItems': 10, 'maxItems': 10}
+        """
+        from . import builders
 
-    class MaxItems(Any, id="validation:/properties/maxItems"):
-        @utils.validates(list, tuple, set)
-        def validator(cls, object):
-            exceptions.assertLessEqual(len(object), cls.value(Arrays.MaxItems))
-
-    class UniqueItems(Any, id="validation:/properties/uniqueItems"):
-        @utils.validates(list, tuple, set)
-        def validator(cls, object):
-            assert len(set(object)) == len(
-                object
-            ), f"the items of the object are not unique"
-
-    class Contains(Any):
-        pass
-
-    class Sorted(Any):
-        pass
-
-    class Reversed(Any):
-        pass
-
-    @classmethod
-    def sorted(cls, key=EMPTY, reverse=EMPTY):
-        cls = cls + Arrays.Sorted[key or True]
-        if reverse is not EMPTY:
-            cls = cls + Arrays.Reversed[reverse]
-        return cls
+        return cls + builders.InstanceBuilder(**build_list(object)).build()
 
 
-class List(Arrays, apis.Meaning, Type["array"], list):
-    def __init__(self, *args):
-        from . import callables
-
-        cls = type(self)
-        if not args:
-            args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
-
-        cast = cls.value(callables.Cast)
-        if cast:
-            args = (cls.preprocess(*args),)
-
-        sort = cls.value(Arrays.Sorted)
-
-        if sort:
-            args = (
-                sorted(
-                    list(*args),
-                    key=callable(sort) and sort or None,
-                    reverse=cls.value(Arrays.Reversed, default=False),
-                ),
-            )
-
-        if not cast:
-            cls.validate(*args)
-
-        list.__init__(self, *args)
-
-    @classmethod
+class Items(Any):
+    @validates
     def validator(cls, object):
-        exceptions.assertIsInstance(object, (tuple, list, set))
+        value = Schemata.value(cls, Items)
+        if isinstance(value, (tuple, list)):
+            for i, (x, y) in enumerate(zip(value, object)):
+                exceptions.ValidationException(type=x, schema=i, path=i).validate(y)
+        else:
+            for i, x in enumerate(object):
+                exceptions.ValidationException(type=value, path=i).validate(x)
 
-    @classmethod
-    def py(cls, ravel=True):
-        value = cls.value(List.Items)
-        if value:
-            return typing.List[value]
-        return list
+
+class AdditionalItems(Any):
+    pass
 
 
-class ListofUri(List[Uri], apis.Gather):
+class MinItems(Any):
+    @validates
+    def validator(cls, object):
+        exceptions.assertGreaterEqual(len(object), Schemata.value(cls, MinItems))
+
+
+class MaxItems(Any):
+    @validates
+    def validator(cls, object):
+        exceptions.assertLessEqual(len(object), Schemata.value(cls, MaxItems))
+
+
+class UniqueItems(Any):
+    @validates
+    def validator(cls, object):
+        assert len(set(object)) == len(
+            object
+        ), f"the items of the object are not unique"
+
+
+class Contains(Any):
+    pass
+
+
+class List(Arrays, Type["array"], list):
     pass
 
 
 class Tuple(Arrays, Type["array"], tuple):
-    @classmethod
-    def validator(cls, object):
-        exceptions.assertIsInstance(object, tuple)
-
-    @classmethod
-    def py(cls, ravel=True):
-        from . import builders, utils
-
-        value = cls.value(Arrays.Items)
-        if value:
-            return typing.Tuple[tuple(map(utils.get_py, value))]
-        return tuple
+    pass
 
 
 class Set(Arrays, Type["array"], set):
-    def __init__(self, *args):
-        from . import callables
-
-        cls = type(self)
-        if not args:
-            args = utils.enforce_tuple(utils.get_default(cls, cls.__mro__[-2]()))
-
-        cast = cls.value(callables.Cast)
-        if cast:
-            args = (cls.preprocess(*args),)
-
-        if not cast:
-            cls.validate(*args)
-
-        super().__init__(*args)
-
-    @classmethod
-    def validator(cls, object):
-        exceptions.assertIsInstance(object, set)
-
-    @classmethod
-    def py(cls, ravel=True):
-
-        value = cls.value(List.Items)
-        if value:
-            return typing.Set[value]
-        return set
+    pass
 
 
 utils.JSONSCHEMA_SCHEMATA_MAPPING["array"] = List
+
+
+@utils.register
+def build_list(x: type):
+    return dict(items=x)
+
+
+@build_list.register(int)
+@build_list.register(float)
+def build_list_numeric(x):
+    return dict(minItems=x, maxItems=x)
+
+
+@build_list.register
+def build_list_tuple(x: tuple, **schema):
+    last = schema
+    for i, y in enumerate(x):
+        if isinstance(y, type):
+            last.setdefault("items", [])
+            last["items"].append(y)
+            continue
+        items = build_list(y)
+        last.update(items)
+        last.setdefault("items", {})
+        last = last["items"]
+    return schema
+
+
+@build_list.register
+def build_list_dict(x: dict):
+    return dict(items=dict(properties=x))
+
+
+@build_list.register
+def build_list_slice(x: slice, **schema):
+    if x.start is not None:
+        schema["minItems"] = x.start
+    if x.stop is not None:
+        schema["maxItems"] = x.stop
+    if x.step is not None:
+        schema["items"] = isinstance(x.step, Schemata) and x.step or Type[x.step]
+    return schema
+
+
+class ListofUri(List[Uri]):
+    async def _gather(self):
+        import asyncio
+
+        import httpx
+
+        from .arrays import List
+
+        async with httpx.AsyncClient() as client:
+            return List(await asyncio.gather(*self.map(client.get)))
+
+    def gather(self):
+        try:
+            import asyncio
+
+            return asyncio.run(self._gather())
+        except RuntimeError:
+            import nest_asyncio
+
+            nest_asyncio.apply()
+            return asyncio.run(self._gather())

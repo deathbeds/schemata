@@ -2,44 +2,87 @@
 
 import abc
 import builtins
+import enum
 import inspect
+import os
 import typing
-from contextlib import suppress
 
-from . import apis, exceptions, utils
+from numpy.lib.arraysetops import isin
+
+import schemata
+
+from . import builders, exceptions, mixins, utils
 from .utils import ANNO, DOC, EMPTY
 
-__all__ = (
-    "Any",
-    "Bool",
-    "false",
-    "Comment_",
-    "Const",
-    "Default",
-    "Deprecated",
-    "Description",
-    "Definitions",
-    "Enum",
-    "Examples",
-    "Any",
-    "MetaType",
-    "Null",
-    "Optional",
-    "ReadOnly",
-    "Ref_",
-    "Schema_",
-    "true",
-    "Title",
-    "Type",
-    "Value",
-    "WriteOnly",
-)
+__all__ = ("Any", "Bool", "Const", "Enum", "Envvar", "Any", "Schemata", "Null", "Type")
 
 
-class MetaType(apis.TypeOps, abc.ABCMeta):
+def get_bases(cls, bases, dict):
+    """build the underlying schemata types for python class syntaxes"""
+    is_array = any(issubclass(cls, (tuple, list, set)) for cls in bases)
+    is_object = any(issubclass(cls, builtins.dict) for cls in bases)
+
+    schema = {}
+
+    if dict.get(DOC):
+        schema["description"] = dict[DOC]
+
+    if is_array or is_object:
+        # for lists and dicts, collect schema features from python lanuage features
+        schema.update(
+            properties=builtins.dict(dict[ANNO]),
+            required=(),
+            dependencies={},
+            definitions={},
+        )
+        dict[ANNO].clear()
+
+        ignore = set(sum(map(dir, bases), []))
+        for k, v in dict.items():
+            if callable(v):
+                if isinstance(v, Schemata):
+                    if getattr(v, ANNO, None):
+                        schema["definitions"][k] = v
+                elif inspect.isfunction(v):
+                    sig = inspect.signature(v)
+
+                    if sig.return_annotation is not inspect._empty:
+                        schema["properties"][k] = sig.return_annotation
+
+                    if (
+                        next(iter(sig.parameters.values())).annotation
+                        is not inspect._empty
+                    ):
+                        schema["dependencies"].update({k: builders.from_signature(v)})
+            elif k in schema["properties"]:
+                schema["properties"][k] += Default[v]
+
+    schema = {k: v for k, v in schema.items() if v}
+
+    if schema:
+        schema = Schemata.from_schema(schema)
+        if is_array:
+            schema = Schemata.from_schema(items=schema)
+
+        return (schema,)
+    return ()
+
+
+def get_ordered_keys(cls):
+    schema = cls.schema(1)
+    order = list(schema.get("required", []))
+    order += list(schema.get("properties", {}))
+    for k, v in schema.get("dependencies", {}).items():
+        if k in order:
+            i = order.index(k)
+            order = order[:i] + list(v.get("required", [])) + order[i:]
+    return sorted(set(order), key=order.index)
+
+
+class Schemata(mixins.TypeOps, abc.ABCMeta):
     """a schemaful python type"""
 
-    def __new__(cls, name, bases, dict, value=EMPTY, **kwargs):
+    def __new__(cls, name, bases, dict, value=EMPTY):
         """\
 instantiate a new schemata type.
 
@@ -47,83 +90,33 @@ instantiate a new schemata type.
 * __doc__ refers the description of the class
         
         """
-        key = utils.normalize_json_key(name)
+        # ensure annotations on the class
         dict.setdefault(ANNO, {})
         if value is not EMPTY:
-            dict[ANNO].update({key: value})
+            dict[ANNO].update({utils.normalize_json_key(name): value})
 
-        # build
-        cls = super().__new__(cls, name, bases, dict)
+        cls = super().__new__(cls, name, bases + get_bases(cls, bases, dict), dict)
         cls.__annotations__ = utils.merge(cls)
-
-        return cls
-
-    def mro(cls):
-        bases = super().mro()
-
-        is_array = any(issubclass(x, (tuple, list, set)) for x in bases)
-        is_object = any(issubclass(x, builtins.dict) for x in bases)
-
-        dict = vars(cls)
-        if dict.get(DOC):
-            bases += (Description[dict[DOC]],)
 
         comments = inspect.getcomments(cls)
         if comments:
-            bases += (Comment_[comments],)
+            cls.__annotations__["$comment"] = comments
 
-        if is_array or is_object:
-            extra = []
+        with utils.suppress(NameError):
+            setattr(Any, cls.__name__, getattr(Any, cls.__name__, cls))
 
-            defs, deps = {}, __import__("collections").defaultdict(tuple)
-            for k, v in dict.items():
-                if isinstance(v, MetaType):
-                    if getattr(v, ANNO, None):
-                        defs[k] = v
-                elif inspect.isfunction(v):
-                    sig = inspect.signature(v)
+        if issubclass(cls, builtins.dict):
+            with utils.suppress(ImportError):
+                cls._ordered_keys = get_ordered_keys(cls)
 
-                    if sig.return_annotation != inspect._empty:
-                        dict[ANNO].setdefault(k, sig.return_annotation)
-
-                    for i, (key, param) in enumerate(sig.parameters.items()):
-                        if isinstance(param.annotation, MetaType):
-                            deps.setdefault(k, param.annotation)
-
-                elif callable(v):
-                    pass
-
-            for k, v in dict.items():
-                if not callable(v) and k in dict[ANNO]:
-                    dict[ANNO][k] = dict[ANNO][k].default(v)
-
-            if dict[ANNO]:
-                from . import objects
-
-                extra += (objects.Dict.Properties[builtins.dict(dict[ANNO])],)
-                dict[ANNO].clear()
-
-            if deps:
-                extra += (objects.Dict.Dependencies[deps],)
-
-            if is_array and extra:
-                from .arrays import Arrays
-
-                extra = (Arrays.Items[type("Annotations", tuple(extra), {})],)
-
-            if defs:
-                extra += (Definitions[defs],)
-
-            id = bases.index(object)
-            bases = bases[:id] + list(extra) + bases[id:]
-        return bases
+        return cls
 
     def key(cls):
         return utils.normalize_json_key(cls.__name__)
 
     def value(cls, *key, default=EMPTY):
         """get the corresponding value to the class key"""
-        for k in key or (cls.key(),):
+        for k in key or (Schemata.key(cls),):
             if isinstance(k, type):
                 k = k.key()
 
@@ -135,123 +128,189 @@ instantiate a new schemata type.
 
         return default
 
-    def __str__(cls):
-        return cls.key() or super().__str__()
+    def __enter__(cls):
+        setattr(cls, "_hold_validation", getattr(cls, "_hold_validation", 0))
+        cls._hold_validation += 1
+        return cls
+
+    def __exit__(cls, *e):
+        cls._hold_validation -= 1
+
+    @classmethod
+    def from_file(cls, file):
+        from .files import File
+
+        return cls.from_schema(File(file).load())
+
+    @classmethod
+    def from_schema(cls, *args, **kwargs):
+        return builders.InstanceBuilder(*args, **kwargs).build()
+
+    @classmethod
+    def from_signature(cls, callable):
+        return builders.SignatureBuilder(callable).build()
 
     @property
     def __doc__(cls):
-        return utils.get_docstring(cls)
+        return builders.NumPyDoc(cls).build()
 
+    def __instancecheck__(cls, object):
+        try:
+            cls.validate(object)
+        except:
+            return False
+        return True
 
-class Any(apis.FluentType, apis.Validate, apis.TypeConversion, metaclass=MetaType):
-    @classmethod
-    def from_file(cls, file):
-        import json
+    def verified(cls, *args, **kwargs):
+        with cls:
+            return cls(*args, **kwargs)
 
-        return cls.from_schema(json.loads(utils.Path(file).read_text()))
+    def audit(cls, object, max=10):
+        """audit the object against a class returning multiple failures"""
+        exception = exceptions.ValidationException(cls, items=max)
+        with utils.suppress(BaseException):
+            exception.validate(object)
+        return exception
 
-    @classmethod
-    def from_schema(cls, schema):
-        return utils.get_class(schema)
+    def cast(cls, *args, **kwargs):
+        self = cls.verified(*args, **kwargs)
+        self.validate(self)
+        return self
 
-    def __new__(cls, object=EMPTY):
-        # fill in the default values if they exist
-        object = utils.get_default(cls, default=object)
-        if not isinstance(object, Any):
-            return utils.get_schemata(object)
+    def new_type(cls, value=EMPTY, bases=None):
+        if utils.IN_SPHINX and isinstance(value, str):
+            value = utils.Literal(value)
+        return type(cls.__name__, (cls,) + utils.enforce_tuple(bases), {}, value=value)
+
+    def schema(cls, ravel=None):
+        return utils.get_schema(cls, ravel=ravel)
+
+    def validate(cls, object):
+        if not getattr(cls, "_hold_validation", 0):
+            exceptions.ValidationException(cls).validate(object)
         return object
+
+    def validator(cls, object):
+        pass
+
+    def __signature__(cls):
+        return builders.SignatureBuilder(cls).build()
+
+    def to_doctest(cls):
+        import doctest
+        import types
+
+        module = types.ModuleType(cls.__module__)
+        setattr(module, "__test__", {cls.__name__: cls})
+        return doctest.DocTestSuite(module)
+
+    def to_unittest(cls):
+        import unittest
+
+        suite = unittest.TestSuite()
+        suite.addTests(Schemata.to_doctest(cls))
+        suite.addTests(
+            unittest.defaultTestLoader.loadTestsFromTestCase(cls + unittest.TestCase)
+        )
+        return suite
+
+    def to_test_results(cls):
+        import unittest
+
+        result = unittest.TestResult()
+        Schemata.to_unittest(cls).run(result)
+        return result
+
+
+class Any(metaclass=Schemata):
+    def __new__(cls, *args, **kwargs):
+        if issubclass(cls, dict):
+            args, kwargs = (dict(*args, **kwargs),), {}
+        if not args:
+            args = (utils.get_default(cls, default=object),)
+
+        if args:
+            args = (cls.validate(*args[:1]),)
+
+        if not utils.get_first_builtin_type(cls):
+            if isinstance(*args[:1], Any):
+                return args[0]
+
+            cls = Type[type(*args[:1])]
+        return super(Any, cls).__new__(cls, *args, **kwargs)
 
     def __class_getitem__(cls, object):
         return cls.new_type(object)
 
-    @classmethod
-    def new_type(cls, value=EMPTY, bases=None, **kwargs):
-        if isinstance(value, str):
-            value = utils.Literal(value)
-        return type(cls.__name__, (cls,) + utils.enforce_tuple(bases), {}, value=value)
+    def pipe(self, callable, *args, **kwargs):
+        args = (self,) + args
+        for f in utils.enforce_tuple(callable):
+            args, kwargs = (f(*args, **kwargs),), {}
+        return args[0]
+
+    def print(self):
+        try:
+            import rich
+
+            return rich.print(self)
+        except ModuleNotFoundError:
+            import pprint
+
+            if isinstance(self, str):
+                print(self)
+            else:
+                pprint.pprint(self)
 
     @classmethod
     def schema(cls, ravel=None):
-        return utils.get_schema(cls, ravel=ravel)
+        return Schemata.schema(cls, ravel)
 
     @classmethod
-    def cast(cls, object=True, *args):
-        from . import callables
-
-        if args:
-            return callables.Cast[(object,) + args] + cls
-        return callables.Cast[object] + cls
-
-
-class Type(Any):
-    id = "validation:/properties/type"
-
-    def __new__(cls, object=EMPTY, *args, **kw):
-        if object is EMPTY:
-            object = utils.get_default(cls, object)
-
-        from .callables import Cast
-
-        type, cast = cls.value(Type), cls.value(Cast)
-
-        # when the type is a tuple iterate through allowing
-        # for conformations like ("integer", "string") which are valid jsonschema
-        if isinstance(type, tuple):
-            exception = exceptions.ValidationError()
-            for t in type:
-                with exception:
-                    return Type[t].cast(cast)(object, *args, **kw)
-            exception.raises()
-
-        # update the arguments
-        if object is not EMPTY:
-            args = (object,) + args
-
-        if not cast:
-            args = args or (super(Any, cls).__new__(cls),)
-            cls.validate(*args)
-
-        if type:
-            self = super(Any, cls).__new__(cls, *args, **kw)
-        else:
-            return super().__new__(cls, *args, **kw)
-
-        return self
+    def validate(cls, object):
+        return Schemata.validate(cls, object)
 
     @classmethod
     def validator(cls, object):
-        exception = exceptions.ValidationError()
+        return Schemata.validator(cls, object)
 
-        for value in utils.enforce_tuple(cls.value(Type)):
-            if value is EMPTY:
-                continue
-            if isinstance(value, str):
-                if value in utils.JSONSCHEMA_SCHEMATA_MAPPING:
-                    with exception:
-                        utils.JSONSCHEMA_SCHEMATA_MAPPING[value].validator(object)
-                else:
-                    "we'll consider these forward references"
 
-            elif isinstance(value, type):
-                with exception:
-                    exceptions.assertIsInstance(object, value)
-            else:
-                assert False, f"don't know how to enfore type: {value}"
+class Type(Any):
+    @classmethod
+    def to_pytype(cls):
+        types = Schemata.value(cls, Type)
+        if not types:
+            return type
+        result = ()
+        for t in utils.enforce_tuple(types):
+            if isinstance(t, str):
+                if t in utils.JSONSCHEMA_PY_MAPPING:
+                    t = utils.JSONSCHEMA_PY_MAPPING[t]
 
-        exception.raises()
+            result += utils.enforce_tuple(t)
+        return result
 
     @classmethod
-    def py(cls):
-        type = cls.value(Type)
-        if isinstance(type, tuple):
-            return typing.Union[tuple(Type[x].py() for x in type)]
-        if type:
-            return utils.JSONSCHEMA_PY_MAPPING[type]
-        return object
+    def validator(cls, object):
+        exceptions.assertIsInstance(object, cls.to_pytype())
 
     def __class_getitem__(cls, object):
+        """Type item getter methods
+
+        Examples
+        --------
+
+        >>> Type["integer", "number"].schema()
+        {'type': ('integer', 'number')}
+
+        >>> Type["integer"]
+        schemata.numbers.Integer
+
+        >>> assert Type["integer"] is Type[int]
+        """
+
         if object in utils.JSONSCHEMA_STR_MAPPING:
             object = utils.JSONSCHEMA_STR_MAPPING[object]
+
         if object in utils.JSONSCHEMA_SCHEMATA_MAPPING:
             return utils.JSONSCHEMA_SCHEMATA_MAPPING[object]
 
@@ -259,56 +318,44 @@ class Type(Any):
 
 
 class Const(Any):
-    id = "validation:/properties/const"
-
     @classmethod
     def validator(cls, object):
+        """
+        >>> Const[1](1)
+        1
+        """
         exceptions.assertEqual(object, cls.value(Const))
-
-    def map(x, f):
-        cls = type(x)
-        if isinstance(f, type):
-            return cls[type](list(map(f, x)))
-        return cls(list(map(f, x)))
-
-    def filter(x, f):
-        return type(x)(list(filter(f, x)))
-
-    def groupby(x, f):
-        import itertools
 
 
 class Schema_(Any):
     pass
 
 
+class Parent_(Any):
+    pass
+
+
 class Comment_(Any):
-    id = "core:/properties/$comment"
     pass
 
 
 class Default(Any):
-    id = "metadata:/properties/default"
     pass
 
 
 class Definitions(Any):
-    id = "core:/properties/$defs"
     pass
 
 
 class Deprecated(Any):
-    id = "metadata:/properties/default"
     pass
 
 
 class Description(Any):
-    id = "metadata:/properties/description"
     pass
 
 
 class Examples(Any):
-    id = "metadata:/properties/examples"
     pass
 
 
@@ -317,26 +364,19 @@ class Optional(Any):
 
 
 class ReadOnly(Any):
-    id = "metadata:/properties/default"
     pass
 
 
 class Ref_(Any):
-    id = "core:/properties/$ref"
     pass
 
 
 class Title(Any):
-    id = "metadata:/properties/title"
-    pass
-
-
-class Value(Any):
     pass
 
 
 class WriteOnly(Any):
-    id = "metadata:/properties/default"
+    pass
 
 
 class Null(Type["null"]):
@@ -349,39 +389,20 @@ class Null(Type["null"]):
 
         cls.validate(object)
 
-    @classmethod
-    def validator(cls, object):
-        exceptions.assertIs(object, None)
-
 
 Null.register(type(None))
 
 
 class Bool(Type["boolean"], int):
-    def __new__(cls, object=EMPTY):
-        if object is EMPTY:
-            object = utils.get_default(cls, bool())
-        Bool.validator(object)
-        try:
-            return [false, true][object]
-        except NameError:
-            return super().__new__(cls, object)
-
     @classmethod
     def validator(cls, object):
         assert object in (True, False)
-
-    def __repr__(self):
-        return repr([False, True][self])
 
 
 Bool.register(bool)
 
 
-# the enum type
 class Enum(Type):
-    id = "validation:/properties/enum"
-
     def __new__(cls, object=EMPTY):
         enum = cls.value(Enum)
         if object is EMPTY:
@@ -389,6 +410,19 @@ class Enum(Type):
         return enum(object)
 
     def __class_getitem__(cls, object):
+        """
+        >>> Enum["a b"].schema(1)
+        {'enum': ['a', 'b']}
+
+        >>> Enum[1, 2].schema(1)
+        {'enum': ['1', '2']}
+
+        >>> Enum[dict(a=1, b=2)].schema(1)
+        {'enum': ['a', 'b']}
+
+        >>> Integer.enum((1, 2)).schema(1)
+        {'type': 'integer', 'enum': ['1', '2']}
+        """
         if isinstance(object, str) and object:
             object = tuple(object.split())
         if not isinstance(object, dict):
@@ -398,27 +432,8 @@ class Enum(Type):
 
     @classmethod
     def validator(cls, object):
-        cls.value(Enum)(object)
+        Schemata.value(cls, Enum)(object)
         return object
-
-    @classmethod
-    def py(cls):
-        return cls.value(Enum)
-
-
-Any.Comment_ = Comment_
-Any.Const = Const
-Any.Default = Default
-Any.Definitions = Definitions
-Any.Deprecated = Deprecated
-Any.Description = Description
-Any.Enum = Enum
-Any.Examples = Examples
-Any.Optional = Optional
-Any.ReadOnly = ReadOnly
-Any.Ref_ = Ref_
-Any.Title = Title
-Any.WriteOnly = WriteOnly
 
 
 # map a jsonschema to the schemata type
@@ -428,4 +443,11 @@ utils.JSONSCHEMA_SCHEMATA_MAPPING.update(
     enum=Enum,
 )
 
-false, true = Bool(), Bool(True)
+
+class Envvar(Any):
+    def __new__(cls, *args, **kwargs):
+        return os.getenv(Schemata.value(cls, Envvar))
+
+    @classmethod
+    def list(cls):
+        return list(os.environ)

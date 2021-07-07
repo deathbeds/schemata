@@ -1,26 +1,37 @@
+import enum
 import typing
 
 from . import exceptions, utils
-from .types import EMPTY, Any
+from .types import EMPTY, Any, Schemata, Type
 
 __all__ = "AllOf", "AnyOf", "Else", "If", "Not", "OneOf", "Then"
 
 
-class Composite:
-    def __new__(cls, object=EMPTY):
-        return cls.validate(object)
-
-
-class Not(Composite, Any, id="applicator:/properties/not"):
+class AnyOf(Any):
     @classmethod
     def validate(cls, object):
-        exceptions.assertRaises(
-            AssertionError, utils.partial(cls.value(Not).validate, object)
-        )
-        return object
+        type = Schemata.value(cls, AnyOf)
+        exception = exceptions.ValidationException(cls, schema="anyOf", items=len(type))
+        for i, t in enumerate(type):
+            if not isinstance(t, Schemata):
+                t = Type[t]
+            t += Any.Parent_[cls]
+            with exception:
+                with exception.push(schema=i):
+                    return t(object)
 
 
-class AllOf(Composite, Any, id="applicator:/properties/allOf"):
+class Not(Any):
+    @classmethod
+    def validate(cls, object):
+        exception = exceptions.ValidationException(cls, schema="not")
+        nah = Schemata.value(cls, Not)
+        with exception:
+            exceptions.assertNotIsInstance(object, nah)
+        return Any(object)
+
+
+class AllOf(Any):
     @classmethod
     def validate(cls, object):
         for t in cls.value(AllOf):
@@ -28,22 +39,7 @@ class AllOf(Composite, Any, id="applicator:/properties/allOf"):
         return object
 
 
-class AnyOf(Composite, Any, id="applicator:/properties/anyOf"):
-    @classmethod
-    def validate(cls, object):
-        exception = exceptions.ValidationError()
-        for t in cls.value(AnyOf):
-            with exception:
-                return t(object)
-        exception.raises()
-        assert False, "empty anyof"
-
-    @classmethod
-    def py(cls):
-        return typing.Union[utils.get_py(cls.value(AnyOf)) or (object,)]
-
-
-class OneOf(Composite, Any, id="applicator:/properties/oneOf"):
+class OneOf(Any):
     @classmethod
     def validate(cls, object):
         exception = exceptions.ValidationError()
@@ -61,12 +57,8 @@ class OneOf(Composite, Any, id="applicator:/properties/oneOf"):
             return result
         assert False, f"not one of {any}"
 
-    @classmethod
-    def py(cls):
-        return typing.Union[utils.get_py(cls.value(OneOf)) or (object,)]
 
-
-class If(Composite, Any, id="applicator:/properties/if"):
+class If(Any):
     def __class_getitem__(cls, object):
         if isinstance(object, slice):
             types = ()
@@ -91,9 +83,9 @@ class If(Composite, Any, id="applicator:/properties/if"):
         return object
 
 
-class Else(Composite, Any, id="applicator:/properties/else"):
+class Else(Any):
     pass
 
 
-class Then(Composite, Any, id="applicator:/properties/then"):
+class Then(Any):
     pass

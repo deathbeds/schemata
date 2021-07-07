@@ -1,7 +1,21 @@
-from . import strings, utils
+from . import formats, strings, utils
+from .strings import String
 from .types import EMPTY, Any, Type
 
-__all__ = ("E",)
+__all__ = (
+    "E",
+    "F",
+    "Jinja",
+    "UriTemplate",
+)
+
+
+class Template:
+    def __class_getitem__(cls, object):
+        return Any.__class_getitem__.__func__(cls, object)
+
+    def __new__(cls, *args, **kwargs):
+        return super().__new__(cls, cls.render(*args, **kwargs))
 
 
 class E:
@@ -60,3 +74,44 @@ class E:
 
     class Reverse_(Type):
         pass
+
+
+class StringTemplate(Template, String):
+    pass
+
+
+class F(StringTemplate):
+    @classmethod
+    def render(cls, *args, **kwargs):
+        return cls.value(F).format(*args, **kwargs)
+
+
+class Jinja(StringTemplate):
+    @classmethod
+    def render(cls, *args, **kwargs):
+        import jinja2
+
+        return jinja2.Template(cls.value(Jinja)).render(*args, **kwargs)
+
+    @classmethod
+    def input(cls):
+        import jinja2.meta
+
+        from . import Any, Dict
+
+        return Dict.properties(
+            {
+                x: Any
+                for x in jinja2.meta.find_undeclared_variables(
+                    jinja2.Environment().parse(cls.value(Jinja))
+                )
+            }
+        )
+
+
+class UriTemplate(String, formats.UriTemplate):
+    def render(self, *args, **kw):
+        import uritemplate
+
+        template = uritemplate.URITemplate(self)
+        return Uri(template.expand(dict(zip(template.variable_names, args)), **kw))

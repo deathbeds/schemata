@@ -1,19 +1,53 @@
-from . import strings
-from .types import Any, Type
+import mimetypes
+
+from schemata.files import File
+
+from . import strings, utils
+from .types import Any, Schemata, Type
+
+mimetypes = mimetypes.MimeTypes()
 
 __all__ = ("ContentEncoding", "ContentMediaType", "Plain", "Json", "Toml", "Yaml")
 
 
-class ContentMediaType(Any, id="content:/properties/contentMediaType"):
+class ContentMediaType(Any):
+    @classmethod
+    def get_loader(cls, object):
+        for x in reversed(list(utils.get_subclasses(cls))):
+            if object in utils.enforce_tuple(Schemata.value(x, ContentMediaType)):
+                if hasattr(x, "loads"):
+                    return x
+        assert False, f"no loader discovered for {object}"
+
+    @classmethod
+    def get_dumper(cls, object):
+        for x in reversed(list(utils.get_subclasses(cls))):
+            if object in utils.enforce_tuple(Schemata.value(x, ContentMediaType)):
+                if hasattr(x, "dumps"):
+                    return x
+        assert False, f"no loader discovered for {object}"
+
     def _repr_mimebundle_(self, include=None, exclude=None):
-        return dict({type(self).value(ContentMediaType, "text/plain"): self})
+        return {Schemata.value(self, ContentMediaType, default="text/plain"): self}, {}
 
 
-class ContentEncoding(Any, id="content:/properties/contentEncoding"):
+class ContentEncoding(Any):
     pass
 
 
-class Plain(ContentMediaType["application"]):
+class FileExtension(Any):
+    pass
+
+
+class MediaExtension(Any):
+    def __class_getitem__(cls, object):
+        cls += ContentMediaType[object[0]] + FileExtension[tuple(object[1].split())]
+        for y in object[1].split():
+            mimetypes.add_type(object[0], y)
+        return cls
+
+
+class Plain(ContentMediaType["text/plain"]):
     def loads(self):
         return self
 
@@ -22,7 +56,7 @@ class Plain(ContentMediaType["application"]):
         return self
 
 
-class Json(ContentMediaType["application/json"]):
+class Json(MediaExtension["application/json", ".json .ipynb"]):
     def loads(self):
         import json
 
@@ -35,7 +69,7 @@ class Json(ContentMediaType["application/json"]):
         return (strings.String + Json)(json.dumps(self))
 
 
-class Yaml(ContentMediaType["application/yaml"]):
+class Yaml(MediaExtension["application/yaml", ".yml .yaml"]):
     def loads(self):
         import yaml
 
@@ -48,7 +82,7 @@ class Yaml(ContentMediaType["application/yaml"]):
         return (strings.String + Yaml)(yaml.safe_dump(self, **kwargs))
 
 
-class Toml(ContentMediaType["text/toml"]):
+class Toml(MediaExtension["text/toml", ".toml"]):
     def loads(self):
         import toml
 
@@ -61,11 +95,11 @@ class Toml(ContentMediaType["text/toml"]):
         return (strings.String + Toml)(toml.dumps(self))
 
 
-class Markdown(ContentMediaType["text/markdown"]):
+class Markdown(MediaExtension["text/markdown", ".md .markdown"]):
     pass
 
 
-class Html(ContentMediaType["text/html"]):
+class Html(MediaExtension["text/html", ".html"]):
     pass
 
 

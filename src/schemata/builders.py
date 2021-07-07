@@ -1,119 +1,253 @@
-from . import arrays, objects, utils
-from .types import Any
+import collections
+import inspect
+
+import schemata
+
+from . import exceptions, utils
 
 
-@utils.register
-def build_dict(x: type):
-    return objects.Dict.AdditionalProperties[x]
+class Builder:
+    priority = ["type", "required", "title", "description"]
+
+    def __init__(self, *schema, **kwargs):
+
+        if len(schema) == 1:
+            if isinstance(*schema, type):
+                self._type = schema[0]
+                schema = self._type.schema()
+
+        self.schema = dict(utils.merge(schema), **kwargs)
+        super(Builder, type(self)).__init__(self)
+
+    def post(self):
+        return self
+
+    def visit(self):
+        # visit know things first and generic later
+        defer, self.nah = [], []
+        priority = self.priority or ()
+        has_generic = hasattr(self, "generic")
+        for k in sorted(self.schema, key=(priority + list(self.schema)).index):
+            munge = k.replace(":", "_")
+            if munge.startswith("$"):
+                munge = munge[1:] + "_"
+            munge = utils.uppercase(munge)
+            if hasattr(self, munge) and callable(getattr(self, munge)):
+                getattr(self, munge)(k, self.schema[k])
+            elif has_generic and k in priority:
+                self.generic(k, self.schema[k])
+            elif has_generic:
+                defer.append(k)
+            else:
+                self.nah.append(k)
+
+        for k in defer:
+            self.generic(k, self.schema[k])
+        return self
+
+    def build(self):
+        self.visit()
+        return self.post()
 
 
-@build_dict.register
-def build_list_str(x: str):
-    return objects.Dict.Required[tuple(x.split())]
+class DictBuilder(Builder, collections.UserDict):
+    def __init__(self, *args, **kwargs):
+        Builder.__init__(self, *args, **kwargs)
+        self.data.update(
+            {k: v() for k, v in getattr(self, "__annotations__", {}).items()}
+        )
+
+    def one_for_one(self, key, value):
+        self.data[key] = value
 
 
-@build_dict.register(int)
-@build_dict.register(float)
-def build_list_numeric(x):
-    return objects.Dict.MinProperties[x] + objects.Dict.MaxProperties[x]
+class ListBuilder(Builder, collections.UserList):
+    pass
 
 
-@build_dict.register
-def build_dict_tuple(x: tuple):
-    for y in x:
-        if not isinstance(y, str):
-            break
+class InstanceBuilder(ListBuilder):
+    def __init__(self, *args, **kwargs):
+        self.mapping = utils.get_prototype_mapping()
+        super().__init__(*args, **kwargs)
+
+    def generic(self, key, value):
+        if key in self.mapping:
+            self.data.append(self.mapping[key][value])
+
+    def post(self):
+        return type(self.schema.get("title", "DerivedType"), tuple(self.data), {})
+
+
+DOCTEXT = """>>> {type}({object})
+{out}
+"""
+
+SECTION = """{key}
+{sep}
+{body}"""
+
+NOT = """>>> exceptions.assertRaises({type}, {object})
+"""
+
+
+class NumPyDoc(DictBuilder):
+    __annotations__ = {"": list}
+    Arguments: list
+    Attention: list
+    Attributes: list
+    Caution: list
+    Danger: list
+    Error: list
+    Example: list
+    Examples: list
+    Methods: list
+    Notes: list
+    Returns: list
+    References: list
+    Tip: list
+    Todo: list
+    __annotations__.update({"Keyword Arguments": list, "See Also": list})
+
+    def Description(self, key, value):
+        self.data[""].append(value)
+
+    def Examples(self, key, value):
+        self.data["Examples"].extend(
+            DOCTEXT.format(
+                type=self._type.__name__,
+                object=repr(x),
+                out="" if x is None else repr(x),
+            )
+            for x in value
+        )
+
+    def Comment_(self, key, value):
+        self.data["Notes"].append(
+            "".join(x.lstrip("#").lstrip() for x in value.splitlines(True))
+        )
+
+    def Not_(self, key, value):
+        from . import Any, Schemata
+
+        if isinstance(value, Schemata):
+            value = value.schema()
+
+        for example in value.get("examples", ()):
+            self.data["Examples"].append(
+                NOT.format(type=self._type.__name__, object=repr(example))
+            )
+
+    locals()["not"] = Not_
+
+    def post(self):
+        return "\n\n".join(
+            SECTION.format(key=k, sep="-" * len(k), body="\n".join(v))
+            for k, v in self.data.items()
+            if v
+        ).lstrip()
+
+
+class SignatureBuilder(DictBuilder):
+    args: dict
+    kwargs: dict
+    additionalProperties: bool
+
+    def Required(self, key, value):
+        properties = self.schema.get("properties", {})
+        for x in value:
+            if x in properties:
+                self.data["args"][x] = properties[x]
+            else:
+                self.data["args"][x] = None
+
+    def Properties(self, key, value):
+        for k, v in value.items():
+            if k not in self.data["args"]:
+                self.data["kwargs"][k] = v
+
+    def AdditionalProperties(self, key, value):
+        self.data["additionalProperties"] = value
+
+    def post(self):
+        from . import Any, Schemata
+
+        parameters = [
+            inspect.Parameter(
+                k,
+                inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                default=v
+                and Schemata.value(v, Any.Default, default=None)
+                or inspect._empty,
+                annotation=v or inspect._empty,
+            )
+            for k, v in self.data["args"].items()
+        ]
+        parameters += [
+            inspect.Parameter(
+                k,
+                inspect.Parameter.KEYWORD_ONLY,
+                default=v
+                and Schemata.value(v, Any.Default, default=None)
+                or inspect._empty,
+                annotation=v or inspect._empty,
+            )
+            for k, v in self.data["kwargs"].items()
+        ]
+        if self.data["additionalProperties"] != False:
+            parameters.append(
+                inspect.Parameter(
+                    "kwargs",
+                    inspect.Parameter.VAR_KEYWORD,
+                    annotation=True
+                    if self.data["additionalProperties"] in (None, True)
+                    else self.data["additionalProperties"],
+                )
+            )
+        if parameters:
+            return inspect.Signature(parameters)
+        return inspect.signature(utils.get_first_builtin_type(self._type))
+
+
+def from_signature(callable, **schema):
+    from . import Any
+
+    if isinstance(callable, inspect.Signature):
+        sig = callable
     else:
-        return objects.Dict.Required[x]
+        doc = inspect.getdoc(callable)
+        if doc:
+            schema["description"] = doc
+        sig = inspect.signature(callable)
 
-    if 0 < len(x) < 3:
-        for y in x:
-            if not isinstance(y, type):
-                break
-        else:
-            cls = objects.Dict.PropertyNames[x[0]]
-            if len(x) == 2:
-                cls += build_dict(x[1])
-            return cls
-    raise TypeError(f"dictionaries take at most two properties")
+    schema.update(properties={}, required=[], additionalProperties=None)
 
+    for i, p in enumerate(sig.parameters.values()):
+        if not i:
+            if isinstance(p.annotation, (tuple, list, set)):
+                schema["required"].extend(p.annotation)
+                continue
 
-@build_dict.register
-def build_dict_dict(x: dict):
-    return objects.Dict.Properties[x]
+        if p.kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
+            schema["required"].append(p.name)
+        if p.kind in {
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.KEYWORD_ONLY,
+        }:
+            if p.annotation is not inspect._empty:
+                schema["properties"][p.name] = p.annotation
+            if p.default is not inspect._empty:
+                if p.name in schema["properties"]:
+                    schema["properties"][p.name] += Any.Default[p.default]
+                else:
+                    schema["properties"][p.name] = dict(default=p.default)
 
+        elif p.kind == inspect.Parameter.VAR_KEYWORD:
+            schema["additionalProperties"] = (
+                p.annotation is inspect._empty and True or p.annotation
+            )
+    if schema["additionalProperties"] is None:
+        schema.pop("additionalProperties")
 
-@build_dict.register
-def build_dict_slice(x: slice):
-    cls = None
-    if x.start is not None:
-        if not isinstance(x.start, (int, float)):
-            raise TypeError("slice expects start and stop to be in numeric")
-        t = objects.Dict.MinProperties[x.start]
-        cls = cls and cls.add(t) or t
-    if x.stop is not None:
-        if not isinstance(x.stop, (int, float)):
-            raise TypeError("slice expects start and stop to be in numeric")
-        t = objects.Dict.MaxProperties[x.stop]
-        cls = cls and cls.add(t) or t
-
-    if x.step is not None:
-        t = build_dict(x.step)
-        cls = cls and cls.add(t) or t
-    return cls
-
-
-from . import objects, utils
-
-
-@utils.register
-def build_list(x: type):
-    return arrays.List.Items[x]
-
-
-@build_list.register(int)
-@build_list.register(float)
-def build_list_numeric(x):
-    return arrays.List.MinItems[x] + arrays.List.MaxItems[x]
-
-
-@build_list.register
-def build_list_tuple(x: tuple):
-    cls = None
-    for y in reversed(x):
-        t = build_list(y)
-
-        if cls:
-            cls = cls.add(arrays.List.Items[t])
-        else:
-            cls = t
-
-    return cls
-
-
-@build_list.register
-def build_list_dict(x: dict):
-    return arrays.Arrays.Items[objects.Dict.properties(x)]
-
-
-@build_list.register
-def build_list_slice(x: slice):
-    cls = None
-    if x.start is not None:
-        if not isinstance(x.start, (int, float)):
-            raise TypeError("slice expects start and stop to be in numeric")
-        t = arrays.List.MinItems[x.start]
-        cls = cls and cls.add(t) or t
-    if x.stop is not None:
-        if isinstance(x.stop, type):
-            if x.start is not None:
-                if x.step is not None:
-                    TypeError("cant create the type")
-                return cls + arrays.List.MaxItems[x.start] + x.stop
-        t = arrays.List.MaxItems[x.stop]
-        cls = cls and cls.add(t) or t
-
-    if x.step is not None:
-        t = x.step
-        cls = cls and cls.add(t) or t
-    return cls
+    for k in ("properties", "required"):
+        schema[k] or schema.pop(k)
+    return InstanceBuilder(schema).build()
