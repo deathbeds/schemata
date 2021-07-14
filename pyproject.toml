@@ -1,6 +1,9 @@
 [build-system]
-build-backend = "flit_core.buildapi"
-requires = ["flit_core>=3.1,<4"]
+requires = [
+  "setuptools >= 40.9.0",
+  "wheel",
+]
+build-backend = "setuptools.build_meta"
 
 [tool]
 [tool.flit]
@@ -21,6 +24,8 @@ requires = [
   "uritemplate",
   "typing >=3.7.4 ; python_version < '3.7'",
   "strict_rfc3339",
+  "rfc3986",
+  "email_validator",
 ]
 requires-python = ">=3.6"
 
@@ -29,10 +34,11 @@ requires-python = ">=3.6"
 [tool.flit.metadata.requires-extra]
 app = ["typer", "jinja2"]
 ci = ["codecov"]
+time = ["maya", "freezegun"]
+docs = ["jupyter-book", "sphinx_sitemap", "sphinx-jsonschema","black", "isort"]
 ipython = ["IPython"]
 tasks = ["doit"]
 template = ["jinja2", "json-e"]
-docs = ["jupyter-book"]
 test = [
   "hypothesis-jsonschema >=0.19.1",
   "hypothesis",
@@ -40,13 +46,15 @@ test = [
   "jinja2",
   "json-e",
   "nbval",
+  "pandas",
   "parse",
   "pytest-cov",
   "pytest",
   "pyyaml",
   "requests",
+  "requests_cache",
   "toml",
-  "typer"
+  "typer",
 ]
 web = ["fastapi", "jinja2"]
 
@@ -55,15 +63,43 @@ web = ["fastapi", "jinja2"]
 [tool.flit.sdist]
 include = []
 
-[tool.flit.entrypoints]
+[tool.flit.entrypoints.schemata.from]
+signature = "schemata.builders.from_signature"
+schema = "schemata.builders.from_schema"
+class = "schemata.builders.from_cls"
+
+[tool.flit.entrypoints.schemata.to]
+schema = "schemata.types.to_schema"
+signature = "schemata.builders.to_signature"
+click = "schemata.compat.click.to_click"
+typer = "schemata.compat.typer.to_typer"
+pydantic = "schemata.compat.pydantic.to_pydantic"
+traitlets = "schemata.compat.traitlets.to_traitlets"
+ipywidgets = "schemata.compat.ipywidgets.to_ipywidgets"
+fastapi = "schemata.compat.fastapi.to_fastapi"
+params = "schemata.compat.params.to_params"
+numpy = "schemata.compat.numpy.to_numpy"
+pandas = "schemata.compat.pandas.to_pandas"
+
+[tool.flit.entrypoints.schemata.schema]
+setuptools = "schemata.compat.setuptools.Setuptools"
+flit = "schemata.compat.flit.Flit"
+task = "schemata.compat.doit.Task"
+jb = "schemata.compat.jb.Book"
+ld = "schemata.rdf.LD"
+jsonschema = "schmeta.data.jsonschema"
 
 [tool.coverage.run]
 omit = [
-  "*/tests/*",
+  "*/tests/*.py",
+  "*/compat/*.py",
+  "*/src/*.ipynb",
 ]
 
 [tool.coverage.html]
 directory = "docs/coverage"
 
 [tool.pytest.ini_options]
+addopts = "-v --nbval -pno:importnb --durations=5 --cov=src --cov-report=term-missing:skip-covered --no-cov-on-fail"
 doctest_optionflags = ["NORMALIZE_WHITESPACE", "ELLIPSIS"]
+testpaths = ["docs", "src", "src/schemata"]

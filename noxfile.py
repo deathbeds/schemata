@@ -6,7 +6,7 @@ import subprocess
 
 with __import__("contextlib").suppress(ModuleNotFoundError):
 
-    import nox # isort:skip
+    import nox  # isort:skip
 
     CI = "GITHUB_ACTION" in os.environ or "READTHEDOCS" in os.environ
 
@@ -26,9 +26,7 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
     def test(session):
         if CI:
             session.install(*"--ignore-installed --upgrade .[test,ci]".split())
-        session.run(
-            *"pytest -vv --pyargs . --nbval -pno:importnb --durations=5 --cov=schemata --cov-report=term-missing:skip-covered --no-cov-on-fail".split()
-        )
+        session.run("pytest")
         session.run(*"coverage html".split())
 
     @nox.session(python=False)
@@ -40,8 +38,13 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
                 session.install(*"--ignore-installed --upgrade .[docs]".split())
             else:
                 develop(session)
-        session.run(*"jb build --toc docs/_toc.yml --config docs/_config.yml .".split())
+        confpy(session)
+        # use sphinx for the build to ensure we can work on readthedocs
+        session.run(*"sphinx-build . _build/html".split())
         pathlib.Path("_build/html/.nojekyll").touch()
+        pathlib.Path("_build/html.index.html").write_text(
+            """<meta http-equiv="Refresh" content="0; url='readme.html'" />"""
+        )
 
     @nox.session(python=False)
     def develop(session):
@@ -51,6 +54,18 @@ with __import__("contextlib").suppress(ModuleNotFoundError):
             session.install("flit")
         session.run(*"flit install -s".split())
 
+    @nox.session(python=False)
+    def confpy(session):
+        with open("conf.py", "w") as file:
+            session.run(
+                *"jb config sphinx --toc docs/toc.yml --config docs/config.yml .".split(),
+                stdout=file
+            )
+
+        with open("conf.py", "a") as file:
+            file.write("\nbibtex_bibfiles=[]\n")
+
+        session.run(*"black conf.py".split())
 
 
 def task_download_schema():

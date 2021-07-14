@@ -1,12 +1,12 @@
 version: 2
-
+formats: all
 python:
   install:
     - method: pip
       path: .
       extra_requirements:
         - docs
-        - tests
+        - test
 
 sphinx:
-  configuration: conf.py        
+  configuration: conf.py
